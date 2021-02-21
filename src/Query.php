@@ -269,21 +269,11 @@ class Query {
     /**
      * @param $values array
      * @param $isInsert bool
-     * @return string[]
-     */
-    protected function generateInsertOrUpdateParts(array $values, bool $isInsert = true): array {
-        $this->params($values);
-
-        return $this->getGenerator()->insertOrUpdate($values, $isInsert);
-    }
-
-    /**
-     * @param $values array
-     * @param $isInsert bool
      * @return int
      */
     protected function insertOrUpdate(array $values, bool $isInsert = true): int {
-        return $this->execute($this->generateInsertOrUpdateParts($values, $isInsert));
+        $this->params($values);
+        return $this->execute($this->getGenerator()->insertOrUpdate($values, $isInsert));
     }
 
     /**
@@ -308,17 +298,10 @@ class Query {
     }
 
     /**
-     * @return string[]
-     */
-    protected function generateDeleteParts(): array {
-        return $this->getGenerator()->delete();
-    }
-
-    /**
      * @return int
      */
     public function delete(): int {
-        $rowsDeleted = $this->execute($this->generateDeleteParts());
+        $rowsDeleted = $this->execute($this->getGenerator()->delete());
         return $rowsDeleted;
     }
 
