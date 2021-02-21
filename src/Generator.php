@@ -38,6 +38,45 @@ class Generator {
     }
 
     /**
+     * @return string|null
+     */
+    protected function generateOrderByClause(): ?string {
+        if ($orderBy = $this->getPart('orderBys')) {
+            $orderBys = Utilities::arrayToQueryString($orderBy);
+            return "ORDER BY $orderBys";
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function generateLimitClause(): ?string {
+        if ($limit = $this->getPart('limit')) {
+            $clause = "LIMIT $limit";
+
+            $offset = $this->getPart('offset');
+
+            // Else generate an offset, using limit & page values
+            if (is_null($offset)) {
+                $page = $this->getPart('page');
+                if ($page > 1) {
+                    $offset = $limit * ($page - 1);
+                }
+            }
+
+            if ($offset) {
+                $clause .= " OFFSET $offset";
+            }
+
+            return $clause;
+        }
+
+        return null;
+    }
+
+    /**
      * @return string[]
      */
     public function select(): array {
@@ -54,27 +93,12 @@ class Generator {
             $parts[] = $where;
         }
 
-        $orderBy = Utilities::arrayToQueryString($this->getPart('orderBys'));
-        if ($orderBy) {
-            $parts[] = "ORDER BY $orderBy";
+        if ($orderBy = $this->generateOrderByClause()) {
+            $parts[] = $orderBy;
         }
 
-        if ($limit = $this->getPart('limit')) {
-            $parts[] = "LIMIT $limit";
-
-            $offset = $this->getPart('offset');
-
-            // Else generate an offset, using limit & page values
-            if (is_null($offset)) {
-                $page = $this->getPart('page');
-                if ($page > 1) {
-                    $offset = $limit * ($page - 1);
-                }
-            }
-
-            if ($offset) {
-                $parts[] = " OFFSET $offset";
-            }
+        if ($limit = $this->generateLimitClause()) {
+            $parts[] = $limit;
         }
 
         return $parts;
