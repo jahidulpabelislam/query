@@ -52,11 +52,6 @@ class Query {
     /**
      * @var int|null
      */
-    protected $offset = null;
-
-    /**
-     * @var int|null
-     */
     protected $page = null;
 
     /**
@@ -156,22 +151,12 @@ class Query {
      * @param $limit int
      * @return $this
      */
-    public function limit(int $limit, int $offset = null): Query {
-        if (!is_null($offset)) {
-            $this->offset($offset);
+    public function limit(int $limit, int $page = null): Query {
+        if (!is_null($page)) {
+            $this->page($page);
         }
 
         $this->limit = $limit;
-        return $this;
-    }
-
-    /**
-     * @param $offset int
-     * @return $this
-     */
-    public function offset(int $offset): Query {
-        $this->page = null; // reset
-        $this->offset = $offset;
         return $this;
     }
 
@@ -180,7 +165,6 @@ class Query {
      * @return $this
      */
     public function page(int $page): Query {
-        $this->offset = null; // reset
         $this->page = $page;
         return $this;
     }

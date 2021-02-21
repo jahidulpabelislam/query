@@ -56,17 +56,10 @@ class Generator {
         if ($limit = $this->getPart('limit')) {
             $clause = "LIMIT $limit";
 
-            $offset = $this->getPart('offset');
-
-            // Else generate an offset, using limit & page values
-            if (is_null($offset)) {
-                $page = $this->getPart('page');
-                if ($page > 1) {
-                    $offset = $limit * ($page - 1);
-                }
-            }
-
-            if ($offset) {
+            // Generate an offset, using limit & page values
+            $page = $this->getPart('page');
+            if ($page > 1) {
+                $offset = $limit * ($page - 1);
                 $clause .= " OFFSET $offset";
             }
 
