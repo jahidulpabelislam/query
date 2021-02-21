@@ -60,16 +60,21 @@ class Generator {
         }
 
         if ($limit = $this->getPart('limit')) {
-            $limitPart = "LIMIT $limit";
+            $parts[] = "LIMIT $limit";
 
-            // Generate a offset, using limit & page values
-            $page = $this->getPart('page');
-            if ($page > 1) {
-                $offset = $limit * ($page - 1);
-                $limitPart .= " OFFSET $offset";
+            $offset = $this->getPart('offset');
+
+            // Else generate an offset, using limit & page values
+            if (is_null($offset)) {
+                $page = $this->getPart('page');
+                if ($page > 1) {
+                    $offset = $limit * ($page - 1);
+                }
             }
 
-            $parts[] = $limitPart;
+            if ($offset) {
+                $parts[] = " OFFSET $offset";
+            }
         }
 
         return $parts;
