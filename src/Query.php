@@ -22,209 +22,191 @@ class Query {
     /**
      * @var string
      */
-    protected $table;
+    protected $table = null;
+
+    /**
+     * @var array|null
+     */
+    protected $columns = null;
+
+    /**
+     * @var array
+     */
+    protected $wheres = [];
+
+    /**
+     * @var array
+     */
+    protected $orderBys = [];
+
+    /**
+     * @var array
+     */
+    protected $params = [];
+
+    /**
+     * @var int|null
+     */
+    protected $limit = null;
+
+    /**
+     * @var int|null
+     */
+    protected $page = null;
 
     /**
      * @param $connection Connection
-     * @param $table string
+     * @param $table string|null
      */
-    public function __construct(Connection $connection, string $table) {
+    public function __construct(Connection $connection, string $table = null) {
         $this->connection = $connection;
         $this->table = $table;
     }
 
     /**
-     * @param $parts array
-     * @param $params array|null
-     * @param $function string
-     * @return array[]|array|int|null
+     * @return Generator
      */
-    private function execute(array $parts, ?array $params, string $function = "execute") {
-        $query = implode("\n", $parts);
-        $query .= ";";
-        return $this->connection->{$function}($query, $params);
+    protected function getGenerator(): Generator {
+        return new Generator($this);
     }
 
     /**
-     * Convenient function to pluck/get out the single value from an array if it's the only value.
-     * Then build a string value if an array.
-     *
-     * @param $value string[]|string|null
-     * @param $separator string
-     * @return string
+     * @param $part string
+     * @return mixed
      */
-    private static function arrayToQueryString($value, string $separator = ",\n\t"): string {
-        if ($value && is_array($value) && count($value) === 1) {
-            $value = array_shift($value);
-        }
-
-        if (is_array($value) && count($value)) {
-            $value = "\n\t" . implode($separator, $value);
-        }
-
-        if (!$value || !is_string($value)) {
-            return "";
-        }
-
-        return $value;
-    }
-
-    /**
-     * Try and force value as an array if not already
-     *
-     * @param $value array|string|null
-     * @return array
-     */
-    private static function initArray($value): array {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if (is_string($value)) {
-            return [$value];
-        }
-
-        return [];
-    }
-
-    /**
-     * @param $where string[]|string|int|null
-     * @param $params array|null
-     * @return array [string|null, array|null]
-     */
-    private static function generateWhereClause($where, ?array $params): array {
-        if ($where) {
-            if (is_numeric($where)) {
-                $params = static::initArray($params);
-                $params["id"] = (int)$where;
-                $where = "id = :id";
-            }
-
-            $where = static::arrayToQueryString($where, "\n\tAND ");
-
-            return [
-                "WHERE {$where}",
-                $params,
-            ];
-        }
-
-        return [
-            null,
-            $params,
-        ];
+    public function getPart(string $part) {
+        return $this->{$part} ?? null;
     }
 
     /**
      * @param $table string
-     * @param $columns string[]|string|null
-     * @param $where string[]|string|int|null
-     * @param $params array|null
-     * @param $orderBy string[]|string|null
-     * @param $limit int|null
-     * @param $page int|null
-     * @return array [array, array|null]
+     * @param $alias string
+     * @return $this
      */
-    protected static function generateSelectQuery(
-        string $table,
-        $columns = "*",
-        $where = null,
-        ?array $params = [],
-        $orderBy = null,
-        ?int $limit = null,
-        ?int $page = null
-    ): array {
-        $columns = $columns ?: "*";
-        $columns = static::arrayToQueryString($columns);
-
-        $sqlParts = [
-            "SELECT {$columns}",
-            "FROM {$table}",
-        ];
-
-        [$whereClause, $params] = static::generateWhereClause($where, $params);
-        if ($whereClause) {
-            $sqlParts[] = $whereClause;
-
-            if (is_numeric($where)) {
-                $sqlParts[] = "LIMIT 1";
-                return [$sqlParts, $params];
-            }
+    public function table(string $table, string $alias): Query {
+        if (!is_null($alias)) {
+            $table = "$table as $alias";
         }
 
-        $orderBy = static::arrayToQueryString($orderBy);
-        if ($orderBy) {
-            $sqlParts[] = "ORDER BY {$orderBy}";
-        }
-
-        if ($limit) {
-            $limitPart = "LIMIT {$limit}";
-
-            // Generate a offset, using limit & page values
-            if ($page > 1) {
-                $offset = $limit * ($page - 1);
-                $limitPart .= " OFFSET {$offset}";
-            }
-
-            $sqlParts[] = $limitPart;
-        }
-
-        return [$sqlParts, $params];
+        $this->table = $table;
+        return $this;
     }
 
     /**
-     * Get the page to use for a SQL query
-     * Can specify the page and it will make sure it is valid
-     *
-     * @param $page int|string|null
-     * @return int|null
+     * @param $column string
+     * @param $alias string|null
+     * @return $this
      */
-    protected static function getPage($page = null): ?int {
-        if (is_numeric($page)) {
-            $page = (int)$page;
+    public function column(string $column, string $alias = null): Query {
+        if ($column === '*') {
+            $this->columns = null;
+        } else {
+            $this->columns = Utilities::initArray($this->columns);
+            if (!is_null($alias)) {
+                $column = "$column as $alias";
+            }
+            $this->columns[] = $column;
         }
 
-        // If invalid use page 1
-        if (!$page || $page < 1) {
-            $page = 1;
-        }
-
-        return $page;
+        return $this;
     }
 
     /**
-     * @param $columns string[]|string|null
-     * @param $where string[]|string|int|null
-     * @param $params array|null
-     * @param $orderBy string[]|string|null
-     * @param $limit int|null
-     * @param $page int|string|null
+     * @param $where string
+     * @return $this
+     */
+    public function where(string $where): Query {
+        $expression = '=';
+
+        $args = func_get_args();
+
+        // (column, expression, value)
+        if (isset($args[2])) {
+            [$where, $expression, $value] = $args;
+        }
+
+        // (column, expression, value) OR (column, value)
+        if (isset($args[1])) {
+            $value = $value ?? $args[1];
+            $this->param($where, $value);
+            $where = "$where $expression $value";
+        }
+
+        $this->wheres[] = $where;
+        return $this;
+    }
+
+    /**
+     * @param $column string
+     * @param $direction string
+     * @return $this
+     */
+    public function orderBy(string $column, $direction = 'DESC'): Query {
+        $orderBy = "$column $direction";
+        $this->orderBys[] = $orderBy;
+        return $this;
+    }
+
+    /**
+     * @param $limit int
+     * @return $this
+     */
+    public function limit(int $limit): Query {
+        $this->limit = $limit;
+        return $this;
+    }
+
+    /**
+     * @param $page int
+     * @return $this
+     */
+    public function page(int $page): Query {
+        $this->page = $page;
+        return $this;
+    }
+
+    /**
+     * @param $key string
+     * @param $value string|int|float
+     * @return $this
+     */
+    public function param(string $key, $value): Query {
+        $this->params[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @param $params array
+     * @return $this
+     */
+    public function params(array $params): Query {
+        $this->params = array_merge($this->params, $params);
+        return $this;
+    }
+
+    /**
+     * @param $parts string[]
+     * @param $function string
+     * @return array[]|array|int|null
+     */
+    private function execute(array $parts, string $function = "execute") {
+        return $this->connection->{$function}(Utilities::buildQuery($parts), $this->params);
+    }
+
+    /**
      * @return Collection|array|null
      */
-    public function select(
-        $columns = "*",
-        $where = null,
-        ?array $params = null,
-        $orderBy = null,
-        ?int $limit = null,
-        $page = null
-    ) {
-        $page = $limit ? static::getPage($page) : null;
+    public function select() {
+        $limit = $this->limit;
+        $page = $this->page;
 
-        [$sqlParts, $params] = static::generateSelectQuery(
-            $this->table,
-            $columns,
-            $where,
-            $params,
-            $orderBy,
-            $limit,
-            $page
-        );
+        $parts = $this->getGenerator()->select();
 
-        if (($where && is_numeric($where)) || $limit === 1) {
-            return $this->execute($sqlParts, $params, "getOne");
+        if ($limit === 1) {
+            return $this->execute($parts, "getOne");
         }
 
-        $rows = $this->execute($sqlParts, $params, "getAll");
+        $rows = $this->execute($parts, "getAll");
 
         $totalCount = null;
         if ($limit) {
@@ -238,17 +220,8 @@ class Query {
              */
             if ((!$count && $page > 1) || $count === $limit) {
                 // Replace the SELECT part in query with a simple count
-                $sqlParts[0] = "SELECT COUNT(*) as count";
-
-                array_pop($sqlParts); // Remove the LIMIT part in query
-
-                // Remove the ORDER BY part in query if added
-                if ($orderBy) {
-                    array_pop($sqlParts);
-                }
-
-                $row = $this->execute($sqlParts, $params, "getOne");
-                $totalCount = $row["count"] ?? 0;
+                $totalCount = (clone $this)
+                    ->count();
             }
             else {
                 $totalCount = $limit * ($page - 1) + $count;
@@ -259,45 +232,38 @@ class Query {
     }
 
     /**
-     * @param $where string[]|string|int|null
-     * @param $params array|null
      * @return int
      */
-    public function count($where = null, ?array $params = null): int {
-        $row = $this->select("COUNT(*) as total_count", $where, $params, null, 1);
-        return $row["total_count"] ?? 0;
+    public function count(): int {
+        // Clear/reset
+        $this->columns = [];
+        $this->orderBys = [];
+
+        $this->column('COUNT(*)', 'count')
+            ->limit(1)
+        ;
+        $row = $this->select();
+        return $row["count"] ?? 0;
     }
 
     /**
      * @param $values array
-     * @param $where string[]|string|int|null
-     * @param $params array|null
+     * @param $isInsert bool
+     * @return string[]
+     */
+    protected function generateInsertOrUpdateParts(array $values, bool $isInsert = true): array {
+        $this->params($values);
+
+        return $this->getGenerator()->insertOrUpdate($values, $isInsert);
+    }
+
+    /**
+     * @param $values array
      * @param $isInsert bool
      * @return int
      */
-    protected function insertOrUpdate(array $values, $where = null, ?array $params = null, bool $isInsert = true): int {
-        $params = static::initArray($params);
-        $params = array_merge($params, $values);
-
-        $valuesQueries = [];
-        foreach ($values as $column => $value) {
-            $valuesQueries[] = "{$column} = :{$column}";
-        }
-        $valuesQuery = static::arrayToQueryString($valuesQueries);
-
-        $sqlParts = [
-            ($isInsert ? "INSERT INTO" : "UPDATE") . " {$this->table}",
-            "SET {$valuesQuery}",
-        ];
-
-        if (!$isInsert) {
-            [$whereClause, $params] = static::generateWhereClause($where, $params);
-            if ($whereClause) {
-                $sqlParts[] = $whereClause;
-            }
-        }
-
-        return $this->execute($sqlParts, $params);
+    protected function insertOrUpdate(array $values, bool $isInsert = true): int {
+        return $this->execute($this->generateInsertOrUpdateParts($values, $isInsert));
     }
 
     /**
@@ -315,29 +281,24 @@ class Query {
 
     /**
      * @param $values array
-     * @param $where string[]|string|int|null
-     * @param $params array|null
      * @return int
      */
-    public function update(array $values, $where = null, ?array $params = null): int {
-        return $this->insertOrUpdate($values, $where, $params, false);
+    public function update(array $values): int {
+        return $this->insertOrUpdate($values, false);
     }
 
     /**
-     * @param $where string[]|string|int|null
-     * @param $params array|null
+     * @return string[]
+     */
+    protected function generateDeleteParts(): array {
+        return $this->getGenerator()->delete();
+    }
+
+    /**
      * @return int
      */
-    public function delete($where = null, ?array $params = null): int {
-        $sqlParts = ["DELETE FROM {$this->table}"];
-
-        [$whereClause, $params] = static::generateWhereClause($where, $params);
-        if ($whereClause) {
-            $sqlParts[] = $whereClause;
-        }
-
-        $rowsDeleted = $this->execute($sqlParts, $params);
-
+    public function delete(): int {
+        $rowsDeleted = $this->execute($this->generateDeleteParts());
         return $rowsDeleted;
     }
 
