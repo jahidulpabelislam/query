@@ -80,10 +80,10 @@ class Query {
 
     /**
      * @param $table string
-     * @param $alias string
+     * @param $alias string|null
      * @return $this
      */
-    public function table(string $table, string $alias): Query {
+    public function table(string $table, string $alias = null): Query {
         $table = $alias ? "$table as $alias" : $table;
         $this->table = $table;
 
