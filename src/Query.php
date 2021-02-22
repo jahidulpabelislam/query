@@ -108,13 +108,19 @@ class Query {
     }
 
     /**
-     * @param $where string
+     * @param $where string|int
      * @return $this
      */
-    public function where(string $where): Query {
+    public function where($where): Query {
         $expression = '=';
 
         $args = func_get_args();
+
+        // (int)
+        if (!isset($args[1]) && is_numeric($where)) {
+            // (column, expression, value)
+            $args = ['id', '=', (int)$where];
+        }
 
         // (column, expression, value)
         if (isset($args[2])) {
