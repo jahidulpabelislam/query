@@ -131,7 +131,7 @@ class Query {
         if (isset($args[1])) {
             $value = $value ?? $args[1];
             $this->param($where, $value);
-            $where = "$where $expression $value";
+            $where = "$where $expression :$where";
         }
 
         $this->wheres[] = $where;
