@@ -151,6 +151,7 @@ class Query {
 
     /**
      * @param $limit int
+     * @param $page int|null
      * @return $this
      */
     public function limit(int $limit, int $page = null): Query {
