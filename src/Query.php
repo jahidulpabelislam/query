@@ -137,7 +137,7 @@ class Query {
      * @param $direction string
      * @return $this
      */
-    public function orderBy(string $column, $direction = 'ASC'): Query {
+    public function orderBy(string $column, string $direction = 'ASC'): Query {
         $orderBy = "$column $direction";
         $this->orderBys[] = $orderBy;
         return $this;
