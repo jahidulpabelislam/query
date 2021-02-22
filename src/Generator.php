@@ -30,7 +30,6 @@ class Generator {
     protected function generateWhereClause(): ?string {
         if ($wheres = $this->getPart('wheres')) {
             $wheres = Utilities::arrayToQueryString($wheres, "\n\tAND ");
-
             return "WHERE $wheres";
         }
 

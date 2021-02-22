@@ -84,11 +84,9 @@ class Query {
      * @return $this
      */
     public function table(string $table, string $alias): Query {
-        if (!is_null($alias)) {
-            $table = "$table as $alias";
-        }
-
+        $table = $alias ? "$table as $alias" : $table;
         $this->table = $table;
+
         return $this;
     }
 
@@ -102,9 +100,7 @@ class Query {
             $this->columns = null;
         } else {
             $this->columns = Utilities::initArray($this->columns);
-            if (!is_null($alias)) {
-                $column = "$column as $alias";
-            }
+            $column = $alias ? "$column as $alias" : $column;
             $this->columns[] = $column;
         }
 
