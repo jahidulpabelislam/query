@@ -17,17 +17,11 @@
     ],
     "require": {
         "php" : "^7.1",
-        "jpi/database": "dev-master"
+        "jpi/database": "^1"
     },
     "autoload": {
         "psr-4": {
             "JPI\\Database\\": "src/"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jahidulpabelislam/database"
-        }
-    ]
+    }
 }
