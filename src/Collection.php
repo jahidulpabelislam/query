@@ -197,10 +197,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     /**
      * @param $keyToPluck string
      * @param $keyedBy string|null
-     * @return Collection
+     * @return array
      */
-    public function pluck(string $keyToPluck, string $keyedBy = null): Collection {
-        $plucked = new static();
+    public function pluck(string $keyToPluck, string $keyedBy = null): array {
+        $plucked = [];
 
         foreach ($this as $item) {
             $value = static::getFromItem($item, $keyToPluck);
