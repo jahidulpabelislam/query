@@ -1,9 +1,7 @@
 <?php
 
 /**
- * Query builder. Builds the SQL queries and executes/runs them and returns in appropriate format.
- *
- * PHP version 7.1+
+ * Builds the SQL queries and executes/runs them and returns in appropriate format.
  *
  * @author Jahidul Pabel Islam <me@jahidulpabelislam.com>
  * @version v1.0.0
@@ -15,7 +13,7 @@ namespace JPI\Database;
 class Query {
 
     /**
-     * @var Connection
+     * @var \JPI\Database\Connection
      */
     protected $connection;
 
@@ -25,7 +23,7 @@ class Query {
     protected $table;
 
     /**
-     * @param $connection Connection
+     * @param $connection \JPI\Database\Connection
      * @param $table string
      */
     public function __construct(Connection $connection, string $table) {
@@ -198,7 +196,7 @@ class Query {
      * @param $orderBy string[]|string|null
      * @param $limit int|null
      * @param $page int|string|null
-     * @return Collection|array|null
+     * @return \JPI\Database\Collection|array|null
      */
     public function select(
         $columns = "*",
@@ -340,5 +338,4 @@ class Query {
 
         return $rowsDeleted;
     }
-
 }
