@@ -7,13 +7,13 @@
 [![License](https://poser.pugx.org/jpi/query/license)](https://packagist.org/packages/jpi/query)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/master.svg?label=last%20activity)
 
-A very very simple query builder library, this works as a middle man between the application and a database.
+A very very simple library to make querying a database easier, this works as a middle man between the application and a database.
 
-This has been kept very simple stupid (KISS), there is no validation, it will assume you are using it correctly.
+This has been kept very simple stupid (KISS), there is no validation, it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
-I WOULD ADVISE AGAINST USING THIS ON PRODUCTION APPLICATIONS...feel free to use in your own personal / demo / experimental projects.
+I WOULD ADVISE AGAINST USING THIS ON PRODUCTION APPLICATIONS...but feel free to use in your own personal / demo / experimental projects.
 
-So use at your own risk.
+Use at your own risk.
 
 ## Dependencies
 
@@ -33,48 +33,98 @@ $ composer require jpi/query
 
 ## Usage
 
-Assuming you have knowledge on `jpi/database` (if not you can read [here](https://packagist.org/packages/jpi/database)), and that `$connection` is an instance of `JPI\Database\Connection`.
-
-Create an instance, for the first parameter you will need to pass an instance of `JPI\Database\Connection`, and the 2nd is the database table name. The same instance can be used multiple times as long as the table is the same.
+To create an instance, you will need an instance of `\JPI\Database\Connection` (if unfamiliar you can read about that [here](https://packagist.org/packages/jpi/database)) which is the first parameter, and the database table name as the second parameter. The same instance can be used multiple times as long as the table is the same.
 
 ```php
-$query = new \JPI\Database\Query($connection, 'users');
+$query = new \JPI\Database\Query($connection, $table);
 ```
 
 ### Available Methods:
 
-- select: `($columns, $where, $params, $orderBy, $limit, $page)`
-- count: `($where, $params)`
-- insert: `($values)`
-- update: `($values, $where, $params)`
-- delete: `($where, $params)`
+All the methods are self-explanatory.
 
-The params type should be consistent where the param name is the same.
+- select - To get a collection of rows or a single row in the table. Params: `$columns`, `$where`, `$params`, `$orderBy`, `$limit` & `$page` (All optional)
+- count - To get total count of rows in the table. Params: `$where`  & `$params` (All optional)
+- insert - To insert a new row in the table. Params: `$values`
+- update - To update values for row(s) in the table. Params: `$values`, `$where` & `$params` (`$where` & `$params` are optional)
+- delete - To delete row(s) from the table. Params: `$where` & `$params` (All optional)
+
+The params type should be consistent where the name is the same.
 
 #### Params
 
-- `$columns`: Array of strings, single string, or null (defaults to `"*"`)
-- `$where`: Array of strings, single string, integer (assumes where is for `id` column) or null (default)
-- `$params`: Associative array, or null (default)
-- `$orderBy`: Array of strings, single string, or null (default)
-- `$limit`: Integer or null (default)
-- `$page`: Integer or null (default) (Only used of `$limit` is passed)
-- `$values`: Associative array
+- `$columns`: The columns to get in the select query. Type: Array of strings, single string, or null (default: `"*"`)
+- `$where`: The where clauses for query. Type: Array of strings, single string, integer (assumes where is for `id` column) or `null` (default: `null`)
+- `$params`: The key values pairs to bind for query. Type: Associative array, or `null` (default: `null`)
+- `$orderBy`: The order by clauses for the select query. Type: Array of strings, single string, or `null` (default: `null`)
+- `$limit`: The limit for the select query. Type: Integer or `null` (default: `null`)
+- `$page`: . The page number if limited, Used to calculate the offset. Type: Integer or null (default: `null`) (Only used of `$limit` is passed, then default: `1`)
+- `$values`: The key values pairs for insert or update. Type: Associative array
 
 #### Examples
 
-(Assuming a `JPI\Database\Query` instance has been created and set to a variable named `$query`)
+Assuming a `JPI\Database\Query` instance has been created for the `users` database table and set to a variable named `$query`.
 
 ##### select
 
-```php
-$collection = $query->select();
+A `select` has 3 three return types depending on how you use it.
 
+- `limit = 1` OR `$where` is an integer, this will return an associative array of key (column) value pairs. UNLESS none is found then `null` is returned
+- an `\JPI\Database\Collection` is returned if it is a paginated multi row select
+- else a two-dimensional array is returned for other multi row selects
+
+A `\JPI\Database\Collection` works like a normal array just with some extra methods:
+- `get(int $key)` to get an item by key
+- `getCount()` get the count of rows in the collection
+- `getTotalCount()` get the TOTAL count of rows (the count without the LIMIT)
+- `getLimit()` get the LIMIT used in query
+- `getPage()` get the page number from query
+
+```php
+// SELECT * FROM users;
+$collection = $query->select();
+/**
+$collection = [
+    [
+        "id" => 1,
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+        "email" => "jahidul@jahidulpabelislam.com",
+        "password" => "password123",
+        ...
+    ],
+    [
+        "id" => 2,
+        "first_name" => "Test",
+        "last_name" => "Example",
+        "email" => "test@example.com",
+        "password" => "password123",
+        ...
+    ],
+    ...
+];
+*/
+
+// SELECT first_name, last_name FROM users;
 $collection = $query->select([
     "first_name",
     "last_name",
 ]);
+/**
+$collection = [
+    [
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+    ],
+    [
+        "first_name" => "Test",
+        "last_name" => "Example",
+    ],
+    ...
+];
+*/
 
+// SELECT * FROM users WHERE status = "active";
 $collection = $query->select(
     "*",
     "status = :status",
@@ -82,16 +132,64 @@ $collection = $query->select(
         "status" => "active",
     ],
 );
+/**
+$collection = [
+    [
+        "id" => 1,
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+        "email" => "jahidul@jahidulpabelislam.com",
+        "password" => "password123",
+        "status" => "active",
+        ...
+    ],
+    [
+        "id" => 3,
+        "first_name" => "Test",
+        "last_name" => "Example",
+        "email" => "test@example.com",
+        "password" => "password123",
+        "status" => "active",
+        ...
+    ],
+    ...
+];
+*/
 
+// SELECT * FROM users WHERE status = "active" ORDER BY last_name;
 $collection = $query->select(
     "*",
     "status = :status",
     [
         "status" => "active",
     ],
-    "first_name"
+    "last_name"
 );
+/**
+$collection = [
+    [
+        "id" => 3,
+        "first_name" => "Test",
+        "last_name" => "Example",
+        "email" => "test@example.com",
+        "password" => "password123",
+        "status" => "active",
+        ...
+    ],
+    [
+        "id" => 1,
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+        "email" => "jahidul@jahidulpabelislam.com",
+        "password" => "password123",
+        "status" => "active",
+        ...
+    ],
+    ...
+];
+*/
 
+// SELECT * FROM users WHERE status = "active" ORDER BY first_name LIMIT 10 OFFSET 20;
 $collection = $query->select(
     "*",
     "status = :status",
@@ -100,9 +198,33 @@ $collection = $query->select(
     ],
     "first_name",
     10,
-    1
+    2
 );
+/**
+$collection = [
+    [
+        "id" => 31,
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+        "email" => "jahidul@jahidulpabelislam.com",
+        "password" => "password123",
+        "status" => "active",
+        ...
+    ],
+    [
+        "id" => 30,
+        "first_name" => "Test",
+        "last_name" => "Example",
+        "email" => "test@example.com",
+        "password" => "password123",
+        "status" => "active",
+        ...
+    ],
+    ...
+];
+*/
 
+// SELECT * FROM users WHERE first_name LIKE "%jahidul%" LIMIT 1;
 $row = $query->select(
     "*",
     "first_name LIKE :first_name",
@@ -112,39 +234,66 @@ $row = $query->select(
     null,
     1
 );
+/**
+$row = [
+    "id" => 1,
+    "first_name" => "Jahidul",
+    "last_name" => "Islam",
+    "email" => "jahidul@jahidulpabelislam.com",
+    "password" => "password",
+    ...
+];
+*/
 ```
 
 ##### count
 
-```php
-$count = $query->count();
+As the name implies this method will just return the count as an integer.
 
+```php
+// SELECT COUNT(*) FROM users;
+$count = $query->count();
+// $count = 10;
+
+// SELECT COUNT(*) FROM users WHERE status = "active";
 $count = $query->count(
     "status = :status",
     [
         "status" => "active",
     ]
 );
+// $count = 5;
 ```
 
 ##### insert
 
+This method will just return the id of the row created, unless it failed then `null`
+
 ```php
+// INSERT INTO users (first_name, last_name, email, password) VALUES ("Jahidul", "Islam", "jahidul@jahidulpabelislam.com", "password");"
 $id = $query->insert([
-        "first_name" => "Jahidul",
-        "last_name" => "Islam",
-        "email" => "jahidul@jahidulpabelislam.com,
-        "password" => "password",
-    ]);
-    
-/**
-$id = 1;
-*/
+    "first_name" => "Jahidul",
+    "last_name" => "Islam",
+    "email" => "jahidul@jahidulpabelislam.com",
+    "password" => "password",
+]);
+// $id = 1;
 ```
 
 ##### update
 
+This method will return the count of how many rows have been updated by the query.
+
 ```php
+// UPDATE users SET status = "inactive";
+$numberOrRowsUpdated = $query->update(
+    [
+        "status" => "inactive",
+    ]
+);
+// $numberOrRowsUpdated = 10;
+
+// UPDATE users SET first_name = "Pabel" WHERE id = 1;
 $numberOrRowsUpdated = $query->update(
     [
         "first_name" => "Pabel",
@@ -152,20 +301,21 @@ $numberOrRowsUpdated = $query->update(
     ["id = :id"],
     ["id" => 1]
 );
-
-/**
-$numberOrRowsUpdated = 1;
-*/
+// $numberOrRowsUpdated = 1;
 ```
 
 ##### delete
 
-```php
-$numberOrRowsDeleted = $query->delete(["id = :id"], ["id" => 1]);
+This method will return the count of how many rows have been deleted by the query.
 
-/**
-$numberOrRowsDeleted = 1;
-*/
+```php
+// DELETE FROM users;
+$numberOrRowsDeleted = $query->delete();
+// $numberOrRowsDeleted = 10;
+
+// DELETE FROM users WHERE id = 1;
+$numberOrRowsDeleted = $query->delete(["id = :id"], ["id" => 1]);
+// $numberOrRowsDeleted = 1;
 ```
 
 ## Changelog
@@ -180,7 +330,7 @@ If you find any issues or have any feature requests, you can open an [issue](htt
 
 ## Authors
 
--   [Jahidul Pabel Islam](https://jahidulpabelislam.com/) [<me@jahidulpabelislam.com>](mailto:me@jahidulpabelislam.com)
+- [Jahidul Pabel Islam](https://jahidulpabelislam.com/) [<me@jahidulpabelislam.com>](mailto:me@jahidulpabelislam.com)
 
 ## License
 
