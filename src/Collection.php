@@ -60,22 +60,22 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
      * @param $key string
      * @return bool
      */
-    protected function doesKeyExist(string $key): bool {
+    protected function doesKeyExist(int $key): bool {
         return array_key_exists($key, $this->rows);
     }
 
     /**
-     * @param $key string
+     * @param $key int
      * @return array|null
      */
-    public function get(string $key): ?array {
+    public function get(int $key): ?array {
         return $this->rows[$key] ?? null;
     }
 
     // ArrayAccess //
 
     /**
-     * @param $offset string
+     * @param $key int
      * @return bool
      */
     public function offsetExists($key): bool {
@@ -83,7 +83,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $offset string
+     * @param $key int
      * @return array|null
      */
     public function offsetGet($key): ?array {
@@ -91,15 +91,17 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $offset string
-     * @param $item array
+     * @param $key int
+     * @param $row array
+     * @throws Exception
      */
     public function offsetSet($key, $row): void {
         throw new Exception("Updating is not allowed");
     }
 
     /**
-     * @param $offset string
+     * @param $key string
+     * @throws Exception
      */
     public function offsetUnset($key): void {
         throw new Exception("Updating is not allowed");
@@ -138,16 +140,16 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getLimit(): ?int {
+    public function getLimit(): int {
         return $this->limit;
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getPage(): ?int {
+    public function getPage(): int {
         return $this->page;
     }
 }
