@@ -166,6 +166,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     /**
      * @return int
      */
+    public function getCount(): int {
+        return $this->count();
+    }
+
+    /**
+     * @return int
+     */
     public function getTotalCount(): int {
         return $this->totalCount ?? $this->count();
     }
@@ -237,5 +244,4 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
 
         return $collection;
     }
-
 }
