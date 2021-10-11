@@ -224,33 +224,34 @@ class Query {
 
         $rows = $this->execute($sqlParts, $params, "getAll");
 
-        $totalCount = null;
-        if ($limit) {
-            $count = count($rows);
+        if (!$limit) {
+           return $rows;
+        }
 
-            /**
-             * Do a DB query to get total count if:
-             *    - none found on a specific page than 1
-             *    - count is the limit
-             * Else we can work out the total
-             */
-            if ((!$count && $page > 1) || $count === $limit) {
-                // Replace the SELECT part in query with a simple count
-                $sqlParts[0] = "SELECT COUNT(*) as count";
+        $count = count($rows);
 
-                array_pop($sqlParts); // Remove the LIMIT part in query
+        /**
+         * Do a DB query to get total count if:
+         *    - none found on a specific page than 1
+         *    - count is the limit
+         * Else we can work out the total
+         */
+        if ((!$count && $page > 1) || $count === $limit) {
+            // Replace the SELECT part in query with a simple count
+            $sqlParts[0] = "SELECT COUNT(*) as count";
 
-                // Remove the ORDER BY part in query if added
-                if ($orderBy) {
-                    array_pop($sqlParts);
-                }
+            array_pop($sqlParts); // Remove the LIMIT part in query
 
-                $row = $this->execute($sqlParts, $params, "getOne");
-                $totalCount = $row["count"] ?? 0;
+            // Remove the ORDER BY part in query if added
+            if ($orderBy) {
+                array_pop($sqlParts);
             }
-            else {
-                $totalCount = $limit * ($page - 1) + $count;
-            }
+
+            $row = $this->execute($sqlParts, $params, "getOne");
+            $totalCount = $row["count"] ?? 0;
+        }
+        else {
+            $totalCount = $limit * ($page - 1) + $count;
         }
 
         return new Collection($rows, $totalCount, $limit, $page);
