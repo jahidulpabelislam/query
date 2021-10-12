@@ -74,6 +74,7 @@ A `select` has 3 three return types depending on how you use it.
 - else a two-dimensional array is returned for other multi row selects
 
 A `\JPI\Database\Collection` works like a normal array just with some extra methods:
+- `isset(int $key)` check if item exists by key
 - `get(int $key)` to get an item by key
 - `getCount()` get the count of rows in the collection
 - `getTotalCount()` get the TOTAL count of rows (the count without the LIMIT)

@@ -57,10 +57,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $key string
+     * @param $key int
      * @return bool
      */
-    protected function doesKeyExist(int $key): bool {
+    public function isset(int $key): bool {
         return array_key_exists($key, $this->rows);
     }
 
@@ -79,7 +79,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
      * @return bool
      */
     public function offsetExists($key): bool {
-        return $this->doesKeyExist($key);
+        return $this->isset($key);
     }
 
     /**
