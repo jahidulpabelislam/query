@@ -51,20 +51,20 @@ class Query {
      * @param $separator string
      * @return string
      */
-    private static function arrayToQueryString($value, string $separator = ",\n\t"): string {
-        if ($value && is_array($value) && count($value) === 1) {
+    private static function arrayToString($value, string $separator = ",\n\t"): string {
+        if ($value && is_array($value)) {
+            if (count($value) > 1) {
+                return "\n\t" . implode($separator, $value);
+            }
+
             $value = array_shift($value);
         }
 
-        if (is_array($value) && count($value)) {
-            $value = "\n\t" . implode($separator, $value);
+        if (is_string($value)) {
+            return $value;
         }
 
-        if (!$value || !is_string($value)) {
-            return "";
-        }
-
-        return $value;
+        return "";
     }
 
     /**
@@ -98,10 +98,10 @@ class Query {
                 $where = "id = :id";
             }
 
-            $where = static::arrayToQueryString($where, "\n\tAND ");
+            $where = static::arrayToString($where, "\n\tAND ");
 
             return [
-                "WHERE {$where}",
+                "WHERE $where",
                 $params,
             ];
         }
@@ -132,11 +132,11 @@ class Query {
         ?int $page = null
     ): array {
         $columns = $columns ?: "*";
-        $columns = static::arrayToQueryString($columns);
+        $columns = static::arrayToString($columns);
 
         $sqlParts = [
-            "SELECT {$columns}",
-            "FROM {$table}",
+            "SELECT $columns",
+            "FROM $table",
         ];
 
         [$whereClause, $params] = static::generateWhereClause($where, $params);
@@ -149,18 +149,18 @@ class Query {
             }
         }
 
-        $orderBy = static::arrayToQueryString($orderBy);
+        $orderBy = static::arrayToString($orderBy);
         if ($orderBy) {
-            $sqlParts[] = "ORDER BY {$orderBy}";
+            $sqlParts[] = "ORDER BY $orderBy";
         }
 
         if ($limit) {
-            $limitPart = "LIMIT {$limit}";
+            $limitPart = "LIMIT $limit";
 
             // Generate a offset, using limit & page values
             if ($page > 1) {
                 $offset = $limit * ($page - 1);
-                $limitPart .= " OFFSET {$offset}";
+                $limitPart .= " OFFSET $offset";
             }
 
             $sqlParts[] = $limitPart;
@@ -279,14 +279,14 @@ class Query {
         $params = array_merge($params, $values);
 
         $valuesQueries = [];
-        foreach ($values as $column => $value) {
-            $valuesQueries[] = "{$column} = :{$column}";
+        foreach (array_keys($values) as $column) {
+            $valuesQueries[] = "$column = :$column";
         }
-        $valuesQuery = static::arrayToQueryString($valuesQueries);
+        $valuesQuery = static::arrayToString($valuesQueries);
 
         $sqlParts = [
-            ($isInsert ? "INSERT INTO" : "UPDATE") . " {$this->table}",
-            "SET {$valuesQuery}",
+            ($isInsert ? "INSERT INTO" : "UPDATE") . " $this->table",
+            "SET $valuesQuery",
         ];
 
         if (!$isInsert) {
@@ -328,7 +328,7 @@ class Query {
      * @return int
      */
     public function delete($where = null, ?array $params = null): int {
-        $sqlParts = ["DELETE FROM {$this->table}"];
+        $sqlParts = ["DELETE FROM $this->table"];
 
         [$whereClause, $params] = static::generateWhereClause($where, $params);
         if ($whereClause) {
