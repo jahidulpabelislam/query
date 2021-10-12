@@ -38,7 +38,7 @@ class Query {
      * @return array[]|array|int|null
      */
     private function execute(array $parts, ?array $params, string $function = "execute") {
-        $query = implode("\n", $parts);
+        $query = implode(" ", $parts);
         $query .= ";";
         return $this->connection->{$function}($query, $params);
     }
@@ -51,10 +51,10 @@ class Query {
      * @param $separator string
      * @return string
      */
-    private static function arrayToString($value, string $separator = ",\n\t"): string {
+    private static function arrayToString($value, string $separator = ", "): string {
         if ($value && is_array($value)) {
             if (count($value) > 1) {
-                return "\n\t" . implode($separator, $value);
+                return implode($separator, $value);
             }
 
             $value = array_shift($value);
@@ -98,7 +98,7 @@ class Query {
                 $where = "id = :id";
             }
 
-            $where = static::arrayToString($where, "\n\tAND ");
+            $where = static::arrayToString($where, " AND ");
 
             return [
                 "WHERE $where",
