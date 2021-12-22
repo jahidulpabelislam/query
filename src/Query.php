@@ -225,7 +225,7 @@ class Query {
         $rows = $this->execute($sqlParts, $params, "getAll");
 
         if (!$limit) {
-           return $rows;
+            return $rows;
         }
 
         $count = count($rows);
