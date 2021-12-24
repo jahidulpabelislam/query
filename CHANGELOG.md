@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2021-10-{}
+- much improved query builder
+
+## [1.0.1] - 2021-12-24
+
+### Changed
+
+- updated generated queries to remove the unnecessary new lines and tab characters
+
+## [1.0.0] - 2021-10-12
 
 First release! :fire:
 
-[unreleased]: https://github.com/jahidulpabelislam/query/compare/v1.0.0...HEAD
-
+[unreleased]: https://github.com/jahidulpabelislam/query/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/jahidulpabelislam/database/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/jahidulpabelislam/query/releases/tag/v1.0.0
