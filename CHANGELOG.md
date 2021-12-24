@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- updated generated queries to remove the unnecessary new lines and tab characters
+- updated generated queries to remove the unnecessary new line and tab characters
 
 ## [1.0.0] - 2021-10-12
 
