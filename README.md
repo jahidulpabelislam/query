@@ -5,7 +5,7 @@
 [![Total Downloads](https://poser.pugx.org/jpi/query/downloads)](https://packagist.org/packages/jpi/query)
 [![Latest Unstable Version](https://poser.pugx.org/jpi/query/v/unstable)](https://packagist.org/packages/jpi/query)
 [![License](https://poser.pugx.org/jpi/query/license)](https://packagist.org/packages/jpi/query)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/master.svg?label=last%20activity)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/1.x.svg?label=last%20activity)
 
 A very very simple library to make querying a database easier, this works as a middle man between the application and a database.
 
