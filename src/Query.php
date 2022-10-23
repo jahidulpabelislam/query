@@ -1,19 +1,17 @@
 <?php
 
+namespace JPI\Database;
+
 /**
  * Builds the SQL queries and executes/runs them and returns in appropriate format.
  *
  * @author Jahidul Pabel Islam <me@jahidulpabelislam.com>
- * @version v1.0.0
- * @copyright 2010-2021 JPI
+ * @copyright 2012-2022 JPI
  */
-
-namespace JPI\Database;
-
 class Query {
 
     /**
-     * @var \JPI\Database\Connection
+     * @var Connection
      */
     protected $connection;
 
@@ -23,8 +21,8 @@ class Query {
     protected $table;
 
     /**
-     * @param $connection \JPI\Database\Connection
-     * @param $table string
+     * @param Connection $connection
+     * @param string $table
      */
     public function __construct(Connection $connection, string $table) {
         $this->connection = $connection;
@@ -32,12 +30,12 @@ class Query {
     }
 
     /**
-     * @param $parts array
-     * @param $params array|null
-     * @param $function string
+     * @param array $parts
+     * @param array|null $params
+     * @param string $function
      * @return array[]|array|int|null
      */
-    private function execute(array $parts, ?array $params, string $function = "execute") {
+    private function execute(array $parts, ?array $params = null, string $function = "execute") {
         $query = implode(" ", $parts);
         $query .= ";";
         return $this->connection->{$function}($query, $params);
@@ -47,8 +45,8 @@ class Query {
      * Convenient function to pluck/get out the single value from an array if it's the only value.
      * Then build a string value if an array.
      *
-     * @param $value string[]|string|null
-     * @param $separator string
+     * @param string[]|string|null $value
+     * @param string $separator
      * @return string
      */
     private static function arrayToString($value, string $separator = ", "): string {
@@ -70,7 +68,7 @@ class Query {
     /**
      * Try and force value as an array if not already
      *
-     * @param $value array|string|null
+     * @param array|string|null $value
      * @return array
      */
     private static function initArray($value): array {
@@ -86,11 +84,11 @@ class Query {
     }
 
     /**
-     * @param $where string[]|string|int|null
-     * @param $params array|null
+     * @param string[]|string|int|null $where
+     * @param array|null $params
      * @return array [string|null, array|null]
      */
-    private static function generateWhereClause($where, ?array $params): array {
+    private static function generateWhereClause($where, ?array $params = null): array {
         if ($where) {
             if (is_numeric($where)) {
                 $params = static::initArray($params);
@@ -113,20 +111,20 @@ class Query {
     }
 
     /**
-     * @param $table string
-     * @param $columns string[]|string|null
-     * @param $where string[]|string|int|null
-     * @param $params array|null
-     * @param $orderBy string[]|string|null
-     * @param $limit int|null
-     * @param $page int|null
+     * @param string $table
+     * @param string[]|string|null $columns
+     * @param string[]|string|int|null $where
+     * @param array|null $params
+     * @param string[]|string|null $orderBy
+     * @param int|null $limit
+     * @param int|null $page
      * @return array [array, array|null]
      */
     protected static function generateSelectQuery(
         string $table,
         $columns = "*",
         $where = null,
-        ?array $params = [],
+        ?array $params = null,
         $orderBy = null,
         ?int $limit = null,
         ?int $page = null
@@ -173,7 +171,7 @@ class Query {
      * Get the page to use for a SQL query
      * Can specify the page and it will make sure it is valid
      *
-     * @param $page int|string|null
+     * @param int|string|null $page
      * @return int|null
      */
     protected static function getPage($page = null): ?int {
@@ -190,12 +188,12 @@ class Query {
     }
 
     /**
-     * @param $columns string[]|string|null
-     * @param $where string[]|string|int|null
-     * @param $params array|null
-     * @param $orderBy string[]|string|null
-     * @param $limit int|null
-     * @param $page int|string|null
+     * @param string[]|string|null $columns
+     * @param string[]|string|int|null $where
+     * @param array|null $params
+     * @param string[]|string|null $orderBy
+     * @param int|null $limit
+     * @param int|string|null $page
      * @return \JPI\Database\Collection|array|null
      */
     public function select(
@@ -258,8 +256,8 @@ class Query {
     }
 
     /**
-     * @param $where string[]|string|int|null
-     * @param $params array|null
+     * @param string[]|string|int|null $where
+     * @param array|null $params
      * @return int
      */
     public function count($where = null, ?array $params = null): int {
@@ -268,10 +266,10 @@ class Query {
     }
 
     /**
-     * @param $values array
-     * @param $where string[]|string|int|null
-     * @param $params array|null
-     * @param $isInsert bool
+     * @param array $values
+     * @param string[]|string|int|null $where
+     * @param array|null $params
+     * @param bool $isInsert
      * @return int
      */
     protected function insertOrUpdate(array $values, $where = null, ?array $params = null, bool $isInsert = true): int {
@@ -300,7 +298,7 @@ class Query {
     }
 
     /**
-     * @param $values array
+     * @param array $values
      * @return int|null
      */
     public function insert(array $values): ?int {
@@ -313,9 +311,9 @@ class Query {
     }
 
     /**
-     * @param $values array
-     * @param $where string[]|string|int|null
-     * @param $params array|null
+     * @param array $values
+     * @param string[]|string|int|null $where
+     * @param array|null $params
      * @return int
      */
     public function update(array $values, $where = null, ?array $params = null): int {
@@ -323,8 +321,8 @@ class Query {
     }
 
     /**
-     * @param $where string[]|string|int|null
-     * @param $params array|null
+     * @param string[]|string|int|null $where
+     * @param array|null $params
      * @return int
      */
     public function delete($where = null, ?array $params = null): int {
