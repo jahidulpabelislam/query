@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Collection to store result from DB queries.
- *
- * @author Jahidul Pabel Islam <me@jahidulpabelislam.com>
- * @version v1.0.0
- * @copyright 2010-2021 JPI
- */
-
 namespace JPI\Database;
 
 use ArrayAccess;
@@ -15,6 +7,12 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 
+/**
+ * Collection to store result from DB queries.
+ *
+ * @author Jahidul Pabel Islam <me@jahidulpabelislam.com>
+ * @copyright 2012-2022 JPI
+ */
 class Collection implements ArrayAccess, Countable, IteratorAggregate {
 
     /**
@@ -43,10 +41,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     protected $page;
 
     /**
-     * @param $rows array
-     * @param $totalCount int
-     * @param $limit int
-     * @param $page int
+     * @param array $rows
+     * @param int $totalCount
+     * @param int $limit
+     * @param int $page
      */
     public function __construct(array $rows, int $totalCount, int $limit, int $page) {
         $this->rows = $rows;
@@ -57,7 +55,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $key int
+     * @param int $key
      * @return bool
      */
     public function isset(int $key): bool {
@@ -65,7 +63,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $key int
+     * @param int $key
      * @return array|null
      */
     public function get(int $key): ?array {
@@ -75,7 +73,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     // ArrayAccess //
 
     /**
-     * @param $key int
+     * @param int $key
      * @return bool
      */
     public function offsetExists($key): bool {
@@ -83,7 +81,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $key int
+     * @param int $key
      * @return array|null
      */
     public function offsetGet($key): ?array {
@@ -91,8 +89,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $key int
-     * @param $row array
+     * @param int $key
+     * @param array $row
+     * @return void
      * @throws Exception
      */
     public function offsetSet($key, $row): void {
@@ -100,7 +99,8 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate {
     }
 
     /**
-     * @param $key string
+     * @param string $key
+     * @return void
      * @throws Exception
      */
     public function offsetUnset($key): void {
