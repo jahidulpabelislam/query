@@ -2,6 +2,8 @@
 
 namespace JPI\Database;
 
+use JPI\Database;
+
 /**
  * Builds the SQL queries and executes/runs them and returns in appropriate format.
  *
@@ -11,9 +13,9 @@ namespace JPI\Database;
 class Query {
 
     /**
-     * @var Connection
+     * @var Database
      */
-    protected $connection;
+    protected $database;
 
     /**
      * @var string
@@ -21,11 +23,11 @@ class Query {
     protected $table;
 
     /**
-     * @param Connection $connection
+     * @param Database $database
      * @param string $table
      */
-    public function __construct(Connection $connection, string $table) {
-        $this->connection = $connection;
+    public function __construct(Database $database, string $table) {
+        $this->database = $database;
         $this->table = $table;
     }
 
@@ -35,10 +37,10 @@ class Query {
      * @param string $function
      * @return array[]|array|int|null
      */
-    private function execute(array $parts, ?array $params = null, string $function = "execute") {
+    private function execute(array $parts, ?array $params = null, string $function = "exec") {
         $query = implode(" ", $parts);
         $query .= ";";
-        return $this->connection->{$function}($query, $params);
+        return $this->database->{$function}($query, $params);
     }
 
     /**
@@ -217,10 +219,10 @@ class Query {
         );
 
         if (($where && is_numeric($where)) || $limit === 1) {
-            return $this->execute($sqlParts, $params, "getOne");
+            return $this->execute($sqlParts, $params, "selectFirst");
         }
 
-        $rows = $this->execute($sqlParts, $params, "getAll");
+        $rows = $this->execute($sqlParts, $params, "selectAll");
 
         if (!$limit) {
             return $rows;
@@ -245,7 +247,7 @@ class Query {
                 array_pop($sqlParts);
             }
 
-            $row = $this->execute($sqlParts, $params, "getOne");
+            $row = $this->execute($sqlParts, $params, "selectFirst");
             $totalCount = $row["count"] ?? 0;
         }
         else {
@@ -304,7 +306,7 @@ class Query {
     public function insert(array $values): ?int {
         $rowsAffected = $this->insertOrUpdate($values);
         if ($rowsAffected > 0) {
-            return $this->connection->getLastInsertedId();
+            return $this->database->getLastInsertedId();
         }
 
         return null;
