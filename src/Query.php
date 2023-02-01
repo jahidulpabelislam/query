@@ -32,18 +32,6 @@ class Query {
     }
 
     /**
-     * @param array $parts
-     * @param array|null $params
-     * @param string $function
-     * @return array[]|array|int|null
-     */
-    private function execute(array $parts, ?array $params = null, string $function = "exec") {
-        $query = implode(" ", $parts);
-        $query .= ";";
-        return $this->database->{$function}($query, $params);
-    }
-
-    /**
      * Convenient function to pluck/get out the single value from an array if it's the only value.
      * Then build a string value if an array.
      *
@@ -218,11 +206,13 @@ class Query {
             $page
         );
 
+        $query = implode(" ", $sqlParts) . ";";
+
         if (($where && is_numeric($where)) || $limit === 1) {
-            return $this->execute($sqlParts, $params, "selectFirst");
+            return $this->database->selectFirst($query, $params);
         }
 
-        $rows = $this->execute($sqlParts, $params, "selectAll");
+        $rows = $this->database->selectAll($query, $params);
 
         if (!$limit) {
             return $rows;
@@ -247,7 +237,7 @@ class Query {
                 array_pop($sqlParts);
             }
 
-            $row = $this->execute($sqlParts, $params, "selectFirst");
+            $row = $this->database->selectFirst(implode(" ", $sqlParts) . ";", $params);
             $totalCount = $row["count"] ?? 0;
         }
         else {
@@ -296,7 +286,7 @@ class Query {
             }
         }
 
-        return $this->execute($sqlParts, $params);
+        return $this->database->exec(implode(" ", $sqlParts) . ";", $params);
     }
 
     /**
@@ -335,7 +325,7 @@ class Query {
             $sqlParts[] = $whereClause;
         }
 
-        $rowsDeleted = $this->execute($sqlParts, $params);
+        $rowsDeleted = $this->database->exec(implode(" ", $sqlParts) . ";", $params);
 
         return $rowsDeleted;
     }
