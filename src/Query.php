@@ -2,6 +2,8 @@
 
 namespace JPI\Database;
 
+use JPI\Database;
+
 /**
  * Builds the SQL queries and executes/runs them and returns in appropriate format.
  *
@@ -11,9 +13,9 @@ namespace JPI\Database;
 class Query {
 
     /**
-     * @var Connection
+     * @var Database
      */
-    protected $connection;
+    protected $database;
 
     /**
      * @var string
@@ -21,24 +23,12 @@ class Query {
     protected $table;
 
     /**
-     * @param Connection $connection
+     * @param Database $database
      * @param string $table
      */
-    public function __construct(Connection $connection, string $table) {
-        $this->connection = $connection;
+    public function __construct(Database $database, string $table) {
+        $this->database = $database;
         $this->table = $table;
-    }
-
-    /**
-     * @param array $parts
-     * @param array|null $params
-     * @param string $function
-     * @return array[]|array|int|null
-     */
-    private function execute(array $parts, ?array $params = null, string $function = "execute") {
-        $query = implode(" ", $parts);
-        $query .= ";";
-        return $this->connection->{$function}($query, $params);
     }
 
     /**
@@ -66,32 +56,13 @@ class Query {
     }
 
     /**
-     * Try and force value as an array if not already
-     *
-     * @param array|string|null $value
-     * @return array
-     */
-    private static function initArray($value): array {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if (is_string($value)) {
-            return [$value];
-        }
-
-        return [];
-    }
-
-    /**
      * @param string[]|string|int|null $where
-     * @param array|null $params
-     * @return array [string|null, array|null]
+     * @param array $params
+     * @return array [string|null, array]
      */
-    private static function generateWhereClause($where, ?array $params = null): array {
+    private static function generateWhereClause($where, array $params = []): array {
         if ($where) {
             if (is_numeric($where)) {
-                $params = static::initArray($params);
                 $params["id"] = (int)$where;
                 $where = "id = :id";
             }
@@ -114,17 +85,17 @@ class Query {
      * @param string $table
      * @param string[]|string|null $columns
      * @param string[]|string|int|null $where
-     * @param array|null $params
+     * @param array $params
      * @param string[]|string|null $orderBy
      * @param int|null $limit
      * @param int|null $page
-     * @return array [array, array|null]
+     * @return array [array, array]
      */
     protected static function generateSelectQuery(
         string $table,
         $columns = "*",
         $where = null,
-        ?array $params = null,
+        array $params = [],
         $orderBy = null,
         ?int $limit = null,
         ?int $page = null
@@ -190,7 +161,7 @@ class Query {
     /**
      * @param string[]|string|null $columns
      * @param string[]|string|int|null $where
-     * @param array|null $params
+     * @param array $params
      * @param string[]|string|null $orderBy
      * @param int|null $limit
      * @param int|string|null $page
@@ -199,7 +170,7 @@ class Query {
     public function select(
         $columns = "*",
         $where = null,
-        ?array $params = null,
+        array $params = [],
         $orderBy = null,
         ?int $limit = null,
         $page = null
@@ -216,11 +187,13 @@ class Query {
             $page
         );
 
+        $query = implode(" ", $sqlParts) . ";";
+
         if (($where && is_numeric($where)) || $limit === 1) {
-            return $this->execute($sqlParts, $params, "getOne");
+            return $this->database->selectFirst($query, $params);
         }
 
-        $rows = $this->execute($sqlParts, $params, "getAll");
+        $rows = $this->database->selectAll($query, $params);
 
         if (!$limit) {
             return $rows;
@@ -245,7 +218,7 @@ class Query {
                 array_pop($sqlParts);
             }
 
-            $row = $this->execute($sqlParts, $params, "getOne");
+            $row = $this->database->selectFirst(implode(" ", $sqlParts) . ";", $params);
             $totalCount = $row["count"] ?? 0;
         }
         else {
@@ -257,10 +230,10 @@ class Query {
 
     /**
      * @param string[]|string|int|null $where
-     * @param array|null $params
+     * @param array $params
      * @return int
      */
-    public function count($where = null, ?array $params = null): int {
+    public function count($where = null, array $params = []): int {
         $row = $this->select("COUNT(*) as total_count", $where, $params, null, 1);
         return $row["total_count"] ?? 0;
     }
@@ -268,12 +241,11 @@ class Query {
     /**
      * @param array $values
      * @param string[]|string|int|null $where
-     * @param array|null $params
+     * @param array $params
      * @param bool $isInsert
      * @return int
      */
-    protected function insertOrUpdate(array $values, $where = null, ?array $params = null, bool $isInsert = true): int {
-        $params = static::initArray($params);
+    protected function insertOrUpdate(array $values, $where = null, array $params = [], bool $isInsert = true): int {
         $params = array_merge($params, $values);
 
         $valuesQueries = [];
@@ -294,7 +266,7 @@ class Query {
             }
         }
 
-        return $this->execute($sqlParts, $params);
+        return $this->database->exec(implode(" ", $sqlParts) . ";", $params);
     }
 
     /**
@@ -304,7 +276,7 @@ class Query {
     public function insert(array $values): ?int {
         $rowsAffected = $this->insertOrUpdate($values);
         if ($rowsAffected > 0) {
-            return $this->connection->getLastInsertedId();
+            return $this->database->getLastInsertedId();
         }
 
         return null;
@@ -313,19 +285,19 @@ class Query {
     /**
      * @param array $values
      * @param string[]|string|int|null $where
-     * @param array|null $params
+     * @param array $params
      * @return int
      */
-    public function update(array $values, $where = null, ?array $params = null): int {
+    public function update(array $values, $where = null, array $params = []): int {
         return $this->insertOrUpdate($values, $where, $params, false);
     }
 
     /**
      * @param string[]|string|int|null $where
-     * @param array|null $params
+     * @param array $params
      * @return int
      */
-    public function delete($where = null, ?array $params = null): int {
+    public function delete($where = null, array $params = []): int {
         $sqlParts = ["DELETE FROM $this->table"];
 
         [$whereClause, $params] = static::generateWhereClause($where, $params);
@@ -333,7 +305,7 @@ class Query {
             $sqlParts[] = $whereClause;
         }
 
-        $rowsDeleted = $this->execute($sqlParts, $params);
+        $rowsDeleted = $this->database->exec(implode(" ", $sqlParts) . ";", $params);
 
         return $rowsDeleted;
     }
