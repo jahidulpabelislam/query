@@ -165,7 +165,7 @@ class Query {
      * @param string[]|string|null $orderBy
      * @param int|null $limit
      * @param int|string|null $page
-     * @return \JPI\Database\Collection|array|null
+     * @return \JPI\Database\Collection|\JPI\Database\PaginatedCollection|array|null
      */
     public function select(
         $columns = "*",
@@ -198,7 +198,7 @@ class Query {
         $count = count($rows);
 
         if (!$limit) {
-            return new Collection($rows, $count, 0, 0);
+            return new Collection($rows);
         }
 
         /**
@@ -225,7 +225,7 @@ class Query {
             $totalCount = $limit * ($page - 1) + $count;
         }
 
-        return new Collection($rows, $totalCount, $limit, $page);
+        return new PaginatedCollection($rows, $totalCount, $limit, $page);
     }
 
     /**
