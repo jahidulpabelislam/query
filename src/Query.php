@@ -195,11 +195,11 @@ class Query {
 
         $rows = $this->database->selectAll($query, $params);
 
-        if (!$limit) {
-            return $rows;
-        }
-
         $count = count($rows);
+
+        if (!$limit) {
+            return new Collection($rows, $count, 0, 0);
+        }
 
         /**
          * Do a DB query to get total count if:
