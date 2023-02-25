@@ -23,7 +23,7 @@
     "require-dev": {
         "jpi/codestyles" : "^1.0"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "JPI\\Database\\": "src/"
