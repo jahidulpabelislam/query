@@ -14,7 +14,10 @@ use JPI\Database\PaginatedCollection;
  * @author Jahidul Pabel Islam <me@jahidulpabelislam.com>
  * @copyright 2012-2023 JPI
  */
-class Builder {
+class Builder implements WhereableInterface, ParamableInterface {
+
+    use WhereableTrait;
+    use ParamableTrait;
 
     /**
      * @var Database
@@ -34,17 +37,7 @@ class Builder {
     /**
      * @var array
      */
-    protected $wheres = [];
-
-    /**
-     * @var array
-     */
     protected $orderBys = [];
-
-    /**
-     * @var array
-     */
-    protected $params = [];
 
     /**
      * @var int|null
@@ -73,21 +66,6 @@ class Builder {
         return $this->{$part} ?? null;
     }
 
-    /**
-     * @param $key string
-     * @param $value string|int|float
-     * @return $this
-     */
-    public function param(string $key, $value): Builder {
-        $this->params[$key] = $value;
-        return $this;
-    }
-
-    public function params(array $params): Builder {
-        $this->params = array_merge($this->params, $params);
-        return $this;
-    }
-
     public function table(string $table, string $alias = null): Builder {
         $this->table = $alias ? "$table as $alias" : $table;
         return $this;
@@ -101,53 +79,6 @@ class Builder {
             $this->columns[] = $alias ? "$column as $alias" : $column;
         }
 
-        return $this;
-    }
-
-    /**
-     * @param $where string|int
-     * @return $this
-     */
-    public function where($where): Builder {
-        $expression = "=";
-
-        $args = func_get_args();
-
-        // params = int
-        if (!isset($args[1]) && is_numeric($where)) {
-            // (column, expression, value)
-            $args = ["id", "=", (int)$where];
-        }
-
-        // params = column, expression, value
-        if (isset($args[2])) {
-            [$where, $expression, $value] = $args;
-        }
-
-        // params = (column, expression, value) OR (column, value)
-        if (isset($args[1])) {
-            $value = $value ?? $args[1];
-
-            if (is_array($value)) {
-                $expression = 'IN';
-
-                $values = $value;
-                $ins = [];
-                foreach ($values as $i => $value) {
-                    $key = "{$where}_" . ($i + 1);
-                    $ins[] = ":$key";
-                    $this->param($key, $value);
-                }
-                $placeholder = "(" . implode(", ", $ins) . ")";
-            } else {
-                $this->param($where, $value);
-                $placeholder = ":$where";
-            }
-
-            $where = "$where $expression $placeholder";
-        }
-
-        $this->wheres[] = $where;
         return $this;
     }
 

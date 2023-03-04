@@ -23,7 +23,7 @@ class Generator {
      * @param $separator string
      * @return string
      */
-    protected static function arrayToString($value, string $separator = ","): string {
+    public static function arrayToString($value, string $separator = ","): string {
         if (is_array($value) && count($value)) {
             if (count($value) === 1) {
                 $value = array_shift($value);
