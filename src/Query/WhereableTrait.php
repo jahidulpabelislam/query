@@ -24,6 +24,10 @@ trait WhereableTrait {
         if (!isset($args[1]) && is_numeric($where)) {
             // (column, expression, value)
             $args = ["id", "=", (int)$where];
+
+            if ($this instanceof Builder) {
+                $this->limit(1);
+            }
         }
 
         // params = column, expression, value
