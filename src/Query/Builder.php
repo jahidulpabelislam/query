@@ -161,7 +161,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->orderBys = [];
 
         $this->column("COUNT(*)", "count");
-        $this->limit(1);
+        $this->limit(1, 1);
 
         $query = static::buildQuery($this->getGenerator()->select());
 
