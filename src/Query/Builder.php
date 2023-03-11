@@ -177,7 +177,7 @@ class Builder implements WhereableInterface, ParamableInterface {
             $this->params
         );
 
-        if ($rowsAffected > 0) {
+        if ($rowsAffected === 0) {
             return null;
         }
 
