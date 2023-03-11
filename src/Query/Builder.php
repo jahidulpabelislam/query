@@ -163,7 +163,10 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->column("COUNT(*)", "count");
         $this->limit(1);
 
-        $row = $this->select();
+        $query = static::buildQuery($this->getGenerator()->select());
+
+        $row = $this->database->selectFirst($query, $this->params);
+
         return $row["count"] ?? 0;
     }
 
