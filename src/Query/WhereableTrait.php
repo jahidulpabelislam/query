@@ -12,57 +12,36 @@ trait WhereableTrait {
     protected $wheres = [];
 
     /**
-     * @param $where string|int
+     * @param $whereOrColumn string
+     * @param $expression string|null
+     * @param $valueOrPlaceholder mixed
      * @return $this
      */
-    public function where($where) {
-        $expression = "=";
+    public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null) {
+        if ($expression === null && $valueOrPlaceholder === null) {
+            $this->wheres[] = $whereOrColumn;
+            return $this;
+        }
 
-        $args = func_get_args();
-
-        // params = int
-        if (!isset($args[1]) && is_numeric($where)) {
-            // (column, expression, value)
-            $args = ["id", "=", (int)$where];
-
-            if ($this instanceof Builder) {
-                $this->limit(1);
+        if (is_array($valueOrPlaceholder)) {
+            $expression = 'IN';
+            $ins = [];
+            foreach ($valueOrPlaceholder as $i => $value) {
+                $key = "{$whereOrColumn}_" . ($i + 1);
+                $ins[] = ":$key";
+                $this->param($key, $value);
             }
-        }
-
-        // params = column, expression, value
-        if (isset($args[2])) {
-            [$where, $expression, $value] = $args;
-        }
-
-        // params = (column, expression, value) OR (column, value)
-        if (isset($args[1])) {
-            $value = $value ?? $args[1];
-
-            if (is_array($value)) {
-                $expression = 'IN';
-
-                $values = $value;
-                $ins = [];
-                foreach ($values as $i => $value) {
-                    $key = "{$where}_" . ($i + 1);
-                    $ins[] = ":$key";
-                    $this->param($key, $value);
-                }
-                $placeholder = "(" . implode(", ", $ins) . ")";
+            $placeholder = "(" . implode(", ", $ins) . ")";
+        } else {
+            if (is_string($valueOrPlaceholder) && $valueOrPlaceholder[0] !== ':') {
+                $placeholder = ":$valueOrPlaceholder";
+                $this->param($valueOrPlaceholder, $valueOrPlaceholder);
             } else {
-                if (is_string($value) && $value[0] !== ':') {
-                    $placeholder = ":$where";
-                    $this->param($where, $value);
-                } else {
-                    $placeholder = $value;
-                }
+                $placeholder = $valueOrPlaceholder;
             }
-
-            $where = "$where $expression $placeholder";
         }
 
-        $this->wheres[] = (string) $where;
+        $this->wheres[] = "$whereOrColumn $expression $placeholder";
         return $this;
     }
 }

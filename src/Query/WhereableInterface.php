@@ -7,8 +7,10 @@ namespace JPI\Database\Query;
 interface WhereableInterface {
 
     /**
-     * @param $where string|int
+     * @param $whereOrColumn string
+     * @param $expression string|null
+     * @param $valueOrPlaceholder mixed
      * @return $this
      */
-    public function where($where);
+    public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null);
 }
