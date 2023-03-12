@@ -16,7 +16,6 @@ use JPI\Database\PaginatedCollection;
  */
 class Builder implements WhereableInterface, ParamableInterface {
 
-    use WhereableTrait;
     use ParamableTrait;
 
     /**
@@ -33,6 +32,11 @@ class Builder implements WhereableInterface, ParamableInterface {
      * @var array
      */
     protected $columns = [];
+
+    /**
+     * @var Where\AndCondition
+     */
+    protected $where;
 
     /**
      * @var array
@@ -52,6 +56,8 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function __construct(Database $database, string $table = null) {
         $this->database = $database;
         $this->table = $table;
+
+        $this->where = new Database\Query\Where\AndCondition($this);
     }
 
     protected function getGenerator(): Generator {
@@ -79,6 +85,11 @@ class Builder implements WhereableInterface, ParamableInterface {
             $this->columns[] = $alias ? "$column as $alias" : $column;
         }
 
+        return $this;
+    }
+
+    public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null) {
+        $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;
     }
 

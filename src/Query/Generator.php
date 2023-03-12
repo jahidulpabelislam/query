@@ -50,12 +50,12 @@ class Generator {
     }
 
     protected function generateWhereClause(): ?string {
-        $wheres = $this->getPart("wheres");
-        if (!$wheres) {
+        $where = (string) $this->getPart("where");
+        if (!$where) {
             return null;
         }
 
-        return "WHERE " . static::arrayToString($wheres, " AND ");
+        return "WHERE $where";
     }
 
     protected function generateOrderByClause(): ?string {
