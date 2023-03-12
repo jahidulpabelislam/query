@@ -40,6 +40,17 @@ abstract class Condition implements WhereableInterface, ParamableInterface {
     }
 
     public function __toString() {
-        return "(" . Generator::arrayToString($this->wheres, " {$this->getCondition()} ") . ")";
+        $count = count($this->wheres);
+        if (!$count){
+            return "";
+        }
+
+        $clause = Generator::arrayToString($this->wheres, " {$this->getCondition()} ");
+
+        if ($count > 1 ){
+            return "($clause)";
+        }
+
+        return $clause;
     }
 }
