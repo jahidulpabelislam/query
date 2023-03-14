@@ -67,7 +67,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     public function column(string $column, string $alias = null): Builder {
         if ($column === "*") {
-            $this->columns = [];
+            $this->columns[] = "$this->table.*";
         }
         else {
             $this->columns[] = $alias ? "$column as $alias" : $column;
