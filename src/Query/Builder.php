@@ -36,7 +36,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     /**
      * @var Where\AndCondition
      */
-    protected $where;
+    protected $wheres;
 
     /**
      * @var array
@@ -57,19 +57,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->database = $database;
         $this->table = $table;
 
-        $this->where = new Database\Query\Where\AndCondition($this);
-    }
-
-    protected function getGenerator(): Generator {
-        return new Generator($this);
-    }
-
-    /**
-     * @param $part string
-     * @return mixed
-     */
-    public function getPart(string $part) {
-        return $this->{$part} ?? null;
+        $this->wheres = new Database\Query\Where\AndCondition($this);
     }
 
     public function table(string $table, string $alias = null): Builder {
@@ -89,7 +77,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null) {
-        $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
+        $this->wheres->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;
     }
 
@@ -112,11 +100,77 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
+    /**
+     * Convenient function to pluck/get out the single value from an array if it's the only value.
+     * Then build a string value if an array.
+     *
+     * @param $value string[]|string|null
+     * @param $separator string
+     * @return string
+     */
+    public static function arrayToString(array $value, string $separator = ","): string {
+        if (count($value) === 1) {
+            return array_shift($value);
+        }
+
+        return implode($separator, $value);
+    }
+
+    protected function generateWhereClause(): ?string {
+        $wheres = (string) $this->wheres;
+        if (!$wheres) {
+            return null;
+        }
+
+        return "WHERE $wheres";
+    }
+
+    protected function generateOrderByClause(): ?string {
+        $orderBy = $this->orderBys;
+        if (!$orderBy) {
+            return null;
+        }
+
+        return "ORDER BY " . static::arrayToString($orderBy);
+    }
+
+    protected function generateLimitClause(): ?string {
+        $limit = $this->limit;
+        if (!$limit) {
+            return null;
+        }
+
+        $clause = "LIMIT $limit";
+
+        // Generate an offset, using limit & page values
+        $page = $this->page;
+        if ($page > 1) {
+            $offset = $limit * ($page - 1);
+            $clause .= " OFFSET $offset";
+        }
+
+        return $clause;
+    }
+
     public static function buildQuery(array $parts): string {
         $query = implode("\n", $parts);
         $query .= ";";
 
         return $query;
+    }
+
+    public function getSelectQuery(): string {
+        $columns = $this->columns;
+
+        $columns = count($columns) ? static::arrayToString($columns) : "*";
+
+        return static::buildQuery(array_filter([
+            "SELECT $columns",
+            "FROM {$this->table}",
+            $this->generateWhereClause(),
+            $this->generateOrderByClause(),
+            $this->generateLimitClause(),
+        ]));
     }
 
     public function createCollectionFromResult(array $rows) {
@@ -133,7 +187,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function select() {
         $limit = $this->limit;
 
-        $query = static::buildQuery($this->getGenerator()->select());
+        $query = $this->getSelectQuery();
 
         if ($limit === 1) {
             return $this->database->selectFirst($query, $this->params);
@@ -174,17 +228,24 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->column("COUNT(*)", "count");
         $this->limit(1, 1);
 
-        $query = static::buildQuery($this->getGenerator()->select());
-
-        $row = $this->database->selectFirst($query, $this->params);
+        $row = $this->database->selectFirst($this->getSelectQuery(), $this->params);
 
         return $row["count"] ?? 0;
     }
 
     public function insert(array $values): ?int {
         $this->params($values);
+
+        $sets = [];
+        foreach (array_keys($values) as $column) {
+            $sets[] = "$column = :$column";
+        }
+
         $rowsAffected = $this->database->exec(
-            static::buildQuery($this->getGenerator()->insert($values)),
+            static::buildQuery(array_filter([
+                "INSERT INTO {$this->table}",
+                "SET " . static::arrayToString($sets),
+            ])),
             $this->params
         );
 
@@ -198,15 +259,27 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function update(array $values): int {
         $this->params($values);
 
+        $sets = [];
+        foreach (array_keys($values) as $column) {
+            $sets[] = "$column = :$column";
+        }
+
         return $this->database->exec(
-            static::buildQuery($this->getGenerator()->update($values)),
+            static::buildQuery(array_filter([
+                "UPDATE {$this->table}",
+                "SET " . static::arrayToString($sets),
+                $this->generateWhereClause()
+            ])),
             $this->params
         );
     }
 
     public function delete(): int {
         $rowsDeleted = $this->database->exec(
-            static::buildQuery($this->getGenerator()->delete()),
+            static::buildQuery(array_filter([
+                "DELETE FROM {$this->table}",
+                $this->generateWhereClause()
+            ])),
             $this->params
         );
         return $rowsDeleted;

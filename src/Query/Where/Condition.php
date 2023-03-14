@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace JPI\Database\Query\Where;
 
 use JPI\Database\Query\Builder;
-use JPI\Database\Query\Generator;
 use JPI\Database\Query\ParamableInterface;
 use JPI\Database\Query\WhereableInterface;
 use JPI\Database\Query\WhereableTrait;
@@ -45,9 +44,9 @@ abstract class Condition implements WhereableInterface, ParamableInterface {
             return "";
         }
 
-        $clause = Generator::arrayToString($this->wheres, " {$this->getCondition()} ");
+        $clause = $this->query::arrayToString($this->wheres, " {$this->getCondition()} ");
 
-        if ($count > 1 ){
+        if ($count > 1 ) {
             return "($clause)";
         }
 
