@@ -40,7 +40,7 @@ abstract class Condition implements WhereableInterface, ParamableInterface {
 
     public function __toString() {
         $count = count($this->wheres);
-        if (!$count){
+        if (!$count) {
             return "";
         }
 

@@ -34,14 +34,14 @@ class Builder implements WhereableInterface, ParamableInterface {
     protected $columns = [];
 
     /**
-     * @var Where\AndCondition
+     * @var \JPI\Database\Query\Where\AndCondition
      */
-    protected $wheres;
+    protected $where;
 
     /**
-     * @var array
+     * @var \JPI\Database\Query\Clause\OrderBy
      */
-    protected $orderBys = [];
+    protected $orderBy;
 
     /**
      * @var int|null
@@ -57,7 +57,8 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->database = $database;
         $this->table = $table;
 
-        $this->wheres = new Database\Query\Where\AndCondition($this);
+        $this->where = new Database\Query\Clause\Where($this);
+        $this->orderBy = new Database\Query\Clause\OrderBy($this);
     }
 
     public function table(string $table, string $alias = null): Builder {
@@ -77,12 +78,12 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null) {
-        $this->wheres->where($whereOrColumn, $expression, $valueOrPlaceholder);
+        $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;
     }
 
     public function orderBy(string $column, string $direction = "ASC"): Builder {
-        $this->orderBys[] = "$column $direction";
+        $this->orderBy[] = "$column $direction";
         return $this;
     }
 
@@ -114,24 +115,6 @@ class Builder implements WhereableInterface, ParamableInterface {
         }
 
         return implode($separator, $value);
-    }
-
-    protected function generateWhereClause(): ?string {
-        $wheres = (string) $this->wheres;
-        if (!$wheres) {
-            return null;
-        }
-
-        return "WHERE $wheres";
-    }
-
-    protected function generateOrderByClause(): ?string {
-        $orderBy = $this->orderBys;
-        if (!$orderBy) {
-            return null;
-        }
-
-        return "ORDER BY " . static::arrayToString($orderBy);
     }
 
     protected function generateLimitClause(): ?string {
@@ -167,8 +150,8 @@ class Builder implements WhereableInterface, ParamableInterface {
         return static::buildQuery(array_filter([
             "SELECT $columns",
             "FROM {$this->table}",
-            $this->generateWhereClause(),
-            $this->generateOrderByClause(),
+            (string) $this->where,
+            (string) $this->orderBy,
             $this->generateLimitClause(),
         ]));
     }
@@ -223,7 +206,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function count(): int {
         // Clear/reset
         $this->columns = [];
-        $this->orderBys = [];
+        $this->orderBy = new Database\Query\Clause\OrderBy($this);
 
         $this->column("COUNT(*)", "count");
         $this->limit(1, 1);
@@ -268,7 +251,7 @@ class Builder implements WhereableInterface, ParamableInterface {
             static::buildQuery(array_filter([
                 "UPDATE {$this->table}",
                 "SET " . static::arrayToString($sets),
-                $this->generateWhereClause()
+                (string) $this->where
             ])),
             $this->params
         );
@@ -278,7 +261,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         $rowsDeleted = $this->database->exec(
             static::buildQuery(array_filter([
                 "DELETE FROM {$this->table}",
-                $this->generateWhereClause()
+                (string) $this->where
             ])),
             $this->params
         );
