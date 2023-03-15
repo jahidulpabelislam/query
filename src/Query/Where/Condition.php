@@ -46,7 +46,7 @@ abstract class Condition implements WhereableInterface, ParamableInterface {
 
         $clause = $this->query::arrayToString($this->wheres, " {$this->getCondition()} ");
 
-        if ($count > 1 ) {
+        if ($count > 1) {
             return "($clause)";
         }
 
