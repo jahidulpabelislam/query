@@ -2,7 +2,7 @@
 
 namespace JPI\Database\Query\Clause;
 
-use JPI\Database\Query\Where\AndCondition;
+use JPI\Database\Query\Clause\Where\AndCondition;
 
 class Where extends AndCondition {
 

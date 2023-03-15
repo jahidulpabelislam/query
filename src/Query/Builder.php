@@ -34,7 +34,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     protected $columns = [];
 
     /**
-     * @var \JPI\Database\Query\Where\AndCondition
+     * @var \JPI\Database\Query\Clause\Where\AndCondition
      */
     protected $where;
 
@@ -57,7 +57,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->database = $database;
         $this->table = $table;
 
-        $this->where = new Database\Query\Clause\Where($this);
+        $this->where = new Clause\Where($this);
         $this->orderBy = new Database\Query\Clause\OrderBy($this);
     }
 
