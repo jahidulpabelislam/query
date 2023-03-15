@@ -31,8 +31,6 @@ abstract class AbstractClause extends Collection {
             return "";
         }
 
-        print_r($this->items);
-
         $value = $this->query::arrayToString($this->items, " {$this->getSeparator()} ");
 
         return "$this->clause $value";
