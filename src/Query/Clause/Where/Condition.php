@@ -8,8 +8,9 @@ use JPI\Database\Query\Builder;
 use JPI\Database\Query\ParamableInterface;
 use JPI\Database\Query\WhereableInterface;
 use JPI\Database\Query\WhereableTrait;
+use Stringable;
 
-abstract class Condition implements WhereableInterface, ParamableInterface {
+abstract class Condition implements WhereableInterface, ParamableInterface, Stringable {
 
     use WhereableTrait;
 
@@ -38,7 +39,7 @@ abstract class Condition implements WhereableInterface, ParamableInterface {
         return $this->condition;
     }
 
-    public function __toString() {
+    public function __toString(): string {
         $count = count($this->wheres);
         if (!$count) {
             return "";

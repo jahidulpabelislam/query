@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace JPI\Database\Query;
 
 use JPI\Utils\Collection;
+use Stringable;
 
-abstract class AbstractClause extends Collection {
+abstract class AbstractClause extends Collection implements Stringable {
 
     protected $clause;
     protected $separator = ",";
@@ -25,7 +26,7 @@ abstract class AbstractClause extends Collection {
         return $this->separator;
     }
 
-    public function __toString() {
+    public function __toString(): string {
         $count = count($this->items);
         if (!$count) {
             return "";
