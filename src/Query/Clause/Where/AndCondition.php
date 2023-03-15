@@ -6,5 +6,5 @@ namespace JPI\Database\Query\Clause\Where;
 
 class AndCondition extends Condition {
 
-    protected $condition = "AND";
+    protected string $condition = "AND";
 }

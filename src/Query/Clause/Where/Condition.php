@@ -14,23 +14,17 @@ abstract class Condition implements WhereableInterface, ParamableInterface, Stri
 
     use WhereableTrait;
 
-    protected $condition;
+    protected string $condition;
 
-    public function __construct(Builder $query) {
-        $this->query = $query;
+    public function __construct(protected Builder $query) {
     }
 
-    /**
-     * @param $key string
-     * @param $value string|int|float
-     * @return $this
-     */
-    public function param(string $key, $value) {
+    public function param(string $key, string|int|float $value): ParamableInterface {
         $this->query->param($key, $value);
         return $this;
     }
 
-    public function params(array $params) {
+    public function params(array $params): ParamableInterface {
         $this->query->params($params);
         return $this;
     }

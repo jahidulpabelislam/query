@@ -6,22 +6,14 @@ namespace JPI\Database\Query;
 
 trait ParamableTrait {
 
-    /**
-     * @var array
-     */
-    protected $params = [];
+    protected array $params = [];
 
-    /**
-     * @param $key string
-     * @param $value string|int|float
-     * @return $this
-     */
-    public function param(string $key, $value) {
+    public function param(string $key, string|int|float $value): ParamableInterface {
         $this->params[$key] = $value;
         return $this;
     }
 
-    public function params(array $params) {
+    public function params(array $params): ParamableInterface {
         $this->params = array_merge($this->params, $params);
         return $this;
     }

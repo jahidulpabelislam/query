@@ -6,12 +6,7 @@ namespace JPI\Database\Query;
 
 interface ParamableInterface {
 
-    /**
-     * @param $key string
-     * @param $value string|int|float
-     * @return $this
-     */
-    public function param(string $key, $value);
+    public function param(string $key, string|int|float $value): ParamableInterface;
 
-    public function params(array $params);
+    public function params(array $params): ParamableInterface;
 }

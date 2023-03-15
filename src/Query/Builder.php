@@ -7,6 +7,8 @@ namespace JPI\Database\Query;
 use JPI\Database;
 use JPI\Database\Collection;
 use JPI\Database\PaginatedCollection;
+use JPI\Database\Query\Clause\OrderBy as OrderByClause;
+use JPI\Database\Query\Clause\Where as WhereClause;
 
 /**
  * Query builder. Allows building SQL queries also executing them and receiving in appropriate format.
@@ -18,47 +20,19 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     use ParamableTrait;
 
-    /**
-     * @var Database
-     */
-    protected $database;
+    protected array $columns = [];
 
-    /**
-     * @var string|null
-     */
-    protected $table = null;
+    protected WhereClause $where;
 
-    /**
-     * @var array
-     */
-    protected $columns = [];
+    protected OrderByClause $orderBy;
 
-    /**
-     * @var \JPI\Database\Query\Clause\Where\AndCondition
-     */
-    protected $where;
+    protected ?int $limit = null;
 
-    /**
-     * @var \JPI\Database\Query\Clause\OrderBy
-     */
-    protected $orderBy;
+    protected ?int $page = null;
 
-    /**
-     * @var int|null
-     */
-    protected $limit = null;
-
-    /**
-     * @var int|null
-     */
-    protected $page = null;
-
-    public function __construct(Database $database, string $table = null) {
-        $this->database = $database;
-        $this->table = $table;
-
-        $this->where = new Clause\Where($this);
-        $this->orderBy = new Database\Query\Clause\OrderBy($this);
+    public function __construct(protected Database $database, protected ?string $table = null) {
+        $this->where = new WhereClause($this);
+        $this->orderBy = new OrderByClause($this);
     }
 
     public function table(string $table, string $alias = null): Builder {
@@ -77,7 +51,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
-    public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null) {
+    public function where(string $whereOrColumn, ?string $expression = null, string|int|float|array $valueOrPlaceholder = null): WhereableInterface {
         $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;
     }

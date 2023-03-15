@@ -9,13 +9,12 @@ use Stringable;
 
 abstract class AbstractClause extends Collection implements Stringable {
 
-    protected $clause;
-    protected $separator = ",";
+    protected string $clause;
+    protected string $separator = ",";
 
     protected $items = [];
 
-    public function __construct(Builder $query) {
-        $this->query = $query;
+    public function __construct(protected Builder $query) {
     }
 
     public function getClause(): string {

@@ -8,5 +8,5 @@ use JPI\Database\Query\AbstractClause;
 
 class OrderBy extends AbstractClause {
 
-    protected $clause = "ORDER BY";
+    protected string $clause = "ORDER BY";
 }

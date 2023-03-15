@@ -6,18 +6,9 @@ namespace JPI\Database\Query;
 
 trait WhereableTrait {
 
-    /**
-     * @var array
-     */
-    protected $wheres = [];
+    protected array $wheres = [];
 
-    /**
-     * @param $whereOrColumn string
-     * @param $expression string|null
-     * @param $valueOrPlaceholder mixed
-     * @return $this
-     */
-    public function where(string $whereOrColumn, ?string $expression = null, $valueOrPlaceholder = null) {
+    public function where(string $whereOrColumn, ?string $expression = null, string|int|float|array $valueOrPlaceholder = null): WhereableInterface {
         if ($expression === null && $valueOrPlaceholder === null) {
             $this->wheres[] = $whereOrColumn;
             return $this;
