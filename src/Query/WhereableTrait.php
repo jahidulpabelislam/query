@@ -24,7 +24,7 @@ trait WhereableTrait {
         }
 
         if (is_array($valueOrPlaceholder)) {
-            $expression = 'IN';
+            $expression = "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
                 $key = "{$whereOrColumn}_" . ($i + 1);
@@ -33,7 +33,7 @@ trait WhereableTrait {
             }
             $placeholder = "(" . implode(", ", $ins) . ")";
         } else {
-            if (is_string($valueOrPlaceholder) && $valueOrPlaceholder[0] !== ':') {
+            if (is_string($valueOrPlaceholder) && $valueOrPlaceholder[0] !== ":") {
                 $placeholder = ":$valueOrPlaceholder";
                 $this->param($valueOrPlaceholder, $valueOrPlaceholder);
             } else {
