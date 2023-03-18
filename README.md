@@ -17,7 +17,7 @@ Use at your own risk.
 
 ## Dependencies
 
-- PHP 7.1+
+- PHP 8.0
 - Composer
 - PHP PDO
 - MySQL 5+
