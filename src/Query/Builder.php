@@ -56,8 +56,8 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
-    public function orderBy(string $column, string $direction = "ASC"): Builder {
-        $this->orderBy[] = "$column $direction";
+    public function orderBy(string $column, bool $ascDirection = true): Builder {
+        $this->orderBy[] = "$column " . ($ascDirection ? "ASC" : "DESC");
         return $this;
     }
 
