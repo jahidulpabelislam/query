@@ -23,13 +23,13 @@ trait WhereableTrait {
                 $this->param($key, $value);
             }
             $placeholder = "(" . implode(", ", $ins) . ")";
-        } else {
-            if (is_string($valueOrPlaceholder) && $valueOrPlaceholder[0] !== ":") {
-                $placeholder = ":$valueOrPlaceholder";
-                $this->param($valueOrPlaceholder, $valueOrPlaceholder);
-            } else {
-                $placeholder = $valueOrPlaceholder;
-            }
+        }
+        else if (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":") {
+            $placeholder = ":$whereOrColumn";
+            $this->param($whereOrColumn, $valueOrPlaceholder);
+        }
+        else {
+            $placeholder = $valueOrPlaceholder;
         }
 
         $this->wheres[] = "$whereOrColumn $expression $placeholder";
