@@ -124,8 +124,8 @@ class Builder implements WhereableInterface, ParamableInterface {
         return static::buildQuery(array_filter([
             "SELECT $columns",
             "FROM {$this->table}",
-            (string) $this->where,
-            (string) $this->orderBy,
+            (string)$this->where,
+            (string)$this->orderBy,
             $this->generateLimitClause(),
         ]));
     }
@@ -225,7 +225,7 @@ class Builder implements WhereableInterface, ParamableInterface {
             static::buildQuery(array_filter([
                 "UPDATE {$this->table}",
                 "SET " . static::arrayToString($sets),
-                (string) $this->where
+                (string)$this->where,
             ])),
             $this->params
         );
@@ -235,7 +235,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         $rowsDeleted = $this->database->exec(
             static::buildQuery(array_filter([
                 "DELETE FROM {$this->table}",
-                (string) $this->where
+                (string)$this->where,
             ])),
             $this->params
         );
