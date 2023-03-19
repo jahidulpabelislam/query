@@ -187,7 +187,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         $row = $this->database->selectFirst($this->getSelectQuery(), $this->params);
 
-        return $row["count"] ?? 0;
+        return (int)$row["count"];
     }
 
     public function insert(array $values): ?int {
