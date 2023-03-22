@@ -75,10 +75,6 @@ class Builder implements WhereableInterface, ParamableInterface {
     /**
      * Convenient function to pluck/get out the single value from an array if it's the only value.
      * Then build a string value if an array.
-     *
-     * @param $value string[]|string|null
-     * @param $separator string
-     * @return string
      */
     public static function arrayToString(array $value, string $separator = ","): string {
         if (count($value) === 1) {
