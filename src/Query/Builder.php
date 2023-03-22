@@ -12,9 +12,6 @@ use JPI\Database\Query\Clause\Where as WhereClause;
 
 /**
  * Query builder. Allows building SQL queries also executing them and receiving in appropriate format.
- *
- * @author Jahidul Pabel Islam <me@jahidulpabelislam.com>
- * @copyright 2012-2023 JPI
  */
 class Builder implements WhereableInterface, ParamableInterface {
 
