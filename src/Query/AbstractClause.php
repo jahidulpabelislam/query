@@ -12,7 +12,7 @@ abstract class AbstractClause extends Collection implements Stringable {
     protected string $clause;
     protected string $separator = ",";
 
-    protected $items = [];
+    protected array $items = [];
 
     public function __construct(protected Builder $query) {
     }
