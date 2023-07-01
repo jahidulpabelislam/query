@@ -9,6 +9,8 @@ use JPI\Database\Collection;
 use JPI\Database\PaginatedCollection;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
+use JPI\Utils\Collection\PaginatedInterface as PaginatedCollectionInterface;
+use JPI\Utils\CollectionInterface;
 
 /**
  * Query builder. Allows building SQL queries also executing them and receiving in appropriate format.
@@ -123,16 +125,16 @@ class Builder implements WhereableInterface, ParamableInterface {
         ]));
     }
 
-    public function createCollectionFromResult(array $rows) {
+    public function createCollectionFromResult(array $rows): CollectionInterface {
         return new Collection($rows);
     }
 
-    public function createPaginatedCollectionFromResult(array $rows, int $totalCount, int $limit, int $page) {
+    public function createPaginatedCollectionFromResult(array $rows, int $totalCount, int $limit, int $page): PaginatedCollectionInterface {
         return new PaginatedCollection($rows, $totalCount, $limit, $page);
     }
 
     /**
-     * @return PaginatedCollection|Collection|array|null
+     * @return CollectionInterface|PaginatedCollectionInterface|array|null
      */
     public function select() {
         $limit = $this->limit;
