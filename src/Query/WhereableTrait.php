@@ -8,7 +8,11 @@ trait WhereableTrait {
 
     protected array $wheres = [];
 
-    public function where(string $whereOrColumn, ?string $expression = null, string|int|float|array $valueOrPlaceholder = null): WhereableInterface {
+    public function where(
+        string $whereOrColumn,
+        ?string $expression = null,
+        string|int|float|array $valueOrPlaceholder = null
+    ): static {
         if ($expression === null && $valueOrPlaceholder === null) {
             $this->wheres[] = $whereOrColumn;
             return $this;

@@ -29,17 +29,20 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     protected ?int $page = null;
 
-    public function __construct(protected Database $database, protected ?string $table = null) {
+    public function __construct(
+        protected Database $database,
+        protected ?string $table = null
+    ) {
         $this->where = new WhereClause($this);
         $this->orderBy = new OrderByClause($this);
     }
 
-    public function table(string $table, string $alias = null): Builder {
+    public function table(string $table, string $alias = null): static {
         $this->table = $alias ? "$table as $alias" : $table;
         return $this;
     }
 
-    public function column(string $column, string $alias = null): Builder {
+    public function column(string $column, string $alias = null): static {
         if ($column === "*") {
             $this->columns[] = "$this->table.*";
         }
@@ -50,22 +53,26 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
-    public function where(string $whereOrColumn, ?string $expression = null, string|int|float|array $valueOrPlaceholder = null): WhereableInterface {
+    public function where(
+        string $whereOrColumn,
+        ?string $expression = null,
+        string|int|float|array $valueOrPlaceholder = null
+    ): static {
         $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;
     }
 
-    public function orderBy(string $column, bool $ascDirection = true): Builder {
+    public function orderBy(string $column, bool $ascDirection = true): static {
         $this->orderBy[] = "$column " . ($ascDirection ? "ASC" : "DESC");
         return $this;
     }
 
-    public function page(int $page): Builder {
+    public function page(int $page): static {
         $this->page = $page;
         return $this;
     }
 
-    public function limit(int $limit, int $page = null): Builder {
+    public function limit(int $limit, int $page = null): static {
         if (!is_null($page)) {
             $this->page($page);
         }

@@ -19,12 +19,12 @@ abstract class Condition implements WhereableInterface, ParamableInterface, Stri
     public function __construct(protected Builder $query) {
     }
 
-    public function param(string $key, string|int|float $value): ParamableInterface {
+    public function param(string $key, string|int|float $value): static {
         $this->query->param($key, $value);
         return $this;
     }
 
-    public function params(array $params): ParamableInterface {
+    public function params(array $params): static {
         $this->query->params($params);
         return $this;
     }
