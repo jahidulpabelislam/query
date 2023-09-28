@@ -236,4 +236,9 @@ class Builder implements WhereableInterface, ParamableInterface {
         );
         return $rowsDeleted;
     }
+
+    public function __clone() {
+        $this->where = clone $this->where;
+        $this->orderBy = clone $this->orderBy;
+    }
 }
