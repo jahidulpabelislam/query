@@ -182,7 +182,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function count(): int {
         // Clear/reset
         $this->columns = [];
-        $this->orderBy = new Database\Query\Clause\OrderBy($this);
+        $this->orderBy->clear();
 
         $this->column("COUNT(*)", "count");
         $this->limit(1, 1);
