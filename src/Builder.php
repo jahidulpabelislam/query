@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace JPI\Database\Query;
 
 use JPI\Database;
-use JPI\Database\Query\Result;
-use JPI\Database\Query\PaginatedResult;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
 use JPI\Utils\Collection\PaginatedInterface as PaginatedCollectionInterface;
