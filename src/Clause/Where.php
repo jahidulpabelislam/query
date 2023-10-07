@@ -9,12 +9,10 @@ use JPI\Database\Query\Clause\Where\AndCondition;
 class Where extends AndCondition {
 
     public function __toString(): string {
-        $string = parent::__toString();
-
-        if (!$string) {
+        if (!count($this->wheres)) {
             return "";
         }
 
-        return "WHERE $string";
+        return "WHERE " . $this->query::arrayToString($this->wheres, " {$this->getCondition()} ");
     }
 }
