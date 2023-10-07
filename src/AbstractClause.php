@@ -31,7 +31,7 @@ abstract class AbstractClause extends Collection implements Stringable {
             return "";
         }
 
-        $value = $this->query::arrayToString($this->items, " {$this->getSeparator()} ");
+        $value = $this->query::arrayToString($this->items, "{$this->getSeparator()} ");
 
         return "$this->clause $value";
     }
