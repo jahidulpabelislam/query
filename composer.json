@@ -24,7 +24,6 @@
         "jpi/codestyles": "^1.0",
         "phpunit/phpunit": "^9.0"
     },
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "JPI\\Database\\Query\\": "src/",
