@@ -26,7 +26,11 @@
     },
     "autoload": {
         "psr-4": {
-            "JPI\\Database\\Query\\": "src/",
+            "JPI\\Database\\Query\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "JPI\\Database\\Query\\Tests\\": "tests/"
         }
     }
