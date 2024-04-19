@@ -1,19 +1,19 @@
 # Query
 
+USE AT YOUR OWN RISK!
+
+I would advise against using this on production applications...but feel free to use in your own personal / demo / experimental projects.
+
 [![CodeFactor](https://www.codefactor.io/repository/github/jahidulpabelislam/query/badge)](https://www.codefactor.io/repository/github/jahidulpabelislam/query)
 [![Latest Stable Version](https://poser.pugx.org/jpi/query/v/stable)](https://packagist.org/packages/jpi/query)
 [![Total Downloads](https://poser.pugx.org/jpi/query/downloads)](https://packagist.org/packages/jpi/query)
 [![Latest Unstable Version](https://poser.pugx.org/jpi/query/v/unstable)](https://packagist.org/packages/jpi/query)
 [![License](https://poser.pugx.org/jpi/query/license)](https://packagist.org/packages/jpi/query)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/1.x.svg?label=last%20activity)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/2.x.svg?label=last%20activity)
 
-A very very simple library to make querying a database easier, this works as a middle man between the application and a database.
+A simple library to make querying a database easier, this works as a middle man between the application and a database.
 
-This has been kept very simple stupid (KISS), there is no validation, it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
-
-I WOULD ADVISE AGAINST USING THIS ON PRODUCTION APPLICATIONS...but feel free to use in your own personal / demo / experimental projects.
-
-Use at your own risk.
+This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation, it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
 ## Dependencies
 
@@ -21,7 +21,7 @@ Use at your own risk.
 - Composer
 - PHP PDO
 - MySQL 5+
-- [jpi/database](https://packagist.org/packages/jpi/database)
+- [jpi/database](https://packagist.org/packages/jpi/database) v2
 
 ## Installation
 
@@ -33,57 +33,46 @@ $ composer require jpi/query
 
 ## Usage
 
-To create an instance, you will need an instance of `\JPI\Database\Connection` (if unfamiliar you can read about that [here](https://packagist.org/packages/jpi/database)) which is the first parameter, and the database table name as the second parameter. The same instance can be used multiple times as long as the table is the same.
+To create an instance, you will need an instance of `\JPI\Database` (if unfamiliar you can read about that [here](https://packagist.org/packages/jpi/database)) which is the first parameter, and the database table name as the second parameter. The same instance can be used multiple times as long as it's for the same database.
 
 ```php
-$query = new \JPI\Database\Query($connection, $table);
+$queryBuilder = new \JPI\Database\Query\Builder($database, $table);
 ```
 
-### Available Methods:
+### Action Methods:
 
-All the methods are self-explanatory.
+These are the methods to will call to end with `select`, `count: int`, `insert($values array): int|null`, `update($values array): int` & `delete: int`, all are pretty self-explanatory.
 
-- select - To get a collection of rows or a single row in the table. Params: `$columns`, `$where`, `$params`, `$orderBy`, `$limit` & `$page` (All optional)
-- count - To get total count of rows in the table. Params: `$where`  & `$params` (All optional)
-- insert - To insert a new row in the table. Params: `$values`
-- update - To update values for row(s) in the table. Params: `$values`, `$where` & `$params` (`$where` & `$params` are optional)
-- delete - To delete row(s) from the table. Params: `$where` & `$params` (All optional)
+### Builder methods
 
-The params type should be consistent where the name is the same.
+These are all fluent methods, so you can chain them together.
 
-#### Params
+- `table(string $table, string|null $alias)`: if you want to change to another table or didn't set when creating the instance
+- `column(string $column, string|null $alias)`:  will select all columns if not set
+- `where`:
+  - you can pass in whole clause using the first parameter
+  - or you can pass column, expression and value separately
+- `orderBy(string $column, bool $ascDirection = true)`
+- `limit(int $limit, int|null $page)`
+- `page(int)`: used to change the offset, only used if `limit` set
 
-- `$columns`: The columns to get in the select query. Type: Array of strings, single string, or null (default: `"*"`)
-- `$where`: The where clauses for query. Type: Array of strings, single string, integer (assumes where is for `id` column) or `null` (default: `null`)
-- `$params`: The key values pairs to bind for query. Type: Associative array, or `null` (default: `null`)
-- `$orderBy`: The order by clauses for the select query. Type: Array of strings, single string, or `null` (default: `null`)
-- `$limit`: The limit for the select query. Type: Integer or `null` (default: `null`)
-- `$page`: . The page number if limited, Used to calculate the offset. Type: Integer or null (default: `null`) (Only used of `$limit` is passed, then default: `1`)
-- `$values`: The key values pairs for insert or update. Type: Associative array
+### Examples
 
-#### Examples
+Assuming a `\JPI\Database\Query\Builder` instance has been created for the `users` database table and set to a variable named `$queryBuilder`.
 
-Assuming a `JPI\Database\Query` instance has been created for the `users` database table and set to a variable named `$query`.
+#### select
 
-##### select
+This has 4 return types depending on how you use it:
 
-A `select` has 3 three return types depending on how you use it.
+- if you've set `limit` of `1` this will return an associative array of key (column) value pairs or if not found then `null`
+- if paged `\JPI\Database\Query\PaginatedResult`
+- else `\JPI\Database\Query\Result`
 
-- `limit = 1` OR `$where` is an integer, this will return an associative array of key (column) value pairs. UNLESS none is found then `null` is returned
-- an `\JPI\Database\Collection` is returned if it is a paginated multi row select
-- else a two-dimensional array is returned for other multi row selects
-
-A `\JPI\Database\Collection` works like a normal array just with some extra methods:
-- `isset(int $key)` check if item exists by key
-- `get(int $key)` to get an item by key
-- `getCount()` get the count of rows in the collection
-- `getTotalCount()` get the TOTAL count of rows (the count without the LIMIT)
-- `getLimit()` get the LIMIT used in query
-- `getPage()` get the page number from query
+`PaginatedResult` & `Result` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details.
 
 ```php
 // SELECT * FROM users;
-$collection = $query->select();
+$collection = $queryBuilder->select();
 /**
 $collection = [
     [
@@ -107,10 +96,10 @@ $collection = [
 */
 
 // SELECT first_name, last_name FROM users;
-$collection = $query->select([
-    "first_name",
-    "last_name",
-]);
+$collection = $queryBuilder
+    ->column("first_name")
+    ->column("last_name")
+    ->select();
 /**
 $collection = [
     [
@@ -126,13 +115,7 @@ $collection = [
 */
 
 // SELECT * FROM users WHERE status = "active";
-$collection = $query->select(
-    "*",
-    "status = :status",
-    [
-        "status" => "active",
-    ],
-);
+$collection = $queryBuilder->where("status", "=", "active")->select();
 /**
 $collection = [
     [
@@ -157,15 +140,8 @@ $collection = [
 ];
 */
 
-// SELECT * FROM users WHERE status = "active" ORDER BY last_name;
-$collection = $query->select(
-    "*",
-    "status = :status",
-    [
-        "status" => "active",
-    ],
-    "last_name"
-);
+// SELECT * FROM users WHERE status = "active" ORDER BY last_name ASC;
+$collection = $queryBuilder->where("status", "=", "active")->orderBy("last_name")->select();
 /**
 $collection = [
     [
@@ -190,17 +166,8 @@ $collection = [
 ];
 */
 
-// SELECT * FROM users WHERE status = "active" ORDER BY first_name LIMIT 10 OFFSET 20;
-$collection = $query->select(
-    "*",
-    "status = :status",
-    [
-        "status" => "active",
-    ],
-    "first_name",
-    10,
-    2
-);
+// SELECT * FROM users WHERE status = "active" ORDER BY first_name ASC LIMIT 10 OFFSET 20;
+$collection = $queryBuilder->where("status", "=", "active")->orderBy("first_name")->limit(10, 3)->select();
 /**
 $collection = [
     [
@@ -226,15 +193,7 @@ $collection = [
 */
 
 // SELECT * FROM users WHERE first_name LIKE "%jahidul%" LIMIT 1;
-$row = $query->select(
-    "*",
-    "first_name LIKE :first_name",
-    [
-        "first_name" => "%jahidul%",
-    ],
-    null,
-    1
-);
+$row = $queryBuilder->where("first_name", "LIKE", "%jahidul%")->limit(1)->select();
 /**
 $row = [
     "id" => 1,
@@ -247,32 +206,31 @@ $row = [
 */
 ```
 
-##### count
+#### count
 
 As the name implies this method will just return the count as an integer.
 
+Currently only the `table` & `where` builder methods are supported for this action.
+
 ```php
-// SELECT COUNT(*) FROM users;
-$count = $query->count();
+// SELECT COUNT(*) as count FROM users;
+$count = $queryBuilder->count();
 // $count = 10;
 
-// SELECT COUNT(*) FROM users WHERE status = "active";
-$count = $query->count(
-    "status = :status",
-    [
-        "status" => "active",
-    ]
-);
+// SELECT COUNT(*) as count FROM users WHERE status = "active";
+$count = $queryBuilder->where("status", "=", "active")->count();
 // $count = 5;
 ```
 
-##### insert
+#### insert
 
-This method will just return the id of the row created, unless it failed then `null`
+This method will just return the id of the row created, unless it failed then `null`.
+
+Currently only the `table` builder method is supported for this action.
 
 ```php
-// INSERT INTO users (first_name, last_name, email, password) VALUES ("Jahidul", "Islam", "jahidul@jahidulpabelislam.com", "password");"
-$id = $query->insert([
+// INSERT INTO users SET first_name= "Jahidul", last_name= "Islam", email = "jahidul@jahidulpabelislam.com", password = "password";
+$id = $queryBuilder->insert([
     "first_name" => "Jahidul",
     "last_name" => "Islam",
     "email" => "jahidul@jahidulpabelislam.com",
@@ -281,47 +239,44 @@ $id = $query->insert([
 // $id = 1;
 ```
 
-##### update
+#### update
 
 This method will return the count of how many rows have been updated by the query.
 
+Currently only the `table` & `where` builder methods are supported for this action.
+
 ```php
 // UPDATE users SET status = "inactive";
-$numberOrRowsUpdated = $query->update(
-    [
-        "status" => "inactive",
-    ]
-);
+$numberOrRowsUpdated = $queryBuilder->update([
+    "status" => "inactive",
+]);
 // $numberOrRowsUpdated = 10;
 
 // UPDATE users SET first_name = "Pabel" WHERE id = 1;
-$numberOrRowsUpdated = $query->update(
-    [
+$numberOrRowsUpdated = $queryBuilder
+    ->where("id", "=", 1)
+    ->update([
         "first_name" => "Pabel",
-    ],
-    ["id = :id"],
-    ["id" => 1]
-);
+    ])
+;
 // $numberOrRowsUpdated = 1;
 ```
 
-##### delete
+#### delete
 
 This method will return the count of how many rows have been deleted by the query.
 
+Currently only the `table` & `where` builder methods are supported for this action.
+
 ```php
 // DELETE FROM users;
-$numberOrRowsDeleted = $query->delete();
+$numberOrRowsDeleted = $queryBuilder->delete();
 // $numberOrRowsDeleted = 10;
 
 // DELETE FROM users WHERE id = 1;
-$numberOrRowsDeleted = $query->delete(["id = :id"], ["id" => 1]);
+$numberOrRowsDeleted = $queryBuilder->where("id", "=", 1)->delete();
 // $numberOrRowsDeleted = 1;
 ```
-
-## Changelog
-
-See [CHANGELOG](CHANGELOG.md)
 
 ## Support
 
@@ -333,6 +288,6 @@ If you find any issues or have any feature requests, you can open an [issue](htt
 
 - [Jahidul Pabel Islam](https://jahidulpabelislam.com/) [<me@jahidulpabelislam.com>](mailto:me@jahidulpabelislam.com)
 
-## License
+## Licence
 
-This module is licensed under the General Public License - see the [License](LICENSE.md) file for details
+This module is licensed under the General Public Licence - see the [licence](LICENSE.md) file for details.
