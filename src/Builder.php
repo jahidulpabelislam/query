@@ -7,6 +7,9 @@ namespace JPI\Database\Query;
 use JPI\Database;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
+use JPI\Database\Query\Result\PaginatedCollection;
+use JPI\Database\Query\Result\Collection;
+use JPI\Database\Query\Result\Row;
 use JPI\Utils\Collection\PaginatedInterface as PaginatedCollectionInterface;
 use JPI\Utils\CollectionInterface;
 
@@ -16,6 +19,12 @@ use JPI\Utils\CollectionInterface;
 class Builder implements WhereableInterface, ParamableInterface {
 
     use ParamableTrait;
+
+    /** @var class-string<CollectionInterface> */
+    protected static $collectionClass = Collection::class;
+
+    /** @var class-string<PaginatedCollectionInterface> */
+    protected static $paginatedCollectionClass = PaginatedCollection::class;
 
     protected array $columns = [];
 
@@ -130,30 +139,41 @@ class Builder implements WhereableInterface, ParamableInterface {
         ]));
     }
 
-    public function createCollectionFromResult(array $rows): CollectionInterface {
-        return new Result($rows);
+    /** @return class-string<ResultInterface> */
+    public function getResultClass(): string {
+        return Row::class;
     }
 
-    public function createPaginatedCollectionFromResult(array $rows, int $totalCount, int $limit, int $page): PaginatedCollectionInterface {
-        return new PaginatedResult($rows, $totalCount, $limit, $page);
+    public function createResults(array $rows): array {
+        $resultClass = $this->getResultClass();
+        $results = [];
+
+        foreach ($rows as $row) {
+            $results[] = $resultClass::loadFromDatabaseRow($row);
+        }
+
+        return $results;
     }
 
-    /**
-     * @return CollectionInterface|PaginatedCollectionInterface|array|null
-     */
-    public function select() {
+    public function select(): CollectionInterface|PaginatedCollectionInterface|ResultInterface|null {
         $limit = $this->limit;
 
         $query = $this->getSelectQuery();
 
         if ($limit === 1) {
-            return $this->database->selectFirst($query, $this->params);
+            $result = $this->database->selectFirst($query, $this->params);
+
+            if (!$result) {
+                return null;
+            }
+
+            return $this->getResultClass()::loadFromDatabaseRow($result);
         }
 
         $rows = $this->database->selectAll($query, $this->params);
 
         if (!$limit) {
-            return $this->createCollectionFromResult($rows);
+            return new static::$collectionClass($this->createResults($rows));
         }
 
         $page = $this->page ?? 1;
@@ -174,7 +194,7 @@ class Builder implements WhereableInterface, ParamableInterface {
             $totalCount = $limit * ($page - 1) + $count;
         }
 
-        return $this->createPaginatedCollectionFromResult($rows, $totalCount, $limit, $page);
+        return new static::$paginatedCollectionClass($this->createResults($rows), $totalCount, $limit, $page);
     }
 
     public function count(): int {
