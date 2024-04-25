@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
-use JPI\Utils\Arrayable;
 use IteratorAggregate;
+use JPI\Utils\Arrayable;
 
 /**
  * Represents a single row from the database.
