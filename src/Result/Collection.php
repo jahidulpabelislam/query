@@ -9,5 +9,5 @@ use JPI\Utils\Collection as BaseCollection;
 /**
  * Represents collection of zero or more rows from the database.
  */
-class Collection extends BaseCollection {
+class Collection extends BaseCollection implements CollectionInterface {
 }
