@@ -7,11 +7,11 @@ namespace JPI\Database\Query;
 use JPI\Database;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
-use JPI\Database\Query\Result\PaginatedCollection;
 use JPI\Database\Query\Result\Collection;
+use JPI\Database\Query\Result\CollectionInterface;
+use JPI\Database\Query\Result\PaginatedCollection;
+use JPI\Database\Query\Result\PaginatedCollectionInterface;
 use JPI\Database\Query\Result\Row;
-use JPI\Utils\Collection\PaginatedInterface as PaginatedCollectionInterface;
-use JPI\Utils\CollectionInterface;
 
 /**
  * Query builder. Allows building SQL queries also executing them and receiving in appropriate format.
