@@ -4,5 +4,7 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Result;
 
-interface CollectionInterface {
+use JPI\Utils\CollectionInterface as BaseCollectionInterface;
+
+interface CollectionInterface extends BaseCollectionInterface {
 }
