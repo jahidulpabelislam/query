@@ -210,7 +210,7 @@ $row = [
 
 As the name implies this method will just return the count as an integer.
 
-Currently only the `table` & `where` builder methods are supported for this action.
+For obvious reasons only the `table` & `where` builder methods are supported for this action.
 
 ```php
 // SELECT COUNT(*) as count FROM users;
@@ -226,7 +226,7 @@ $count = $queryBuilder->where("status", "=", "active")->count();
 
 This method will just return the id of the row created, unless it failed then `null`.
 
-Currently only the `table` builder method is supported for this action.
+Only the `table` builder method is supported for this action.
 
 ```php
 // INSERT INTO users SET first_name= "Jahidul", last_name= "Islam", email = "jahidul@jahidulpabelislam.com", password = "password";
@@ -243,7 +243,7 @@ $id = $queryBuilder->insert([
 
 This method will return the count of how many rows have been updated by the query.
 
-Currently only the `table` & `where` builder methods are supported for this action.
+`column` & `page` builder methods aren't supported for this action.
 
 ```php
 // UPDATE users SET status = "inactive";
@@ -266,7 +266,7 @@ $numberOrRowsUpdated = $queryBuilder
 
 This method will return the count of how many rows have been deleted by the query.
 
-Currently only the `table` & `where` builder methods are supported for this action.
+`column` & `page` builder methods aren't supported for this action.
 
 ```php
 // DELETE FROM users;
