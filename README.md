@@ -41,7 +41,7 @@ $queryBuilder = new \JPI\Database\Query\Builder($database, $table);
 
 ### Action Methods:
 
-These are the methods to will call to end with `select`, `count: int`, `insert($values array): int|null`, `update($values array): int` & `delete: int`, all are pretty self-explanatory.
+These are the methods to call to end with `select`, `count: int`, `insert($values array): int|null`, `update($values array): int` & `delete: int`, all are pretty self-explanatory.
 
 ### Builder methods
 
@@ -50,7 +50,7 @@ These are all fluent methods, so you can chain them together.
 - `table(string $table, string|null $alias)`: if you want to change to another table or didn't set when creating the instance
 - `column(string $column, string|null $alias)`:  will select all columns if not set
 - `where`:
-  - you can pass in whole clause using the first parameter
+  - you can pass in the whole clause using the first parameter
   - or you can pass column, expression and value separately
 - `orderBy(string $column, bool $ascDirection = true)`
 - `limit(int $limit, int|null $page)`
