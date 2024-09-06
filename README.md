@@ -11,7 +11,7 @@ I would advise against using this on production applications...but feel free to 
 [![License](https://poser.pugx.org/jpi/query/license)](https://packagist.org/packages/jpi/query)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/2.x.svg?label=last%20activity)
 
-A simple library to make querying a database easier, this works as a middle man between the application and a database.
+A simple library to make querying a database easier it works as a middleman between the application and a database.
 
 This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation, it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
@@ -224,7 +224,7 @@ $count = $queryBuilder->where("status", "=", "active")->count();
 
 #### insert
 
-This method will just return the id of the row created, unless it failed then `null`.
+This method will just return the id of the row created unless it fails then `null`.
 
 Only the `table` builder method is supported for this action.
 
@@ -280,9 +280,9 @@ $numberOrRowsDeleted = $queryBuilder->where("id", "=", 1)->delete();
 
 ## Support
 
-If you found this library interesting or useful please do spread the word of this library: share on your social's, star on GitHub, etc.
+If you found this library interesting or useful please spread the word about this library: share on your socials, star on GitHub, etc.
 
-If you find any issues or have any feature requests, you can open an [issue](https://github.com/jahidulpabelislam/query/issues) or can email [me @ jahidulpabelislam.com](mailto:me@jahidulpabelislam.com) :smirk:.
+If you find any issues or have any feature requests, you can open an [issue](https://github.com/jahidulpabelislam/query/issues) or email [me @ jahidulpabelislam.com](mailto:me@jahidulpabelislam.com) :smirk:.
 
 ## Authors
 
