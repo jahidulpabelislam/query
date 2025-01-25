@@ -9,7 +9,7 @@ use JPI\Database\Query\Clause\Where\AndCondition;
 class Where extends AndCondition {
 
     public function __toString(): string {
-        if (!count($this->wheres)) {
+        if (empty($this->wheres)) {
             return "";
         }
 

@@ -26,8 +26,7 @@ abstract class AbstractClause extends Collection implements Stringable {
     }
 
     public function __toString(): string {
-        $count = count($this->items);
-        if (!$count) {
+        if (empty($this->items)) {
             return "";
         }
 

@@ -128,7 +128,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function getSelectQuery(): string {
         $columns = $this->columns;
 
-        $columns = count($columns) ? static::arrayToString($columns) : "*";
+        $columns = !empty($columns) ? static::arrayToString($columns) : "*";
 
         return static::buildQuery(array_filter([
             "SELECT $columns",
