@@ -132,7 +132,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         return static::buildQuery(array_filter([
             "SELECT $columns",
-            "FROM {$this->table}",
+            "FROM $this->table",
             (string)$this->where,
             (string)$this->orderBy,
             $this->generateLimitClause(),
@@ -220,7 +220,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         $rowsAffected = $this->database->exec(
             static::buildQuery(array_filter([
-                "INSERT INTO {$this->table}",
+                "INSERT INTO $this->table",
                 "SET " . static::arrayToString($sets),
             ])),
             $this->params
@@ -243,7 +243,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         return $this->database->exec(
             static::buildQuery(array_filter([
-                "UPDATE {$this->table}",
+                "UPDATE $this->table",
                 "SET " . static::arrayToString($sets),
                 (string)$this->where,
                 (string)$this->orderBy,
@@ -256,7 +256,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function delete(): int {
         $rowsDeleted = $this->database->exec(
             static::buildQuery(array_filter([
-                "DELETE FROM {$this->table}",
+                "DELETE FROM $this->table",
                 (string)$this->where,
                 (string)$this->orderBy,
                 $this->generateLimitClause(),
