@@ -28,6 +28,8 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     protected array $columns = [];
 
+    protected array $joins = [];
+
     protected WhereClause $where;
 
     protected OrderByClause $orderBy;
@@ -56,6 +58,12 @@ class Builder implements WhereableInterface, ParamableInterface {
         else {
             $this->columns[] = $alias ? "$column as $alias" : $column;
         }
+
+        return $this;
+    }
+
+    public function join(string $type, string $table, string $on): static {
+        $this->joins[] = "$type JOIN $table ON $on";
 
         return $this;
     }
@@ -127,12 +135,15 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     public function getSelectQuery(): string {
         $columns = $this->columns;
+        $joins = $this->joins;
 
         $columns = !empty($columns) ? static::arrayToString($columns) : "*";
+        $joins = !empty($joins) ? static::arrayToString($joins) : null;
 
         return static::buildQuery(array_filter([
             "SELECT $columns",
             "FROM $this->table",
+            $joins,
             (string)$this->where,
             (string)$this->orderBy,
             $this->generateLimitClause(),
