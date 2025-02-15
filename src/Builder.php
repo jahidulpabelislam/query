@@ -21,10 +21,10 @@ class Builder implements WhereableInterface, ParamableInterface {
     use ParamableTrait;
 
     /** @var class-string<CollectionInterface> */
-    protected static $collectionClass = Collection::class;
+    protected static string $collectionClass = Collection::class;
 
     /** @var class-string<PaginatedCollectionInterface> */
-    protected static $paginatedCollectionClass = PaginatedCollection::class;
+    protected static string $paginatedCollectionClass = PaginatedCollection::class;
 
     protected array $columns = [];
 
