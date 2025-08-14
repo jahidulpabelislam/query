@@ -1,9 +1,5 @@
 # Query
 
-USE AT YOUR OWN RISK!
-
-I would advise against using this on production applications...but feel free to use in your own personal / demo / experimental projects.
-
 [![CodeFactor](https://www.codefactor.io/repository/github/jahidulpabelislam/query/badge)](https://www.codefactor.io/repository/github/jahidulpabelislam/query)
 [![Latest Stable Version](https://poser.pugx.org/jpi/query/v/stable)](https://packagist.org/packages/jpi/query)
 [![Total Downloads](https://poser.pugx.org/jpi/query/downloads)](https://packagist.org/packages/jpi/query)
@@ -13,7 +9,7 @@ I would advise against using this on production applications...but feel free to 
 
 A simple library to make querying a database easier it works as a middleman between the application and a database.
 
-This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation, it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
+This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation (so use at your own risk), it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
 ## Dependencies
 
@@ -115,7 +111,9 @@ $collection = [
 */
 
 // SELECT * FROM users WHERE status = "active";
-$collection = $queryBuilder->where("status", "=", "active")->select();
+$collection = $queryBuilder
+    ->where("status", "=", "active")
+    ->select();
 /**
 $collection = [
     [
@@ -141,7 +139,10 @@ $collection = [
 */
 
 // SELECT * FROM users WHERE status = "active" ORDER BY last_name ASC;
-$collection = $queryBuilder->where("status", "=", "active")->orderBy("last_name")->select();
+$collection = $queryBuilder
+    ->where("status", "=", "active")
+    ->orderBy("last_name")
+    ->select();
 /**
 $collection = [
     [
@@ -167,7 +168,11 @@ $collection = [
 */
 
 // SELECT * FROM users WHERE status = "active" ORDER BY first_name ASC LIMIT 10 OFFSET 20;
-$collection = $queryBuilder->where("status", "=", "active")->orderBy("first_name")->limit(10, 3)->select();
+$collection = $queryBuilder
+    ->where("status", "=", "active")
+    ->orderBy("first_name")
+    ->limit(10, 3)
+    ->select();
 /**
 $collection = [
     [
@@ -193,7 +198,10 @@ $collection = [
 */
 
 // SELECT * FROM users WHERE first_name LIKE "%jahidul%" LIMIT 1;
-$row = $queryBuilder->where("first_name", "LIKE", "%jahidul%")->limit(1)->select();
+$row = $queryBuilder
+    ->where("first_name", "LIKE", "%jahidul%")
+    ->limit(1)
+    ->select();
 /**
 $row = [
     "id" => 1,
@@ -218,7 +226,9 @@ $count = $queryBuilder->count();
 // $count = 10;
 
 // SELECT COUNT(*) as count FROM users WHERE status = "active";
-$count = $queryBuilder->where("status", "=", "active")->count();
+$count = $queryBuilder
+    ->where("status", "=", "active")
+    ->count();
 // $count = 5;
 ```
 
@@ -257,8 +267,7 @@ $numberOrRowsUpdated = $queryBuilder
     ->where("id", "=", 1)
     ->update([
         "first_name" => "Pabel",
-    ])
-;
+    ]);
 // $numberOrRowsUpdated = 1;
 ```
 
@@ -274,7 +283,9 @@ $numberOrRowsDeleted = $queryBuilder->delete();
 // $numberOrRowsDeleted = 10;
 
 // DELETE FROM users WHERE id = 1;
-$numberOrRowsDeleted = $queryBuilder->where("id", "=", 1)->delete();
+$numberOrRowsDeleted = $queryBuilder
+    ->where("id", "=", 1)
+    ->delete();
 // $numberOrRowsDeleted = 1;
 ```
 
