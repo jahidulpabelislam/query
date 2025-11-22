@@ -4,6 +4,7 @@ namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
 use JPI\Database\Query\Builder;
+use JPI\Database\Query\Clause\Join;
 use JPI\Database\Query\Clause\Where;
 use PHPUnit\Framework\TestCase;
 
@@ -111,6 +112,19 @@ LIMIT 5;",
             "SELECT *
 FROM table_one
 LIMIT 5 OFFSET 5;",
+            $builder->getSelectQuery()
+        );
+
+        $builder = new Builder($database, 'table_one');
+
+        $join = new Join($builder);
+        $builder->join($join);
+        $builder->join($join);
+
+        // With a join
+        $this->assertSame(
+            "SELECT *
+FROM table_one;",
             $builder->getSelectQuery()
         );
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JPI\Database\Query;
 
 use JPI\Database;
+use JPI\Database\Query\Clause\Join as JoinClause;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
 use JPI\Database\Query\Result\Collection;
@@ -62,8 +63,8 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
-    public function join(string $type, string $table, string $on): static {
-        $this->joins[] = "$type JOIN $table ON $on";
+    public function join(JoinClause $join): static {
+        $this->joins[] = $join;
 
         return $this;
     }
@@ -102,7 +103,7 @@ class Builder implements WhereableInterface, ParamableInterface {
      */
     public static function arrayToString(array $value, string $separator = ","): string {
         if (count($value) === 1) {
-            return array_shift($value);
+            return (string)array_shift($value);
         }
 
         return implode($separator, $value);
