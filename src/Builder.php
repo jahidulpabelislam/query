@@ -44,12 +44,12 @@ class Builder implements WhereableInterface, ParamableInterface {
         $this->orderBy = new OrderByClause($this);
     }
 
-    public function table(string $table, string $alias = null): static {
+    public function table(string $table, ?string $alias = null): static {
         $this->table = $alias ? "$table as $alias" : $table;
         return $this;
     }
 
-    public function column(string $column, string $alias = null): static {
+    public function column(string $column, ?string $alias = null): static {
         if ($column === "*") {
             $this->columns[] = "$this->table.*";
         }
@@ -63,7 +63,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function where(
         string $whereOrColumn,
         ?string $expression = null,
-        string|int|float|array $valueOrPlaceholder = null
+        string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;
@@ -79,7 +79,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
-    public function limit(int $limit, int $page = null): static {
+    public function limit(int $limit, ?int $page = null): static {
         if (!is_null($page)) {
             $this->page($page);
         }

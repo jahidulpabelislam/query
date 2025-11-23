@@ -11,7 +11,7 @@ trait WhereableTrait {
     public function where(
         string $whereOrColumn,
         ?string $expression = null,
-        string|int|float|array $valueOrPlaceholder = null
+        string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         if ($expression === null && $valueOrPlaceholder === null) {
             $this->wheres[] = $whereOrColumn;

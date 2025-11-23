@@ -9,6 +9,6 @@ interface WhereableInterface {
     public function where(
         string $whereOrColumn,
         ?string $expression = null,
-        string|int|float|array $valueOrPlaceholder = null
+        string|int|float|array|null $valueOrPlaceholder = null
     ): static;
 }
