@@ -16,7 +16,7 @@ class Join extends AbstractClause {
     public function on(
         string $onOrColumn,
         ?string $expression = null,
-        string|int|float|array $valueOrPlaceholder = null
+        string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         $this->where($onOrColumn, $expression, $valueOrPlaceholder);
         return $this;
