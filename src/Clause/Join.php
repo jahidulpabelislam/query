@@ -21,6 +21,4 @@ class Join extends AbstractClause {
         $this->where($onOrColumn, $expression, $valueOrPlaceholder);
         return $this;
     }
-
 }
-
