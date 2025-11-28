@@ -12,7 +12,7 @@ final class BuilderTest extends TestCase {
     public function testAll(): void {
         $database = $this->createMock(Database::class);
 
-        $builder = new Builder($database, 'table_one');
+        $builder = new Builder($database, "table_one");
 
         // Just select all
         $this->assertSame(
@@ -22,7 +22,7 @@ FROM table_one;",
         );
 
         // Changing table
-        $builder->table('table');
+        $builder->table("table");
         $this->assertSame(
             "SELECT *
 FROM table;",
@@ -30,7 +30,7 @@ FROM table;",
         );
 
         // Single column
-        $builder->column('column');
+        $builder->column("column");
         $this->assertSame(
             "SELECT column
 FROM table;",
@@ -38,7 +38,7 @@ FROM table;",
         );
 
         // + another column with an alias
-        $builder->column('column_two', 'column_two_alias');
+        $builder->column("column_two", "column_two_alias");
         $this->assertSame(
             "SELECT column,column_two as column_two_alias
 FROM table;",
@@ -46,7 +46,7 @@ FROM table;",
         );
 
         // + single where clause
-        $builder->where('column_one', '=', 1);
+        $builder->where("column_one", "=", 1);
         $this->assertSame(
             "SELECT column,column_two as column_two_alias
 FROM table
@@ -55,7 +55,7 @@ WHERE column_one = :column_one;",
         );
 
         // + another where clause
-        $builder->where('column_two', '=', 2);
+        $builder->where("column_two", "=", 2);
         $this->assertSame(
             "SELECT column,column_two as column_two_alias
 FROM table
@@ -65,8 +65,8 @@ WHERE column_one = :column_one AND column_two = :column_two;",
 
         // + inner OR where
         $orWhere = new Where\OrCondition($builder);
-        $orWhere->where('column_three', '=', 3)
-            ->where('column_four', '=', 4)
+        $orWhere->where("column_three", "=", 3)
+            ->where("column_four", "=", 4)
         ;
         $builder->where((string)$orWhere);
         $this->assertSame(
@@ -77,8 +77,8 @@ WHERE column_one = :column_one AND column_two = :column_two AND (column_three = 
         );
 
         // Order by
-        $builder = new Builder($database, 'table_one');
-        $builder->orderBy('column_one');
+        $builder = new Builder($database, "table_one");
+        $builder->orderBy("column_one");
         $this->assertSame(
             "SELECT *
 FROM table_one
@@ -87,7 +87,7 @@ ORDER BY column_one ASC;",
         );
 
         // + another order by
-        $builder->orderBy('column_two', false);
+        $builder->orderBy("column_two", false);
         $this->assertSame(
             "SELECT *
 FROM table_one
@@ -96,7 +96,7 @@ ORDER BY column_one ASC, column_two DESC;",
         );
 
         // Limit
-        $builder = new Builder($database, 'table_one');
+        $builder = new Builder($database, "table_one");
         $builder->limit(5);
         $this->assertSame(
             "SELECT *
