@@ -117,7 +117,7 @@ LIMIT 5 OFFSET 5;",
 
         // With a join
         $builder = new Builder($database, "table_one");
-        $builder->join(table: "table_two", on: "column_one = column_two");
+        $builder->join("table_two", "column_one = column_two");
         $this->assertSame(
             "SELECT *
 FROM table_one
