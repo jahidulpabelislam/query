@@ -8,6 +8,8 @@ trait WhereableTrait {
 
     protected array $wheres = [];
 
+    abstract public function param(string $key, string|int|float $value): static;
+
     public function where(
         string $whereOrColumn,
         ?string $expression = null,
