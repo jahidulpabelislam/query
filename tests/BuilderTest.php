@@ -115,16 +115,25 @@ LIMIT 5 OFFSET 5;",
             $builder->getSelectQuery()
         );
 
-        $builder = new Builder($database, 'table_one');
-
-        $join = new Join($builder);
-        $builder->join($join);
-        $builder->join($join);
-
         // With a join
+        $builder = new Builder($database, "table_one");
+        $builder->join(table: "table_two", on: "column_one = column_two");
         $this->assertSame(
             "SELECT *
-FROM table_one;",
+FROM table_one
+INNER JOIN table_two ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
+
+        $builder = new Builder($database, "table_one");
+        $join = new Join($builder, "table_two");
+        $join->on("column_one = column_two");
+        $join->on("column_three = column_four");
+        $builder->join($join);
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
             $builder->getSelectQuery()
         );
     }
