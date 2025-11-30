@@ -42,7 +42,7 @@ class Join extends AbstractClause {
     }
 
     public function getClause(): string {
-        return $this->clause . " $this->table ON";
+        return "$this->clause $this->table ON";
     }
 
     public function getItems(): array {
