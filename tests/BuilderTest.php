@@ -126,10 +126,11 @@ INNER JOIN table_two ON column_one = column_two;",
         );
 
         $builder = new Builder($database, "table_one");
-        $join = new Join($builder, "table_two");
-        $join->on("column_one = column_two");
-        $join->on("column_three = column_four");
-        $builder->join($join);
+        $builder->join(
+            $builder->newJoinClause("table_two")
+                ->on("column_one = column_two")
+                ->on("column_three = column_four")
+        );
         $this->assertSame(
             "SELECT *
 FROM table_one
