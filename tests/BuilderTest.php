@@ -115,7 +115,7 @@ LIMIT 5 OFFSET 5;",
             $builder->getSelectQuery()
         );
 
-        // With a join
+        // With an inner join
         $builder = new Builder($database, "table_one");
         $builder->join("table_two", "column_one = column_two");
         $this->assertSame(
@@ -125,6 +125,7 @@ INNER JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
 
+        // With 2 ON conditions on an inner join
         $builder = new Builder($database, "table_one");
         $builder->join(
             $builder->newJoinClause("table_two")
@@ -135,6 +136,26 @@ INNER JOIN table_two ON column_one = column_two;",
             "SELECT *
 FROM table_one
 INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
+            $builder->getSelectQuery()
+        );
+
+        // With a right join - using helper/alias method
+        $builder = new Builder($database, "table_one");
+        $builder->rightJoin("table_two", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+RIGHT JOIN table_two ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
+
+        // With a left join - using helper/alias method
+        $builder = new Builder($database, "table_one");
+        $builder->leftJoin("table_two", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+LEFT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
     }

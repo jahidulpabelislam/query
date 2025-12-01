@@ -81,11 +81,11 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function rightJoin(string $table, string $on): static {
-        $this->join("RIGHT", $table, $on);
+        return $this->join($table, $on, "RIGHT");
     }
 
     public function leftJoin(string $table, string $on): static {
-        $this->join("LEFT", $table, $on);
+        return $this->join($table, $on, "LEFT");
     }
 
     public function where(
