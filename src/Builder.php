@@ -66,7 +66,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function join(
         JoinClause|string $joinOrTable,
         ?string $on = null,
-        ?string $type = "INNER",
+        string $type = "INNER",
     ): static {
         if (!$joinOrTable instanceof JoinClause) {
             $joinOrTable = new JoinClause($this, $joinOrTable, $type, $on);
