@@ -4,7 +4,6 @@ namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
 use JPI\Database\Query\Builder;
-use JPI\Database\Query\Clause\Join;
 use JPI\Database\Query\Clause\Where;
 use PHPUnit\Framework\TestCase;
 
