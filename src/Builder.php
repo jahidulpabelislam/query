@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JPI\Database\Query;
 
 use JPI\Database;
+use JPI\Database\Query\Clause\Join as JoinClause;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
 use JPI\Database\Query\Result\Collection;
@@ -27,6 +28,8 @@ class Builder implements WhereableInterface, ParamableInterface {
     protected static string $paginatedCollectionClass = PaginatedCollection::class;
 
     protected array $columns = [];
+
+    protected array $joins = [];
 
     protected WhereClause $where;
 
@@ -58,6 +61,31 @@ class Builder implements WhereableInterface, ParamableInterface {
         }
 
         return $this;
+    }
+
+    public function newJoinClause(string $table, string $type = "INNER"): JoinClause {
+        return new JoinClause($this, $table, $type);
+    }
+
+    public function join(
+        JoinClause|string $joinOrTable,
+        ?string $on = null,
+        string $type = "INNER"
+    ): static {
+        if (!$joinOrTable instanceof JoinClause) {
+            $joinOrTable = $this->newJoinClause($joinOrTable, $type)->on($on);
+        }
+        $this->joins[] = $joinOrTable;
+
+        return $this;
+    }
+
+    public function rightJoin(string $table, string $on): static {
+        return $this->join($table, $on, "RIGHT");
+    }
+
+    public function leftJoin(string $table, string $on): static {
+        return $this->join($table, $on, "LEFT");
     }
 
     public function where(
@@ -94,7 +122,7 @@ class Builder implements WhereableInterface, ParamableInterface {
      */
     public static function arrayToString(array $value, string $separator = ","): string {
         if (count($value) === 1) {
-            return array_shift($value);
+            return (string)array_shift($value);
         }
 
         return implode($separator, $value);
@@ -127,12 +155,15 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     public function getSelectQuery(): string {
         $columns = $this->columns;
+        $joins = $this->joins;
 
         $columns = !empty($columns) ? static::arrayToString($columns) : "*";
+        $joins = !empty($joins) ? static::arrayToString($joins, " ") : null;
 
         return static::buildQuery(array_filter([
             "SELECT $columns",
             "FROM $this->table",
+            $joins,
             (string)$this->where,
             (string)$this->orderBy,
             $this->generateLimitClause(),

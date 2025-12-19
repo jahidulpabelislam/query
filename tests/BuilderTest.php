@@ -113,5 +113,60 @@ FROM table_one
 LIMIT 5 OFFSET 5;",
             $builder->getSelectQuery()
         );
+
+        // With an inner join
+        $builder = new Builder($database, "table_one");
+        $builder->join("table_two", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+INNER JOIN table_two ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
+
+        // With 2 ON conditions on an inner join
+        $builder = new Builder($database, "table_one");
+        $builder->join(
+            $builder->newJoinClause("table_two")
+                ->on("column_one = column_two")
+                ->on("column_three = column_four")
+        );
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
+            $builder->getSelectQuery()
+        );
+
+        // With a right join - using helper/alias method
+        $builder = new Builder($database, "table_one");
+        $builder->rightJoin("table_two", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+RIGHT JOIN table_two ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
+
+        // With a left join - using helper/alias method
+        $builder = new Builder($database, "table_one");
+        $builder->leftJoin("table_two", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+LEFT JOIN table_two ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
+
+        // 2 joins
+        $builder = new Builder($database, "table_one");
+        $builder->join("table_two", "column_one = column_two");
+        $builder->leftJoin("table_three", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
     }
 }
