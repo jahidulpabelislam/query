@@ -229,7 +229,7 @@ $collection = [
         "first_name" => "Jahidul",
         "login_user_id" => 1,
         "login_user_user_id" => 1,
-        "login_user_date" => ""2025-10-29 10:00:00",
+        "login_user_date" => "2025-10-29 10:00:00",
         ...
     ],
     [
@@ -237,14 +237,14 @@ $collection = [
         "first_name" => "Jahidul",
         "login_user_id" => 2,
         "login_user_user_id" => 1,
-        "login_user_date" => ""2025-11-01 12:00:00",
+        "login_user_date" => "2025-11-01 12:00:00",
         ...
     ],
 ];
 
 /**
 SELECT * FROM users
-INNER JOIN user_logins ON user_id = login_user_user_id AND login_user_date > '2025-12-01';
+INNER JOIN user_logins ON user_id = login_user_user_id AND login_user_date > '2025-11-01';
  */
 $queryBuilder->join(
     $queryBuilder->newJoinClause("user_logins")
@@ -259,7 +259,7 @@ $collection = [
         "first_name" => "Jahidul",
         "login_user_id" => 2,
         "login_user_user_id" => 1,
-        "login_user_date" => ""2025-11-01 12:00:00",
+        "login_user_date" => "2025-11-01 12:00:00",
         ...
     ],
 ];
