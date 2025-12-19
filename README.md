@@ -29,7 +29,7 @@ $ composer require jpi/query
 
 ## Usage
 
-To create an instance, you will need an instance of `\JPI\Database` (which is an extention of `PDO` - you can find out more [here](https://packagist.org/packages/jpi/database)) which is the first parameter, and the database table name as the second parameter. The same instance can be used multiple times as long as it's for the same database.
+To create an instance, you will need an instance of `\JPI\Database` (which is an extension of `PDO` - you can find out more [here](https://packagist.org/packages/jpi/database)) which is the first parameter, and the database table name as the second parameter. The same instance can be used multiple times as long as it's for the same database.
 
 ```php
 $queryBuilder = new \JPI\Database\Query\Builder($database, $table);

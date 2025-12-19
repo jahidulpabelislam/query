@@ -213,7 +213,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         /**
          * Do a DB query to get total count if:
-         *    - none found on a specific page than 1
+         *    - none found on a page greater than 1
          *    - count is the limit
          * Else we can work out the total
          */
