@@ -158,5 +158,16 @@ FROM table_one
 LEFT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
+
+        // 2 joins
+        $builder = new Builder($database, "table_one");
+        $builder->join("table_two", "column_one = column_two");
+        $builder->leftJoin("table_three", "column_one = column_two");
+        $this->assertSame(
+            "SELECT *
+FROM table_one
+INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_one = column_two;",
+            $builder->getSelectQuery()
+        );
     }
 }
