@@ -12,8 +12,8 @@ use JPI\Utils\Arrayable;
  *
  * Allow iterating over the column values and getting value by column name.
  */
-interface ResultInterface extends Arrayable, IteratorAggregate
-{
+interface ResultInterface extends Arrayable, IteratorAggregate {
+
     public static function loadFromDatabaseRow(array $row): static;
 
     public function getValue(string $key): mixed;

@@ -106,7 +106,7 @@ LIMIT 5;",
         );
 
         // Limit + page
-        $builder->limit(5,  2);
+        $builder->limit(5, 2);
         $this->assertSame(
             "SELECT *
 FROM table_one

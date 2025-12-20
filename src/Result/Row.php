@@ -9,7 +9,7 @@ use ArrayIterator;
 use Countable;
 use JPI\Database\Query\ResultInterface;
 
-class Row implements ArrayAccess, Countable, ResultInterface  {
+class Row implements ArrayAccess, Countable, ResultInterface {
 
     public function __construct(
         protected array $data
