@@ -13,7 +13,7 @@ final class WhereClauseTest extends TestCase {
      */
     private function getParams(Builder $builder): array {
         $reflection = new \ReflectionClass($builder);
-        $property = $reflection->getProperty('params');
+        $property = $reflection->getProperty("params");
         $property->setAccessible(true);
         return $property->getValue($builder);
     }
