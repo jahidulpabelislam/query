@@ -77,10 +77,13 @@ FROM table
 WHERE column_one = :column_one AND column_two = :column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([
-            "column_one" => 1,
-            "column_two" => 2,
-        ], $this->getParams($builder));
+        $this->assertSame(
+            [
+                "column_one" => 1,
+                "column_two" => 2,
+            ],
+            $this->getParams($builder)
+        );
 
         // + inner OR where
         $orWhere = new Where\OrCondition($builder);
@@ -94,12 +97,15 @@ FROM table
 WHERE column_one = :column_one AND column_two = :column_two AND (column_three = :column_three OR column_four = :column_four);",
             $builder->getSelectQuery()
         );
-        $this->assertSame([
-            "column_one" => 1,
-            "column_two" => 2,
-            "column_three" => 3,
-            "column_four" => 4,
-        ], $this->getParams($builder));
+        $this->assertSame(
+            [
+                "column_one" => 1,
+                "column_two" => 2,
+                "column_three" => 3,
+                "column_four" => 4,
+            ],
+            $this->getParams($builder)
+        );
 
         // Order by
         $builder = new Builder($database, "table_one");
