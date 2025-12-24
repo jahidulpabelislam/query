@@ -31,6 +31,9 @@ trait WhereableTrait {
                 $this->param($key, $value);
             }
             $placeholder = "(" . implode(", ", $ins) . ")";
+            
+            // Update counter to account for the parameter names used by IN clause
+            $this->paramCounters[$whereOrColumn] = count($valueOrPlaceholder);
         }
         else if (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":") {
             // Generate unique parameter key

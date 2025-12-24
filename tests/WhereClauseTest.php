@@ -125,5 +125,25 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame(25, $params['id']);
         $this->assertArrayHasKey('id_1', $params);
         $this->assertSame(35, $params['id_1']);
+        
+        // Test edge case: IN followed by single value comparison
+        $builder2 = $this->createPartialMock(Builder::class, []);
+        $where2 = new Where($builder2);
+        $where2->where("status", "IN", ["active", "pending"]);
+        $where2->where("status", "!=", "deleted");
+        
+        $this->assertSame("WHERE status IN (:status_1, :status_2) AND status != :status_3", (string)$where2);
+        
+        $reflection2 = new \ReflectionClass($builder2);
+        $property2 = $reflection2->getProperty('params');
+        $property2->setAccessible(true);
+        $params2 = $property2->getValue($builder2);
+        
+        $this->assertArrayHasKey('status_1', $params2);
+        $this->assertSame('active', $params2['status_1']);
+        $this->assertArrayHasKey('status_2', $params2);
+        $this->assertSame('pending', $params2['status_2']);
+        $this->assertArrayHasKey('status_3', $params2);
+        $this->assertSame('deleted', $params2['status_3']);
     }
 }
