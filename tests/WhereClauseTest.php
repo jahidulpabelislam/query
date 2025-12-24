@@ -103,4 +103,27 @@ final class WhereClauseTest extends TestCase {
         );
         $this->assertSame("WHERE column = :column AND (column = 8 OR column = 9)", (string)$where);
     }
+
+    public function testMultipleDifferentValuesForSameColumn(): void {
+        $builder = $this->createPartialMock(Builder::class, []);
+
+        // Test the issue: same column with different operators
+        $where = new Where($builder);
+        $where->where("id", ">=", 25);
+        $where->where("id", "<=", 35);
+        
+        // Should generate unique parameter names
+        $this->assertSame("WHERE id >= :id AND id <= :id_1", (string)$where);
+        
+        // Verify both parameters are stored
+        $reflection = new \ReflectionClass($builder);
+        $property = $reflection->getProperty('params');
+        $property->setAccessible(true);
+        $params = $property->getValue($builder);
+        
+        $this->assertArrayHasKey('id', $params);
+        $this->assertSame(25, $params['id']);
+        $this->assertArrayHasKey('id_1', $params);
+        $this->assertSame(35, $params['id_1']);
+    }
 }

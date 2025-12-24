@@ -8,6 +8,8 @@ trait WhereableTrait {
 
     protected array $wheres = [];
 
+    protected array $paramCounters = [];
+
     abstract public function param(string $key, string|int|float $value): static;
 
     public function where(
@@ -31,8 +33,18 @@ trait WhereableTrait {
             $placeholder = "(" . implode(", ", $ins) . ")";
         }
         else if (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":") {
-            $placeholder = ":$whereOrColumn";
-            $this->param($whereOrColumn, $valueOrPlaceholder);
+            // Generate unique parameter key
+            if (isset($this->paramCounters[$whereOrColumn])) {
+                $this->paramCounters[$whereOrColumn]++;
+                $key = "{$whereOrColumn}_{$this->paramCounters[$whereOrColumn]}";
+            }
+            else {
+                $this->paramCounters[$whereOrColumn] = 0;
+                $key = $whereOrColumn;
+            }
+            
+            $placeholder = ":$key";
+            $this->param($key, $valueOrPlaceholder);
         }
         else {
             $placeholder = $valueOrPlaceholder;
