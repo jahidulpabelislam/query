@@ -23,14 +23,14 @@ final class WhereClauseTest extends TestCase {
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\AndCondition($builder);
         $this->assertSame("", (string)$where);
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Basic single manual where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\AndCondition($builder);
         $where->where("column = 1");
         $this->assertSame("column = 1", (string)$where);
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Basic single = where
         $builder = $this->createPartialMock(Builder::class, []);
@@ -69,14 +69,14 @@ final class WhereClauseTest extends TestCase {
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\OrCondition($builder);
         $this->assertSame("", (string)$where);
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Basic single manual where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\OrCondition($builder);
         $where->where("column = 1");
         $this->assertSame("column = 1", (string)$where);
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Basic single = where
         $builder = $this->createPartialMock(Builder::class, []);
@@ -115,14 +115,14 @@ final class WhereClauseTest extends TestCase {
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $this->assertSame("", (string)$where);
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Basic single manual where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column = 1");
         $this->assertSame("WHERE column = 1", (string)$where);
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Basic single = where
         $builder = $this->createPartialMock(Builder::class, []);

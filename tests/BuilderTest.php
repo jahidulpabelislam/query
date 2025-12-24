@@ -30,7 +30,7 @@ final class BuilderTest extends TestCase {
 FROM table_one;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Changing table
         $builder->table("table");
@@ -39,7 +39,7 @@ FROM table_one;",
 FROM table;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Single column
         $builder->column("column");
@@ -48,7 +48,7 @@ FROM table;",
 FROM table;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // + another column with an alias
         $builder->column("column_two", "column_two_alias");
@@ -57,7 +57,7 @@ FROM table;",
 FROM table;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // + single where clause
         $builder->where("column_one", "=", 1);
@@ -112,7 +112,7 @@ FROM table_one
 ORDER BY column_one ASC;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // + another order by
         $builder->orderBy("column_two", false);
@@ -122,7 +122,7 @@ FROM table_one
 ORDER BY column_one ASC, column_two DESC;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Limit
         $builder = new Builder($database, "table_one");
@@ -133,7 +133,7 @@ FROM table_one
 LIMIT 5;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // Limit + page
         $builder->limit(5, 2);
@@ -143,7 +143,7 @@ FROM table_one
 LIMIT 5 OFFSET 5;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // With an inner join
         $builder = new Builder($database, "table_one");
@@ -154,7 +154,7 @@ FROM table_one
 INNER JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // With 2 ON conditions on an inner join
         $builder = new Builder($database, "table_one");
@@ -169,7 +169,7 @@ FROM table_one
 INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // With a right join - using helper/alias method
         $builder = new Builder($database, "table_one");
@@ -180,7 +180,7 @@ FROM table_one
 RIGHT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // With a left join - using helper/alias method
         $builder = new Builder($database, "table_one");
@@ -191,7 +191,7 @@ FROM table_one
 LEFT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
 
         // 2 joins
         $builder = new Builder($database, "table_one");
@@ -203,6 +203,6 @@ FROM table_one
 INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([], $this->getParams($builder));
+        $this->assertEmpty($this->getParams($builder));
     }
 }
