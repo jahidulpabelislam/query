@@ -37,9 +37,7 @@ final class WhereClauseTest extends TestCase {
         $where = new Where\AndCondition($builder);
         $where->where("column", "=", 1);
         $this->assertSame("column = :column", (string)$where);
-        $this->assertSame([
-            'column' => 1,
-        ], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $this->getParams($builder));
 
         // IN
         $builder = $this->createPartialMock(Builder::class, []);
@@ -47,8 +45,8 @@ final class WhereClauseTest extends TestCase {
         $where->where("column", "IN", [2, 3]);
         $this->assertSame("column IN (:column_1, :column_2)", (string)$where);
         $this->assertSame([
-            'column_1' => 2,
-            'column_2' => 3,
+            "column_1" => 2,
+            "column_2" => 3,
         ], $this->getParams($builder));
 
         // Multiple
@@ -58,9 +56,9 @@ final class WhereClauseTest extends TestCase {
         $where->where("column", "IN", [5, 6]);
         $this->assertSame("(column = :column AND column IN (:column_1, :column_2))", (string)$where);
         $this->assertSame([
-            'column' => 4,
-            'column_1' => 5,
-            'column_2' => 6,
+            "column" => 4,
+            "column_1" => 5,
+            "column_2" => 6,
         ], $this->getParams($builder));
     }
 
@@ -83,9 +81,7 @@ final class WhereClauseTest extends TestCase {
         $where = new Where\OrCondition($builder);
         $where->where("column", "=", 1);
         $this->assertSame("column = :column", (string)$where);
-        $this->assertSame([
-            'column' => 1,
-        ], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $this->getParams($builder));
 
         // IN
         $builder = $this->createPartialMock(Builder::class, []);
@@ -93,8 +89,8 @@ final class WhereClauseTest extends TestCase {
         $where->where("column", "IN", [2, 3]);
         $this->assertSame("column IN (:column_1, :column_2)", (string)$where);
         $this->assertSame([
-            'column_1' => 2,
-            'column_2' => 3,
+            "column_1" => 2,
+            "column_2" => 3,
         ], $this->getParams($builder));
 
         // Multiple
@@ -104,9 +100,9 @@ final class WhereClauseTest extends TestCase {
         $where->where("column", "IN", [5, 6]);
         $this->assertSame("(column = :column OR column IN (:column_1, :column_2))", (string)$where);
         $this->assertSame([
-            'column' => 4,
-            'column_1' => 5,
-            'column_2' => 6,
+            "column" => 4,
+            "column_1" => 5,
+            "column_2" => 6,
         ], $this->getParams($builder));
     }
 
@@ -129,9 +125,7 @@ final class WhereClauseTest extends TestCase {
         $where = new Where($builder);
         $where->where("column", "=", 1);
         $this->assertSame("WHERE column = :column", (string)$where);
-        $this->assertSame([
-            'column' => 1,
-        ], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $this->getParams($builder));
 
         // IN
         $builder = $this->createPartialMock(Builder::class, []);
@@ -139,8 +133,8 @@ final class WhereClauseTest extends TestCase {
         $where->where("column", "IN", [1, 2]);
         $this->assertSame("WHERE column IN (:column_1, :column_2)", (string)$where);
         $this->assertSame([
-            'column_1' => 1,
-            'column_2' => 2,
+            "column_1" => 1,
+            "column_2" => 2,
         ], $this->getParams($builder));
 
         // Multiple
@@ -150,9 +144,9 @@ final class WhereClauseTest extends TestCase {
         $where->where("column", "IN", [5, 6]);
         $this->assertSame("WHERE column = :column AND column IN (:column_1, :column_2)", (string)$where);
         $this->assertSame([
-            'column' => 4,
-            'column_1' => 5,
-            'column_2' => 6,
+            "column" => 4,
+            "column_1" => 5,
+            "column_2" => 6,
         ], $this->getParams($builder));
 
         // Multiple + inner or
@@ -165,8 +159,6 @@ final class WhereClauseTest extends TestCase {
                 ->where("column = 9")
         );
         $this->assertSame("WHERE column = :column AND (column = 8 OR column = 9)", (string)$where);
-        $this->assertSame([
-            'column' => 7,
-        ], $this->getParams($builder));
+        $this->assertSame(["column" => 7], $this->getParams($builder));
     }
 }

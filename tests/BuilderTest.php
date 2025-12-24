@@ -67,9 +67,7 @@ FROM table
 WHERE column_one = :column_one;",
             $builder->getSelectQuery()
         );
-        $this->assertSame([
-            'column_one' => 1,
-        ], $this->getParams($builder));
+        $this->assertSame(["column_one" => 1], $this->getParams($builder));
 
         // + another where clause
         $builder->where("column_two", "=", 2);
@@ -80,8 +78,8 @@ WHERE column_one = :column_one AND column_two = :column_two;",
             $builder->getSelectQuery()
         );
         $this->assertSame([
-            'column_one' => 1,
-            'column_two' => 2,
+            "column_one" => 1,
+            "column_two" => 2,
         ], $this->getParams($builder));
 
         // + inner OR where
@@ -97,10 +95,10 @@ WHERE column_one = :column_one AND column_two = :column_two AND (column_three = 
             $builder->getSelectQuery()
         );
         $this->assertSame([
-            'column_one' => 1,
-            'column_two' => 2,
-            'column_three' => 3,
-            'column_four' => 4,
+            "column_one" => 1,
+            "column_two" => 2,
+            "column_three" => 3,
+            "column_four" => 4,
         ], $this->getParams($builder));
 
         // Order by
