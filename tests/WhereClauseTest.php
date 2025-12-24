@@ -155,6 +155,7 @@ final class WhereClauseTest extends TestCase {
             'column_2' => 6,
         ], $this->getParams($builder));
 
+        // Multiple + inner or
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", "=", 7);
