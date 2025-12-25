@@ -22,7 +22,7 @@ class Row implements ArrayAccess, Countable, ResultInterface {
 
     protected function checkKey(string $key): void {
         if (!array_key_exists($key, $this->data)) {
-            throw new \OutOfBoundsException("'$key' does not exist in the row.");
+            throw new \OutOfBoundsException("`$key` does not exist in the row.");
         }
     }
 
