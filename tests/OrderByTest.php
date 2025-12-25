@@ -4,10 +4,12 @@ namespace JPI\Database\Query\Tests;
 
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\Clause\OrderBy;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 final class OrderByTest extends TestCase {
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAll(): void {
         $builder = $this->createPartialMock(Builder::class, []);
 

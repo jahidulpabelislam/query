@@ -4,6 +4,7 @@ namespace JPI\Database\Query\Tests;
 
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\Clause\Where;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 final class WhereClauseTest extends TestCase {
@@ -18,6 +19,7 @@ final class WhereClauseTest extends TestCase {
         return $property->getValue($builder);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAnd(): void {
         // Empty
         $builder = $this->createPartialMock(Builder::class, []);
@@ -68,6 +70,7 @@ final class WhereClauseTest extends TestCase {
         );
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testOr(): void {
         // Empty
         $builder = $this->createPartialMock(Builder::class, []);
@@ -118,6 +121,7 @@ final class WhereClauseTest extends TestCase {
         );
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testClause(): void {
         // Empty
         $builder = $this->createPartialMock(Builder::class, []);

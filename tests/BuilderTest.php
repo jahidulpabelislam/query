@@ -20,7 +20,7 @@ final class BuilderTest extends TestCase {
     }
 
     public function testAll(): void {
-        $database = $this->createMock(Database::class);
+        $database = $this->createStub(Database::class);
 
         $builder = new Builder($database, "table_one");
 
