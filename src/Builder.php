@@ -13,6 +13,7 @@ use JPI\Database\Query\Result\CollectionInterface;
 use JPI\Database\Query\Result\PaginatedCollection;
 use JPI\Database\Query\Result\PaginatedCollectionInterface;
 use JPI\Database\Query\Result\Row;
+use Traversable;
 
 /**
  * Query builder. Allows building SQL queries also executing them and receiving in appropriate format.
@@ -120,7 +121,8 @@ class Builder implements WhereableInterface, ParamableInterface {
      * Convenient function to pluck/get out the single value from an array if it's the only value.
      * Then build a string value if an array.
      */
-    public static function arrayToString(array $value, string $separator = ","): string {
+    public static function arrayToString(Traversable|array $value, string $separator = ","): string {
+        $value = iterator_to_array($value);
         if (count($value) === 1) {
             return (string)array_shift($value);
         }

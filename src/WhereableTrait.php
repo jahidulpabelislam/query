@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
+/**
+ * Assumes this is used in a class implementing ArrayAccess where the items are the where clauses.
+ */
 trait WhereableTrait {
-
-    protected array $wheres = [];
 
     abstract public function param(string $key, string|int|float $value): static;
 
@@ -16,7 +17,7 @@ trait WhereableTrait {
         string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         if ($expression === null && $valueOrPlaceholder === null) {
-            $this->wheres[] = $whereOrColumn;
+            $this[] = $whereOrColumn;
             return $this;
         }
 
@@ -38,7 +39,7 @@ trait WhereableTrait {
             $placeholder = $valueOrPlaceholder;
         }
 
-        $this->wheres[] = "$whereOrColumn $expression $placeholder";
+        $this[] = "$whereOrColumn $expression $placeholder";
         return $this;
     }
 }
