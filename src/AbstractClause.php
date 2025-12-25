@@ -12,9 +12,8 @@ abstract class AbstractClause extends Collection implements Stringable {
     protected string $clause;
     protected string $separator = ",";
 
-    protected array $items = [];
-
     public function __construct(protected Builder $query) {
+        parent::__construct();
     }
 
     public function getClause(): string {
@@ -25,17 +24,12 @@ abstract class AbstractClause extends Collection implements Stringable {
         return $this->separator;
     }
 
-    public function getItems(): array {
-        return $this->items;
-    }
-
     public function __toString(): string {
-        $items = $this->getItems();
-        if (empty($items)) {
+        if (empty($this->getItems())) {
             return "";
         }
 
-        $value = $this->query::arrayToString($items, "{$this->getSeparator()} ");
+        $value = $this->query::arrayToString($this, "{$this->getSeparator()} ");
 
         return "{$this->getClause()} $value";
     }
