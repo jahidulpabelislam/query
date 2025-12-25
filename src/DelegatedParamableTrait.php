@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
+use Stringable;
+
 /**
  * Delegate the param methods to the query builder.
  */
 trait DelegatedParamableTrait {
 
-    public function param(string $key, string|int|float $value): static {
+    public function param(string $key, Stringable|string|int|float $value): static {
         $this->query->param($key, $value);
         return $this;
     }

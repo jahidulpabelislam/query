@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
+use Stringable;
+
 /**
  * Assumes this is used in a class implementing ArrayAccess where the items are the where clauses.
  */
 trait WhereableTrait {
 
-    abstract public function param(string $key, string|int|float $value): static;
+    abstract public function param(string $key, Stringable|string|int|float $value): static;
 
     public function where(
-        string $whereOrColumn,
+        Stringable|string $whereOrColumn,
         ?string $expression = null,
-        string|int|float|array|null $valueOrPlaceholder = null
+        Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         if ($expression === null && $valueOrPlaceholder === null) {
             $this[] = $whereOrColumn;

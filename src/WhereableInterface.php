@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
+use Stringable;
+
 interface WhereableInterface {
 
     public function where(
-        string $whereOrColumn,
+        Stringable|string $whereOrColumn,
         ?string $expression = null,
-        string|int|float|array|null $valueOrPlaceholder = null
+        Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static;
 }

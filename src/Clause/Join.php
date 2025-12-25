@@ -8,6 +8,7 @@ use JPI\Database\Query\AbstractClause;
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\DelegatedParamableTrait;
 use JPI\Database\Query\WhereableTrait;
+use Stringable;
 
 class Join extends AbstractClause {
 
@@ -33,9 +34,9 @@ class Join extends AbstractClause {
     }
 
     public function on(
-        string $onOrColumn,
+        Stringable|string $onOrColumn,
         ?string $expression = null,
-        string|int|float|array|null $valueOrPlaceholder = null
+        Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         $this->where($onOrColumn, $expression, $valueOrPlaceholder);
         return $this;

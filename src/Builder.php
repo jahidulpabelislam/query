@@ -13,6 +13,7 @@ use JPI\Database\Query\Result\CollectionInterface;
 use JPI\Database\Query\Result\PaginatedCollection;
 use JPI\Database\Query\Result\PaginatedCollectionInterface;
 use JPI\Database\Query\Result\Row;
+use Stringable;
 use Traversable;
 
 /**
@@ -90,9 +91,9 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function where(
-        string $whereOrColumn,
+        Stringable|string $whereOrColumn,
         ?string $expression = null,
-        string|int|float|array|null $valueOrPlaceholder = null
+        Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
         return $this;

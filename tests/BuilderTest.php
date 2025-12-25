@@ -92,7 +92,7 @@ WHERE column_one = :column_one AND column_two = :column_two;",
         $orWhere->where("column_three", "=", 3)
             ->where("column_four", "=", 4)
         ;
-        $builder->where((string)$orWhere);
+        $builder->where($orWhere);
         $this->assertSame(
             "SELECT column,column_two as column_two_alias
 FROM table
