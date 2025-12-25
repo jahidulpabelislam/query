@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
