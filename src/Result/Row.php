@@ -8,6 +8,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use JPI\Database\Query\ResultInterface;
+use OutOfBoundsException;
 
 class Row implements ArrayAccess, Countable, ResultInterface {
 
@@ -22,10 +23,13 @@ class Row implements ArrayAccess, Countable, ResultInterface {
 
     protected function checkKey(string $key): void {
         if (!array_key_exists($key, $this->data)) {
-            throw new \OutOfBoundsException("`$key` does not exist in the row.");
+            throw new OutOfBoundsException("`$key` does not exist in the row.");
         }
     }
 
+    /**
+     * @throws OutOfBoundsException
+     */
     public function getValue(string $key): mixed {
         $this->checkKey($key);
         return $this->data[$key] ?? null;
