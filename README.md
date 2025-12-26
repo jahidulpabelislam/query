@@ -11,6 +11,18 @@ A simple library to make querying a database easier it works as a middleman betw
 
 This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation (so use at your own risk), it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
+## Features
+
+- Fluent, chainable query builder for SQL operations with PHP.
+- Simple, expressive syntax for building SELECT, INSERT, UPDATE, and DELETE queries.
+- Methods for configuring tables, columns (with alias support), joins, where clauses, ordering, limiting, and paging.
+- Supports INNER, LEFT, and RIGHT JOINs, including advanced multi-condition ON clauses.
+- Methods return convenient result collections or arrays for direct use in PHP code.
+- Supports counting, inserting, updating, and deleting records with single calls.
+- Powered by and tightly integrated with the [jpi/database](https://packagist.org/packages/jpi/database) package.
+- Designed with the KISS principle—minimal validation to maximize performance for experienced developers.
+- Allows incremental building and execution of queries.
+
 ## Dependencies
 
 - PHP 8.0+
