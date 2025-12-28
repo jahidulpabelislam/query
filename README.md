@@ -13,11 +13,9 @@ This has been kept very simple stupid (KISS), other than type errors from PHP th
 
 ## Features
 
-- Fluent, chainable query builder for SQL operations with PHP.
-- Simple, expressive syntax for building SELECT, INSERT, UPDATE, and DELETE queries.
+- Fluent, chainable query builder with simple, expressive syntax for SELECT, INSERT, UPDATE, and DELETE queries that return convenient result collections or arrays.
 - Methods for configuring tables, columns (with alias support), joins, where clauses, ordering, limiting, and paging.
 - Supports INNER, LEFT, and RIGHT JOINs, including advanced multi-condition ON clauses.
-- Methods return convenient result collections or arrays for direct use in PHP code.
 - Supports counting, inserting, updating, and deleting records with single calls.
 - Designed with the KISS principle—minimal validation to maximize performance for experienced developers.
 - Allows incremental building and execution of queries.
