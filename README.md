@@ -13,7 +13,7 @@ This has been kept very simple stupid (KISS), other than type errors from PHP th
 
 ## Features
 
-- Fluent, chainable query builder with simple, expressive syntax for SELECT, INSERT, UPDATE, and DELETE queries that return convenient result collections or arrays.
+- Fluent, chainable query builder with simple, expressive syntax and returns convenient result collections or arrays.
 - Methods for configuring tables, columns (with alias support), joins, where clauses, ordering, limiting, and paging.
 - Supports INNER, LEFT, and RIGHT JOINs, including advanced multi-condition ON clauses.
 - Supports counting, inserting, updating, and deleting records with single calls.
