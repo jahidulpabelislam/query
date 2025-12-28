@@ -19,7 +19,6 @@ This has been kept very simple stupid (KISS), other than type errors from PHP th
 - Supports INNER, LEFT, and RIGHT JOINs, including advanced multi-condition ON clauses.
 - Methods return convenient result collections or arrays for direct use in PHP code.
 - Supports counting, inserting, updating, and deleting records with single calls.
-- Powered by and tightly integrated with the [jpi/database](https://packagist.org/packages/jpi/database) package.
 - Designed with the KISS principle—minimal validation to maximize performance for experienced developers.
 - Allows incremental building and execution of queries.
 
