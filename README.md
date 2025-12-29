@@ -15,7 +15,7 @@ This has been kept very simple stupid (KISS), with minimal validation to maximiz
 
 - Fluent, chainable query builder with simple, expressive syntax for building SELECT, INSERT, UPDATE, and DELETE queries
 - Methods for configuring tables, columns, joins (INNER, LEFT, and RIGHT), where clauses, ordering, limiting, and paging.
-- Returns convenient result collections for direct use in PHP code.
+- Returns convenient result collections.
 - Supports counting, inserting, updating, and deleting records with single calls.
 
 ## Dependencies
