@@ -9,7 +9,7 @@
 
 A simple query builder library to make querying a database easier. It works as a middleman between your application and the database.
 
-This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation (so use at your own risk), it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
+This has been kept very simple stupid (KISS), with minimal validation to maximize performance for experienced developers. Other than type errors from PHP there is no validation (so use at your own risk), it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
 ## Features
 
@@ -17,7 +17,6 @@ This has been kept very simple stupid (KISS), other than type errors from PHP th
 - Methods for configuring tables, columns (with alias support), joins, where clauses, ordering, limiting, and paging.
 - Returns convenient result collections for direct use in PHP code.
 - Supports counting, inserting, updating, and deleting records with single calls.
-- Designed with the KISS principle—minimal validation to maximize performance for experienced developers.
 
 ## Dependencies
 
