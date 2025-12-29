@@ -7,7 +7,7 @@
 [![License](https://poser.pugx.org/jpi/query/license)](https://packagist.org/packages/jpi/query)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/2.x.svg?label=last%20activity)
 
-A simple library to make querying a database easier. It works as a middleman between your application and the database.
+A simple query builder library to make querying a database easier. It works as a middleman between your application and the database.
 
 This has been kept very simple stupid (KISS), other than type errors from PHP there is no validation (so use at your own risk), it will assume you are using it correctly. So please make sure to add your own validation if using user inputs in these queries.
 
@@ -18,7 +18,6 @@ This has been kept very simple stupid (KISS), other than type errors from PHP th
 - Returns convenient result collections for direct use in PHP code.
 - Supports counting, inserting, updating, and deleting records with single calls.
 - Designed with the KISS principle—minimal validation to maximize performance for experienced developers.
-- Allows incremental building and execution of queries.
 
 ## Dependencies
 
