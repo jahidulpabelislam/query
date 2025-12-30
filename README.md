@@ -13,7 +13,7 @@ This has been kept very simple stupid (KISS), with minimal validation to maximiz
 
 ## Features
 
-- Fluent, chainable query builder with simple, expressive syntax for building queries
+- Fluent, chainable query builder with simple, expressive syntax
 - Support for `SELECT`, `INSERT`, `UPDATE`, and `DELETE` queries
 - Support for columns, joins (INNER, LEFT, and RIGHT), where clauses, ordering, limiting, and paging
 - Returns convenient result collections
