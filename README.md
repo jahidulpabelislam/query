@@ -9,7 +9,7 @@
 
 A simple and lightweight SQL query builder library to make querying a database easier. It works as a middleman between your application and the database.
 
-This has been kept very simple stupid (KISS), with minimal validation (PHP type errors only) to reduce complexity in the library and maximize performance for developers. Therefore, please make sure to add your own validation if using user inputs in these queries.
+This has been kept very simple stupid (KISS), with minimal validation (PHP type errors only) to reduce complexity in the library and maximize performance for consumer developers. Therefore, please make sure to add your own validation if using user inputs in these queries.
 
 ## Features
 
