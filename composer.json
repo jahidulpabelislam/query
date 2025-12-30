@@ -1,6 +1,6 @@
 {
     "name": "jpi/query",
-    "description": "Simple & lightweight SQL database query builder",
+    "description": "A simple and lightweight SQL query builder for PHP",
     "license": "GPL-3.0-only",
     "authors": [
         {
