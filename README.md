@@ -7,7 +7,7 @@
 [![License](https://poser.pugx.org/jpi/query/license)](https://packagist.org/packages/jpi/query)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/query/2.x.svg?label=last%20activity)
 
-A simple SQL query builder library to make querying a database easier. It works as a middleman between your application and the database.
+A simple and lightweight SQL query builder library to make querying a database easier. It works as a middleman between your application and the database.
 
 This has been kept very simple stupid (KISS), with minimal validation (PHP type errors only) to reduce complexity in the library and maximize performance for developers. Therefore, please make sure to add your own validation if using user inputs in these queries.
 
