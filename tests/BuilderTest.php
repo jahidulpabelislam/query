@@ -18,7 +18,8 @@ final class BuilderTest extends TestCase {
             ->willReturn([
                 ['id' => 1, 'name' => 'Test 1'],
                 ['id' => 2, 'name' => 'Test 2'],
-            ]);
+            ])
+        ;
 
         $database->method('selectFirst')
             ->willReturnCallback(function (string $query, array $params) {
@@ -26,7 +27,8 @@ final class BuilderTest extends TestCase {
                     return ['count' => 2];
                 }
                 return ['id' => 1, 'name' => 'Test 1'];
-            });
+            })
+        ;
 
         return $database;
     }
@@ -234,7 +236,7 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
 
     public function testSelectOne(): void {
         // With limit 1 always returns single result
-        $builder = new Builder( $this->createDatabase(), "users");
+        $builder = new Builder($this->createDatabase(), "users");
         $builder->limit(1);
         $result = $builder->select();
         $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
