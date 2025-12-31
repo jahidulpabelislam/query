@@ -14,19 +14,19 @@ final class BuilderTest extends TestCase {
 
     private function createDatabase(): Database&Stub {
         $database = $this->createStub(Database::class);
-        $database->method('selectAll')
+        $database->method("selectAll")
             ->willReturn([
-                ['id' => 1, 'name' => 'Test 1'],
-                ['id' => 2, 'name' => 'Test 2'],
+                ["column_one" => "Value 11", "column_two" => "Value 12"],
+                ["column_one" => "Value 21", "column_two" => "Value 22"],
             ])
         ;
 
-        $database->method('selectFirst')
+        $database->method("selectFirst")
             ->willReturnCallback(function (string $query, array $params) {
-                if (str_contains($query, 'as count')) {
-                    return ['count' => 2];
+                if (str_contains($query, "as count")) {
+                    return ["count" => 2];
                 }
-                return ['id' => 1, 'name' => 'Test 1'];
+                return ["column_one" => "Value 11", "column_two" => "Value 12"];
             })
         ;
 
@@ -34,7 +34,7 @@ final class BuilderTest extends TestCase {
     }
 
     private function createBuilder(?Database $database = null): Builder {
-        return new Builder($database ?: $this->createDatabase(), "users");
+        return new Builder($database ?: $this->createDatabase(), "table_one");
     }
 
     /**
@@ -265,8 +265,8 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $database = $this->createMock(Database::class);
 
         // Should call selectAll but not selectFirst (which count() uses internally)
-        $database->expects($this->once())->method('selectAll');
-        $database->expects($this->never())->method('selectFirst');
+        $database->expects($this->once())->method("selectAll");
+        $database->expects($this->never())->method("selectFirst");
 
         // When withPagination is false, should return Collection instead of PaginatedCollection
         $result = $this->createBuilder($database)
