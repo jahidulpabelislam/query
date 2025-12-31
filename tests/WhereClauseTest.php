@@ -56,6 +56,27 @@ final class WhereClauseTest extends TestCase {
             $this->getParams($builder)
         );
 
+        // Single value array should use = instead of IN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where\AndCondition($builder);
+        $where->where("column", "IN", [1]);
+        $this->assertSame("column = :column", (string)$where);
+        $this->assertSame(["column" => 1], $this->getParams($builder));
+
+        // NOT IN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where\AndCondition($builder);
+        $where->where("column", "NOT IN", [7, 8, 9]);
+        $this->assertSame("column NOT IN (:column_1, :column_2, :column_3)", (string)$where);
+        $this->assertSame(
+            [
+                "column_1" => 7,
+                "column_2" => 8,
+                "column_3" => 9,
+            ],
+            $this->getParams($builder)
+        );
+
         // Multiple
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\AndCondition($builder);
@@ -107,6 +128,27 @@ final class WhereClauseTest extends TestCase {
             $this->getParams($builder)
         );
 
+        // Single value array should use = instead of IN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where\OrCondition($builder);
+        $where->where("column", "IN", [1]);
+        $this->assertSame("column = :column", (string)$where);
+        $this->assertSame(["column" => 1], $this->getParams($builder));
+
+        // NOT IN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where\OrCondition($builder);
+        $where->where("column", "NOT IN", [7, 8, 9]);
+        $this->assertSame("column NOT IN (:column_1, :column_2, :column_3)", (string)$where);
+        $this->assertSame(
+            [
+                "column_1" => 7,
+                "column_2" => 8,
+                "column_3" => 9,
+            ],
+            $this->getParams($builder)
+        );
+
         // Multiple
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\OrCondition($builder);
@@ -154,6 +196,27 @@ final class WhereClauseTest extends TestCase {
             [
                 "column_1" => 1,
                 "column_2" => 2,
+            ],
+            $this->getParams($builder)
+        );
+
+        // Single value array should use = instead of IN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "IN", [1]);
+        $this->assertSame("WHERE column = :column", (string)$where);
+        $this->assertSame(["column" => 1], $this->getParams($builder));
+
+        // NOT IN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "NOT IN", [7, 8, 9]);
+        $this->assertSame("WHERE column NOT IN (:column_1, :column_2, :column_3)", (string)$where);
+        $this->assertSame(
+            [
+                "column_1" => 7,
+                "column_2" => 8,
+                "column_3" => 9,
             ],
             $this->getParams($builder)
         );
