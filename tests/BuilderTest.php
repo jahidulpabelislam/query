@@ -33,6 +33,10 @@ final class BuilderTest extends TestCase {
         return $database;
     }
 
+    private function createBuilder(): Builder {
+        return new Builder($this->createDatabase(), "users");
+    }
+
     /**
      * Helper method to access protected params property using reflection
      */
@@ -236,28 +240,25 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
 
     public function testSelectOne(): void {
         // With limit 1 always returns single result
-        $builder = new Builder($this->createDatabase(), "users");
-        $builder->limit(1);
-        $result = $builder->select();
+        $result = $this->createBuilder()
+            ->limit(1)
+            ->select();
         $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
         $this->assertNotInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
     }
 
     public function testSelectAll(): void {
         // Without limit always returns Collection
-        $builder = new Builder($this->createDatabase(), "users");
-        $result = $builder->select(false);
+        $result = $this->createBuilder()->select(false);
         $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
         $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
 
     public function testSelectWithPagination(): void {
         // withPagination defaults to true (Default behavior)
-
-        $builder = new Builder($this->createDatabase(), "users");
-        $builder->limit(2);
-
-        $result = $builder->select();
+        $result = $this->createBuilder()
+            ->limit(2)
+            ->select();
         $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
 
