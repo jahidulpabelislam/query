@@ -27,7 +27,7 @@ trait WhereableTrait {
             if (count($valueOrPlaceholder) === 1) {
                 $expression = "=";
                 $placeholder = ":$whereOrColumn";
-                $this->param($whereOrColumn, reset($valueOrPlaceholder));
+                $this->param($whereOrColumn, array_values($valueOrPlaceholder)[0]);
             } else {
                 $expression = "IN";
                 $ins = [];
