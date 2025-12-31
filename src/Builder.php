@@ -206,7 +206,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         $rows = $this->database->selectAll($query, $this->params);
 
-        if (!$limit || !$withPagination) {
+        if (!$limit || ($limit && !$withPagination)) {
             return new static::$collectionClass($this->createResults($rows));
         }
 
