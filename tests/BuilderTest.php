@@ -254,7 +254,7 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
     }
 
     public function testSelectWithPagination(): void {
-        // withPagination defaults to true (Default behavior)
+        // withPagination true (Default behavior)
         $result = $this->createBuilder()
             ->limit(2)
             ->select();
