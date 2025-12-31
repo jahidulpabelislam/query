@@ -23,7 +23,7 @@ final class BuilderTest extends TestCase {
         $database->method('selectFirst')
             ->willReturnCallback(function (string $query, array $params) {
                 if (str_contains($query, 'as count')) {
-                    return ['count' => 10];
+                    return ['count' => 2];
                 }
                 return ['id' => 1, 'name' => 'Test 1'];
             });
