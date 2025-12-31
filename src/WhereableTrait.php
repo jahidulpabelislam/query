@@ -24,7 +24,7 @@ trait WhereableTrait {
         }
 
         if (is_array($valueOrPlaceholder) && count($valueOrPlaceholder) === 1) {
-            $expression = $expression === "NOT IN" ? "!=" : "=";
+            $expression = $expression === "NOT IN" ? "<>" : "=";
             $valueOrPlaceholder = reset($valueOrPlaceholder);
         }
 
