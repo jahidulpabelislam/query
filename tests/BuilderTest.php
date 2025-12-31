@@ -7,9 +7,29 @@ namespace JPI\Database\Query\Tests;
 use JPI\Database;
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\Clause\Where;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class BuilderTest extends TestCase {
+
+    private function createDatabase(): Database&Stub {
+        $database = $this->createStub(Database::class);
+        $database->method('selectAll')
+            ->willReturn([
+                ['id' => 1, 'name' => 'Test 1'],
+                ['id' => 2, 'name' => 'Test 2'],
+            ]);
+
+        $database->method('selectFirst')
+            ->willReturnCallback(function (string $query, array $params) {
+                if (str_contains($query, 'as count')) {
+                    return ['count' => 10];
+                }
+                return ['id' => 1, 'name' => 'Test 1'];
+            });
+
+        return $database;
+    }
 
     /**
      * Helper method to access protected params property using reflection
@@ -21,8 +41,8 @@ final class BuilderTest extends TestCase {
         return $property->getValue($builder);
     }
 
-    public function testAll(): void {
-        $database = $this->createStub(Database::class);
+    public function testSelectBuilding(): void {
+        $database = $this->createDatabase();
 
         $builder = new Builder($database, "table_one");
 
@@ -212,97 +232,46 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $this->assertEmpty($this->getParams($builder));
     }
 
-    public function testSelectWithPaginationTrue(): void {
-        $database = $this->createStub(Database::class);
-        $database->method('selectAll')
-            ->willReturn([
-                ['id' => 1, 'name' => 'Test 1'],
-                ['id' => 2, 'name' => 'Test 2'],
-            ]);
-        // Mock count query response
-        $database->method('selectFirst')
-            ->willReturn(['count' => 10]);
+    public function testSelectWithPagination(): void {
+        // withPagination defaults to true (Default behavior)
 
-        $builder = new Builder($database, "users");
+        $builder = new Builder($this->createDatabase(), "users");
         $builder->limit(2);
 
-        // Default behavior (withPagination defaults to true)
         $result = $builder->select();
-        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
-
-        // Explicitly setting withPagination to true
-        $result = $builder->select(true);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
 
     public function testSelectWithPaginationFalse(): void {
-        $database = $this->createStub(Database::class);
-        $database->method('selectAll')
-            ->willReturn([
-                ['id' => 1, 'name' => 'Test 1'],
-                ['id' => 2, 'name' => 'Test 2'],
-            ]);
+        $database = $this->createMock(Database::class);
 
         $builder = new Builder($database, "users");
         $builder->limit(2);
+
+        // Should call selectAll but not selectFirst (which count() uses internally)
+        $database->expects($this->once())->method('selectAll');
+        $database->expects($this->never())->method('selectFirst');
 
         // When withPagination is false, should return Collection instead of PaginatedCollection
         $result = $builder->select(false);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
 
-    public function testSelectWithPaginationFalseSkipsCountQuery(): void {
-        $database = $this->createMock(Database::class);
-        
-        // Should call selectAll but not selectFirst (which count() uses internally)
-        $database->expects($this->once())
-            ->method('selectAll')
-            ->willReturn([
-                ['id' => 1, 'name' => 'Test 1'],
-                ['id' => 2, 'name' => 'Test 2'],
-            ]);
-
-        // selectFirst should not be called when withPagination is false
-        $database->expects($this->never())
-            ->method('selectFirst');
-
-        $builder = new Builder($database, "users");
-        $builder->limit(2);
-
-        // This should NOT trigger a count query
+    public function testSelectAll(): void {
+        // Without limit always returns Collection
+        $builder = new Builder($this->createDatabase(), "users");
         $result = $builder->select(false);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
 
-    public function testSelectWithPaginationFalseWithoutLimit(): void {
-        $database = $this->createStub(Database::class);
-        $database->method('selectAll')
-            ->willReturn([
-                ['id' => 1, 'name' => 'Test 1'],
-                ['id' => 2, 'name' => 'Test 2'],
-            ]);
-
-        $builder = new Builder($database, "users");
-        // No limit set
-
-        // Without limit, withPagination has no effect (always returns Collection)
-        $result = $builder->select(false);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
-    }
-
-    public function testSelectWithPaginationFalseAndLimitOne(): void {
-        $database = $this->createStub(Database::class);
-        $database->method('selectFirst')
-            ->willReturn(['id' => 1, 'name' => 'Test 1']);
-
-        $builder = new Builder($database, "users");
+    public function testSelectOne(): void {
+        // With limit 1 always returns single result
+        $builder = new Builder( $this->createDatabase(), "users");
         $builder->limit(1);
-
-        // With limit 1, withPagination has no effect (always returns single result)
-        $result = $builder->select(false);
+        $result = $builder->select();
         $this->assertInstanceOf(\JPI\Database\Query\ResultInterface::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
     }
 }
