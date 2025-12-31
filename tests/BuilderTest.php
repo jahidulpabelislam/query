@@ -211,4 +211,98 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         );
         $this->assertEmpty($this->getParams($builder));
     }
+
+    public function testSelectWithPaginationTrue(): void {
+        $database = $this->createStub(Database::class);
+        $database->method('selectAll')
+            ->willReturn([
+                ['id' => 1, 'name' => 'Test 1'],
+                ['id' => 2, 'name' => 'Test 2'],
+            ]);
+        // Mock count query response
+        $database->method('selectFirst')
+            ->willReturn(['count' => 10]);
+
+        $builder = new Builder($database, "users");
+        $builder->limit(2);
+
+        // Default behavior (withPagination defaults to true)
+        $result = $builder->select();
+        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
+
+        // Explicitly setting withPagination to true
+        $result = $builder->select(true);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
+    }
+
+    public function testSelectWithPaginationFalse(): void {
+        $database = $this->createStub(Database::class);
+        $database->method('selectAll')
+            ->willReturn([
+                ['id' => 1, 'name' => 'Test 1'],
+                ['id' => 2, 'name' => 'Test 2'],
+            ]);
+
+        $builder = new Builder($database, "users");
+        $builder->limit(2);
+
+        // When withPagination is false, should return Collection instead of PaginatedCollection
+        $result = $builder->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
+    }
+
+    public function testSelectWithPaginationFalseSkipsCountQuery(): void {
+        $database = $this->createMock(Database::class);
+        
+        // Should call selectAll but not selectFirst (which count() uses internally)
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->willReturn([
+                ['id' => 1, 'name' => 'Test 1'],
+                ['id' => 2, 'name' => 'Test 2'],
+            ]);
+
+        // selectFirst should not be called when withPagination is false
+        $database->expects($this->never())
+            ->method('selectFirst');
+
+        $builder = new Builder($database, "users");
+        $builder->limit(2);
+
+        // This should NOT trigger a count query
+        $result = $builder->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
+    }
+
+    public function testSelectWithPaginationFalseWithoutLimit(): void {
+        $database = $this->createStub(Database::class);
+        $database->method('selectAll')
+            ->willReturn([
+                ['id' => 1, 'name' => 'Test 1'],
+                ['id' => 2, 'name' => 'Test 2'],
+            ]);
+
+        $builder = new Builder($database, "users");
+        // No limit set
+
+        // Without limit, withPagination has no effect (always returns Collection)
+        $result = $builder->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollectionInterface::class, $result);
+    }
+
+    public function testSelectWithPaginationFalseAndLimitOne(): void {
+        $database = $this->createStub(Database::class);
+        $database->method('selectFirst')
+            ->willReturn(['id' => 1, 'name' => 'Test 1']);
+
+        $builder = new Builder($database, "users");
+        $builder->limit(1);
+
+        // With limit 1, withPagination has no effect (always returns single result)
+        $result = $builder->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\ResultInterface::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\CollectionInterface::class, $result);
+    }
 }
