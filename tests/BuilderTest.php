@@ -232,6 +232,23 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $this->assertEmpty($this->getParams($builder));
     }
 
+    public function testSelectOne(): void {
+        // With limit 1 always returns single result
+        $builder = new Builder( $this->createDatabase(), "users");
+        $builder->limit(1);
+        $result = $builder->select();
+        $this->assertInstanceOf(\JPI\Database\Query\ResultInterface::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+    }
+
+    public function testSelectAll(): void {
+        // Without limit always returns Collection
+        $builder = new Builder($this->createDatabase(), "users");
+        $result = $builder->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
     public function testSelectWithPagination(): void {
         // withPagination defaults to true (Default behavior)
 
@@ -258,20 +275,4 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
 
-    public function testSelectAll(): void {
-        // Without limit always returns Collection
-        $builder = new Builder($this->createDatabase(), "users");
-        $result = $builder->select(false);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
-    }
-
-    public function testSelectOne(): void {
-        // With limit 1 always returns single result
-        $builder = new Builder( $this->createDatabase(), "users");
-        $builder->limit(1);
-        $result = $builder->select();
-        $this->assertInstanceOf(\JPI\Database\Query\ResultInterface::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
-    }
 }
