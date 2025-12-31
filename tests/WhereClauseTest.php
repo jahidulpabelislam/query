@@ -64,6 +64,7 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame(["column_1" => 1], $this->getParams($builder));
 
         // Single value array without operator should default to =
+        // Note: Passing null explicitly as expression parameter to test default behavior
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\AndCondition($builder);
         $where->where("column", null, [1]);
@@ -143,6 +144,7 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame(["column_1" => 1], $this->getParams($builder));
 
         // Single value array without operator should default to =
+        // Note: Passing null explicitly as expression parameter to test default behavior
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where\OrCondition($builder);
         $where->where("column", null, [1]);
@@ -222,6 +224,7 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame(["column_1" => 1], $this->getParams($builder));
 
         // Single value array without operator should default to =
+        // Note: Passing null explicitly as expression parameter to test default behavior
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", null, [1]);
