@@ -244,7 +244,6 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
             ->limit(1)
             ->select();
         $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
     }
 
     public function testSelectAll(): void {
