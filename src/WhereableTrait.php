@@ -29,7 +29,7 @@ trait WhereableTrait {
         }
 
         if (is_array($valueOrPlaceholder)) {
-            $expression = $expression?: "IN";
+            $expression = $expression ?: "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
                 $key = "{$whereOrColumn}_" . ($i + 1);
