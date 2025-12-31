@@ -24,14 +24,20 @@ trait WhereableTrait {
         }
 
         if (is_array($valueOrPlaceholder)) {
-            $expression = "IN";
-            $ins = [];
-            foreach ($valueOrPlaceholder as $i => $value) {
-                $key = "{$whereOrColumn}_" . ($i + 1);
-                $ins[] = ":$key";
-                $this->param($key, $value);
+            if (count($valueOrPlaceholder) === 1) {
+                $expression = "=";
+                $placeholder = ":$whereOrColumn";
+                $this->param($whereOrColumn, reset($valueOrPlaceholder));
+            } else {
+                $expression = "IN";
+                $ins = [];
+                foreach ($valueOrPlaceholder as $i => $value) {
+                    $key = "{$whereOrColumn}_" . ($i + 1);
+                    $ins[] = ":$key";
+                    $this->param($key, $value);
+                }
+                $placeholder = "(" . implode(", ", $ins) . ")";
             }
-            $placeholder = "(" . implode(", ", $ins) . ")";
         }
         else if (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":") {
             $placeholder = ":$whereOrColumn";
