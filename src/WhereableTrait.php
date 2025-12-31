@@ -23,6 +23,11 @@ trait WhereableTrait {
             return $this;
         }
 
+        if (is_array($valueOrPlaceholder) && count($valueOrPlaceholder) === 1) {
+            $expression = "=";
+            $valueOrPlaceholder = reset($valueOrPlaceholder);
+        }
+
         if (is_array($valueOrPlaceholder)) {
             $expression = "IN";
             $ins = [];
