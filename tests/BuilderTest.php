@@ -33,8 +33,8 @@ final class BuilderTest extends TestCase {
         return $database;
     }
 
-    private function createBuilder(): Builder {
-        return new Builder($this->createDatabase(), "users");
+    private function createBuilder(?Database $database = null): Builder {
+        return new Builder($database ?: $this->createDatabase(), "users");
     }
 
     /**
@@ -264,15 +264,14 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
     public function testSelectWithPaginationFalse(): void {
         $database = $this->createMock(Database::class);
 
-        $builder = new Builder($database, "users");
-        $builder->limit(2);
-
         // Should call selectAll but not selectFirst (which count() uses internally)
         $database->expects($this->once())->method('selectAll');
         $database->expects($this->never())->method('selectFirst');
 
         // When withPagination is false, should return Collection instead of PaginatedCollection
-        $result = $builder->select(false);
+        $result = $this->createBuilder($database)
+            ->limit(2)
+            ->select(false);
         $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
         $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
