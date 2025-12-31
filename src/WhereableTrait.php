@@ -24,12 +24,12 @@ trait WhereableTrait {
         }
 
         if (is_array($valueOrPlaceholder) && count($valueOrPlaceholder) === 1) {
-            $expression = "=";
+            $expression = $expression === "NOT IN" ? "<>" : "=";
             $valueOrPlaceholder = reset($valueOrPlaceholder);
         }
 
         if (is_array($valueOrPlaceholder)) {
-            $expression = "IN";
+            $expression = $expression ?: "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
                 $key = "{$whereOrColumn}_" . ($i + 1);
