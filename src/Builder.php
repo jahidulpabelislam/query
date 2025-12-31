@@ -189,7 +189,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $results;
     }
 
-    public function select(): CollectionInterface|PaginatedCollectionInterface|ResultInterface|null {
+    public function select(bool $withPagination = true): CollectionInterface|PaginatedCollectionInterface|ResultInterface|null {
         $limit = $this->limit;
 
         $query = $this->getSelectQuery();
@@ -206,7 +206,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         $rows = $this->database->selectAll($query, $this->params);
 
-        if (!$limit) {
+        if (!$limit || ($limit && !$withPagination)) {
             return new static::$collectionClass($this->createResults($rows));
         }
 

@@ -7,9 +7,35 @@ namespace JPI\Database\Query\Tests;
 use JPI\Database;
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\Clause\Where;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class BuilderTest extends TestCase {
+
+    private function createDatabase(): Database&Stub {
+        $database = $this->createStub(Database::class);
+        $database->method("selectAll")
+            ->willReturn([
+                ["column_one" => "Value 11", "column_two" => "Value 12"],
+                ["column_one" => "Value 21", "column_two" => "Value 22"],
+            ])
+        ;
+
+        $database->method("selectFirst")
+            ->willReturnCallback(function (string $query, array $params) {
+                if (str_contains($query, "as count")) {
+                    return ["count" => 2];
+                }
+                return ["column_one" => "Value 11", "column_two" => "Value 12"];
+            })
+        ;
+
+        return $database;
+    }
+
+    private function createBuilder(?Database $database = null): Builder {
+        return new Builder($database ?: $this->createDatabase(), "table_one");
+    }
 
     /**
      * Helper method to access protected params property using reflection
@@ -21,8 +47,8 @@ final class BuilderTest extends TestCase {
         return $property->getValue($builder);
     }
 
-    public function testAll(): void {
-        $database = $this->createStub(Database::class);
+    public function testSelectBuilding(): void {
+        $database = $this->createDatabase();
 
         $builder = new Builder($database, "table_one");
 
@@ -211,4 +237,43 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         );
         $this->assertEmpty($this->getParams($builder));
     }
+
+    public function testSelectOne(): void {
+        // With limit 1 always returns single result
+        $result = $this->createBuilder()
+            ->limit(1)
+            ->select();
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
+    }
+
+    public function testSelectAll(): void {
+        // Without limit always returns Collection
+        $result = $this->createBuilder()->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
+    public function testSelectWithPagination(): void {
+        // withPagination true (Default behavior)
+        $result = $this->createBuilder()
+            ->limit(2)
+            ->select();
+        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
+    public function testSelectWithPaginationFalse(): void {
+        $database = $this->createMock(Database::class);
+
+        // Should call selectAll but not selectFirst (which count() uses internally)
+        $database->expects($this->once())->method("selectAll");
+        $database->expects($this->never())->method("selectFirst");
+
+        // When withPagination is false, should return Collection instead of PaginatedCollection
+        $result = $this->createBuilder($database)
+            ->limit(2)
+            ->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
 }
