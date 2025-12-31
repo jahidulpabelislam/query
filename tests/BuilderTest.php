@@ -237,7 +237,7 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $builder = new Builder( $this->createDatabase(), "users");
         $builder->limit(1);
         $result = $builder->select();
-        $this->assertInstanceOf(\JPI\Database\Query\ResultInterface::class, $result);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
         $this->assertNotInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
     }
 
