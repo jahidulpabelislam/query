@@ -38,7 +38,7 @@ trait WhereableTrait {
             }
             $placeholder = "(" . implode(", ", $ins) . ")";
         }
-        else if (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":") {
+        else if ($valueOrPlaceholder !== null && (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":")) {
             $placeholder = ":$whereOrColumn";
             $this->param($whereOrColumn, $valueOrPlaceholder);
         }
@@ -46,7 +46,7 @@ trait WhereableTrait {
             $placeholder = $valueOrPlaceholder;
         }
 
-        $this[] = "$whereOrColumn $expression $placeholder";
+        $this[] = trim("$whereOrColumn $expression $placeholder", " ");
         return $this;
     }
 }
