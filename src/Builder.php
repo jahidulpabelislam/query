@@ -123,7 +123,7 @@ class Builder implements WhereableInterface, ParamableInterface {
      * Then build a string value if an array.
      */
     public static function arrayToString(Traversable|array $value, string $separator = ","): string {
-        $value = iterator_to_array($value);
+        $value = $value instanceof Traversable ? iterator_to_array($value) : $value;
         if (count($value) === 1) {
             return (string)array_shift($value);
         }
