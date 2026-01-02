@@ -33,12 +33,12 @@ abstract class Condition extends Collection implements WhereableInterface, Param
             return "";
         }
 
-        $clause = $this->query::arrayToString($this, " {$this->getOperator()} ");
+        $condition = $this->query::arrayToString($this, " {$this->getOperator()} ");
 
         if ($count > 1) {
-            return "($clause)";
+            return "($condition)";
         }
 
-        return $clause;
+        return $condition;
     }
 }
