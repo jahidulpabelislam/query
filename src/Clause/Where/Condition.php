@@ -17,14 +17,14 @@ abstract class Condition extends Collection implements WhereableInterface, Param
     use DelegatedParamableTrait;
     use WhereableTrait;
 
-    protected string $condition;
+    protected string $operator;
 
     public function __construct(protected Builder $query) {
         parent::__construct();
     }
 
-    public function getCondition(): string {
-        return $this->condition;
+    public function getOperator(): string {
+        return $this->operator;
     }
 
     public function __toString(): string {
@@ -33,7 +33,7 @@ abstract class Condition extends Collection implements WhereableInterface, Param
             return "";
         }
 
-        $clause = $this->query::arrayToString($this, " {$this->getCondition()} ");
+        $clause = $this->query::arrayToString($this, " {$this->getOperator()} ");
 
         if ($count > 1) {
             return "($clause)";

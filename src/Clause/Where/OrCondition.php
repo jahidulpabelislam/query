@@ -6,5 +6,5 @@ namespace JPI\Database\Query\Clause\Where;
 
 class OrCondition extends Condition {
 
-    protected string $condition = "OR";
+    protected string $operator = "OR";
 }
