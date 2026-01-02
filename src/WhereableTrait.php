@@ -7,7 +7,7 @@ namespace JPI\Database\Query;
 use Stringable;
 
 /**
- * Assumes this is used in a class implementing ArrayAccess where the items are the where clauses.
+ * Assumes this is used in a class implementing ArrayAccess where the items are the expressions.
  */
 trait WhereableTrait {
 
