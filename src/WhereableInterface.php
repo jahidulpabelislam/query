@@ -10,7 +10,7 @@ interface WhereableInterface {
 
     public function where(
         Stringable|string $whereOrColumn,
-        ?string $expression = null,
+        ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static;
 }

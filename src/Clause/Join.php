@@ -35,10 +35,10 @@ class Join extends AbstractClause {
 
     public function on(
         Stringable|string $onOrColumn,
-        ?string $expression = null,
+        ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
-        $this->where($onOrColumn, $expression, $valueOrPlaceholder);
+        $this->where($onOrColumn, $operator, $valueOrPlaceholder);
         return $this;
     }
 

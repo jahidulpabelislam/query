@@ -15,21 +15,21 @@ trait WhereableTrait {
 
     public function where(
         Stringable|string $whereOrColumn,
-        ?string $expression = null,
+        ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
-        if ($expression === null && $valueOrPlaceholder === null) {
+        if ($operator === null && $valueOrPlaceholder === null) {
             $this[] = $whereOrColumn;
             return $this;
         }
 
         if (is_array($valueOrPlaceholder) && count($valueOrPlaceholder) === 1) {
-            $expression = $expression === "NOT IN" ? "<>" : "=";
+            $operator = $operator === "NOT IN" ? "<>" : "=";
             $valueOrPlaceholder = reset($valueOrPlaceholder);
         }
 
         if (is_array($valueOrPlaceholder)) {
-            $expression = $expression ?: "IN";
+            $operator = $operator ?: "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
                 $key = "{$whereOrColumn}_" . ($i + 1);
@@ -46,7 +46,7 @@ trait WhereableTrait {
             $placeholder = $valueOrPlaceholder;
         }
 
-        $this[] = trim("$whereOrColumn $expression $placeholder", " ");
+        $this[] = trim("$whereOrColumn $operator $placeholder", " ");
         return $this;
     }
 }
