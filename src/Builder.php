@@ -91,11 +91,11 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function where(
-        Stringable|string $whereOrColumn,
+        Stringable|string $columnOrExpression,
         ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
-        $this->where->where($whereOrColumn, $operator, $valueOrPlaceholder);
+        $this->where->where($columnOrExpression, $operator, $valueOrPlaceholder);
         return $this;
     }
 

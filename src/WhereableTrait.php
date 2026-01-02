@@ -14,12 +14,12 @@ trait WhereableTrait {
     abstract public function param(string $key, Stringable|string|int|float $value): static;
 
     public function where(
-        Stringable|string $whereOrColumn,
+        Stringable|string $columnOrExpression,
         ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         if ($operator === null && $valueOrPlaceholder === null) {
-            $this[] = $whereOrColumn;
+            $this[] = $columnOrExpression;
             return $this;
         }
 
@@ -32,21 +32,21 @@ trait WhereableTrait {
             $operator = $operator ?: "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
-                $key = "{$whereOrColumn}_" . ($i + 1);
+                $key = "{$columnOrExpression}_" . ($i + 1);
                 $ins[] = ":$key";
                 $this->param($key, $value);
             }
             $placeholder = "(" . implode(", ", $ins) . ")";
         }
         else if ($valueOrPlaceholder !== null && (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":")) {
-            $placeholder = ":$whereOrColumn";
-            $this->param($whereOrColumn, $valueOrPlaceholder);
+            $placeholder = ":$columnOrExpression";
+            $this->param($columnOrExpression, $valueOrPlaceholder);
         }
         else {
             $placeholder = $valueOrPlaceholder;
         }
 
-        $this[] = trim("$whereOrColumn $operator $placeholder", " ");
+        $this[] = trim("$columnOrExpression $operator $placeholder", " ");
         return $this;
     }
 }
