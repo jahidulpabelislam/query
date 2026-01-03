@@ -113,11 +113,11 @@ WHERE column_one = :column_one AND column_two = :column_two;",
         );
 
         // + inner OR where
-        $orWhere = $builder->newOrCondition();
-        $orWhere->where("column_three", "=", 3)
-            ->where("column_four", "=", 4)
-        ;
-        $builder->where($orWhere);
+        $builder->where(
+            $builder->newOrCondition()
+                ->where("column_three", "=", 3)
+                ->where("column_four", "=", 4)
+        );
         $this->assertSame(
             "SELECT column,column_two as column_two_alias
 FROM table
