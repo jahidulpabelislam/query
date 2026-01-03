@@ -8,6 +8,8 @@ use JPI\Database;
 use JPI\Database\Query\Clause\Join as JoinClause;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
+use JPI\Database\Query\Clause\Where\AndCondition;
+use JPI\Database\Query\Clause\Where\OrCondition;
 use JPI\Database\Query\Result\Collection;
 use JPI\Database\Query\Result\CollectionInterface;
 use JPI\Database\Query\Result\PaginatedCollection;
@@ -116,6 +118,14 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         $this->limit = $limit;
         return $this;
+    }
+
+    public function newAndCondition(): AndCondition {
+        return new AndCondition($this);
+    }
+
+    public function newOrCondition(): OrCondition {
+        return new OrCondition($this);
     }
 
     /**
