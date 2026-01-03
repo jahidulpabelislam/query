@@ -9,8 +9,8 @@ use Stringable;
 interface WhereableInterface {
 
     public function where(
-        Stringable|string $whereOrColumn,
-        ?string $expression = null,
+        Stringable|string $columnOrExpression,
+        ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static;
 }

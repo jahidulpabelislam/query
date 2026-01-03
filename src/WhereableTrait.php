@@ -7,46 +7,46 @@ namespace JPI\Database\Query;
 use Stringable;
 
 /**
- * Assumes this is used in a class implementing ArrayAccess where the items are the where clauses.
+ * Assumes this is used in a class implementing ArrayAccess where the items are the expressions.
  */
 trait WhereableTrait {
 
     abstract public function param(string $key, Stringable|string|int|float $value): static;
 
     public function where(
-        Stringable|string $whereOrColumn,
-        ?string $expression = null,
+        Stringable|string $columnOrExpression,
+        ?string $operator = null,
         Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
-        if ($expression === null && $valueOrPlaceholder === null) {
-            $this[] = $whereOrColumn;
+        if ($operator === null && $valueOrPlaceholder === null) {
+            $this[] = $columnOrExpression;
             return $this;
         }
 
         if (is_array($valueOrPlaceholder) && count($valueOrPlaceholder) === 1) {
-            $expression = $expression === "NOT IN" ? "<>" : "=";
+            $operator = $operator === "NOT IN" ? "<>" : "=";
             $valueOrPlaceholder = reset($valueOrPlaceholder);
         }
 
         if (is_array($valueOrPlaceholder)) {
-            $expression = $expression ?: "IN";
+            $operator = $operator ?: "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
-                $key = "{$whereOrColumn}_" . ($i + 1);
+                $key = "{$columnOrExpression}_" . ($i + 1);
                 $ins[] = ":$key";
                 $this->param($key, $value);
             }
             $placeholder = "(" . implode(", ", $ins) . ")";
         }
         else if ($valueOrPlaceholder !== null && (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":")) {
-            $placeholder = ":$whereOrColumn";
-            $this->param($whereOrColumn, $valueOrPlaceholder);
+            $placeholder = ":$columnOrExpression";
+            $this->param($columnOrExpression, $valueOrPlaceholder);
         }
         else {
             $placeholder = $valueOrPlaceholder;
         }
 
-        $this[] = trim("$whereOrColumn $expression $placeholder", " ");
+        $this[] = trim("$columnOrExpression $operator $placeholder", " ");
         return $this;
     }
 }

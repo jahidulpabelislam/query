@@ -13,6 +13,6 @@ class Where extends AndCondition {
             return "";
         }
 
-        return "WHERE " . $this->query::arrayToString($this, " {$this->getCondition()} ");
+        return "WHERE " . $this->query::arrayToString($this, " {$this->getOperator()} ");
     }
 }

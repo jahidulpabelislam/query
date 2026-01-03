@@ -6,7 +6,7 @@ namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
 use JPI\Database\Query\Builder;
-use JPI\Database\Query\Clause\Where;
+use JPI\Database\Query\Clause\Where\OrCondition;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
@@ -114,7 +114,7 @@ WHERE column_one = :column_one AND column_two = :column_two;",
         );
 
         // + inner OR where
-        $orWhere = new Where\OrCondition($builder);
+        $orWhere = new OrCondition($builder);
         $orWhere->where("column_three", "=", 3)
             ->where("column_four", "=", 4)
         ;
