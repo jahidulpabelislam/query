@@ -123,7 +123,7 @@ $queryBuilder->where("id", "NOT IN", [1, 2, 3]);
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
 ```php
-// age BETWEEN :18 AND 65
+// age BETWEEN 18 AND 65
 $queryBuilder->where("age", "BETWEEN", [18, 65]);
 ```
 
