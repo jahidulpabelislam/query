@@ -202,7 +202,7 @@ final class WhereClauseTest extends TestCase {
     }
 
     #[AllowMockObjectsWithoutExpectations]
-    public function testSubquery(): void {
+    public function testSubqueryWithEqualsOperator(): void {
         // Basic subquery with = operator
         $database = $this->createMock(\JPI\Database::class);
         $builder = new Builder($database, "main_table");
@@ -217,7 +217,10 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame($expected, (string)$where);
         // Note: Subquery params are not automatically merged into main builder
         $this->assertEmpty($this->getParams($builder));
+    }
 
+    #[AllowMockObjectsWithoutExpectations]
+    public function testSubqueryWithInOperator(): void {
         // Subquery with IN operator
         $database = $this->createMock(\JPI\Database::class);
         $builder = new Builder($database, "users");
@@ -232,7 +235,10 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame($expected, (string)$where);
         // Note: Subquery params are not automatically merged into main builder
         $this->assertEmpty($this->getParams($builder));
+    }
 
+    #[AllowMockObjectsWithoutExpectations]
+    public function testSubqueryWithNotInOperator(): void {
         // Subquery with NOT IN operator
         $database = $this->createMock(\JPI\Database::class);
         $builder = new Builder($database, "products");
