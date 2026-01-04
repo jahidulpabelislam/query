@@ -23,6 +23,13 @@ trait WhereableTrait {
             return $this;
         }
 
+        if ($operator === "BETWEEN") {
+            $this->param("{$columnOrExpression}_1", $valueOrPlaceholder[0]);
+            $this->param("{$columnOrExpression}_2", $valueOrPlaceholder[1]);
+            $this[] = "$columnOrExpression BETWEEN :{$columnOrExpression}_1 AND :{$columnOrExpression}_2";
+            return $this;
+        }
+
         if (is_array($valueOrPlaceholder) && count($valueOrPlaceholder) === 1) {
             $operator = $operator === "NOT IN" ? "<>" : "=";
             $valueOrPlaceholder = reset($valueOrPlaceholder);
