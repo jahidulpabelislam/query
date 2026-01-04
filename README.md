@@ -321,7 +321,7 @@ $id = $queryBuilder->insert([
     "email" => "jahidul@jahidulpabelislam.com",
     "password" => "password",
 ]);
-// $id = 1;
+// $id = 3;
 
 // Multi-row insert
 // INSERT INTO users (first_name, last_name, email, password) VALUES ("Jahidul", "Islam", "jahidul@jahidulpabelislam.com", "password"), ("Test", "User", "test@example.com", "password123");
