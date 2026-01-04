@@ -198,6 +198,15 @@ final class WhereClauseTest extends TestCase {
     }
 
     #[AllowMockObjectsWithoutExpectations]
+    public function testValues(): void {
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "=", "");
+        $this->assertSame("WHERE column = :column", (string)$where);
+        $this->assertSame(["column" => ""], $builder->getParams());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testSubquery(): void {
         $database = $this->createMock(\JPI\Database::class);
 
@@ -238,15 +247,5 @@ final class WhereClauseTest extends TestCase {
         $expected = "WHERE id IN (SELECT user_id\nFROM premium_users) AND id NOT IN (SELECT user_id\nFROM banned_users)";
         $this->assertSame($expected, (string)$where);
         $this->assertEmpty($builder->getParams());
-    }
-
-    #[AllowMockObjectsWithoutExpectations]
-    public function testEmptyStringValue(): void {
-        // Empty string should be treated as a parameter value, not a placeholder
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = new Where($builder);
-        $where->where("column", "=", "");
-        $this->assertSame("WHERE column = :column", (string)$where);
-        $this->assertSame(["column" => ""], $builder->getParams());
     }
 }
