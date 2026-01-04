@@ -308,7 +308,7 @@ This method supports inserting one or more rows into the table.
 When inserting a single row successfully, the method returns the last inserted ID (as an integer). If the insert fails, it returns `null`.
 
 **Multi-Row Insert:**
-When inserting multiple rows, the method returns `null` (even if successful) since there is no single "last inserted ID" that makes sense for batch inserts.
+When inserting multiple rows, the method returns the number of rows affected (as an integer). This allows you to verify if the insert was successful (returns > 0) or failed (returns 0).
 
 Only the `table` builder method is supported for this action.
 
@@ -325,7 +325,7 @@ $id = $queryBuilder->insert([
 
 // Multi-row insert
 // INSERT INTO users (first_name, last_name, email, password) VALUES ("Jahidul", "Islam", "jahidul@jahidulpabelislam.com", "password"), ("Test", "User", "test@example.com", "password123");
-$id = $queryBuilder->insert([
+$rowCount = $queryBuilder->insert([
     [
         "first_name" => "Jahidul",
         "last_name" => "Islam",
@@ -339,7 +339,7 @@ $id = $queryBuilder->insert([
         "password" => "password123",
     ],
 ]);
-// $id = null (for multi-row inserts, null is always returned)
+// $rowCount = 2 (number of rows inserted)
 ```
 
 #### update
