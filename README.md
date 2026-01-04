@@ -111,12 +111,14 @@ $queryBuilder->where("age", ">", 18);
 $queryBuilder->where("name", "LIKE", "%john%");
 ```
 
-**Array values**: When passing an array as the value, the operator is automatically set to `IN` (or `NOT IN` if specified)
+**IN/NOT IN**:
 
 ```php
 $queryBuilder->where("status", "IN", ["active", "pending"]);
 $queryBuilder->where("id", "NOT IN", [1, 2, 3]);
 ```
+
+**Note**: If there is just one value, it will auto optimise and switch to `=` or `<>` operator.
 
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
