@@ -88,9 +88,7 @@ $queryBuilder->join(
 
 #### `where`
 
-Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
-
-**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
+Adds a expression to the WHERE clause. This method is very flexible and supports multiple calling patterns:
 
 **Note**: By default, multiple `where()` calls on the builder are combined with AND logic.
 
@@ -136,6 +134,8 @@ $subQuery
 ;
 $queryBuilder->where("id", "IN", $subQuery);
 ```
+
+**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection.
 
 #### `orderBy`
 
