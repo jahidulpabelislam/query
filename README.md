@@ -44,7 +44,7 @@ $queryBuilder = new \JPI\Database\Query\Builder($database, $table);
 
 ### Action Methods:
 
-These are the methods to call to end with `select(bool $withPagination = true)`, `count(string $column = "*"): int`, `insert(array $values): int|null`, `update($values array): int` & `delete: int`, all are pretty self-explanatory.
+These are the methods to call to end with `select(bool $withPagination = true)`, `count(string $column = "*"): int`, `insert(array $values): int|null`, `update(array $values): int` & `delete: int`, all are pretty self-explanatory.
 
 ### Builder methods
 
