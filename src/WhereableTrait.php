@@ -52,7 +52,14 @@ trait WhereableTrait {
             }
             $valueOrPlaceholder = "(" . implode(", ", $ins) . ")";
         }
-        else if ($valueOrPlaceholder !== null && (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":")) {
+        else if (
+            $valueOrPlaceholder !== null
+            && (
+                !is_string($valueOrPlaceholder)
+                || !isset($valueOrPlaceholder[0])
+                || $valueOrPlaceholder[0] !== ":"
+            )
+        ) {
             $this->param($columnOrExpression, $valueOrPlaceholder);
             $valueOrPlaceholder = ":$columnOrExpression";
         }

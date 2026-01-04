@@ -198,6 +198,15 @@ final class WhereClauseTest extends TestCase {
     }
 
     #[AllowMockObjectsWithoutExpectations]
+    public function testValues(): void {
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "=", "");
+        $this->assertSame("WHERE column = :column", (string)$where);
+        $this->assertSame(["column" => ""], $builder->getParams());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testSubquery(): void {
         $database = $this->createMock(\JPI\Database::class);
 
