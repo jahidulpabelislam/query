@@ -254,23 +254,34 @@ class Builder implements WhereableInterface, ParamableInterface {
         return (int)$row["count"];
     }
 
-    public function insert(array $values): ?int {
-        $this->params($values);
+    public function insert(array $records): ?int {
+        if (!is_numeric(array_key_first($records))) {
+            $records = [$records];
+        }
 
-        $sets = [];
-        foreach (array_keys($values) as $column) {
-            $sets[] = "$column = :$column";
+        $values = [];
+        $columns = array_keys($records[0]);
+        foreach ($records as $i => $record) {
+            $recordPlaceholders = [];
+            foreach ($record as $column => $value) {
+                $key = "{$column}_" . ($i + 1);
+                $this->param($key, $value);
+                $recordPlaceholders[] = ":$key";
+            }
+
+            $values[] = "(" . static::arrayToString($recordPlaceholders) . ")";
         }
 
         $rowsAffected = $this->database->exec(
             static::buildQuery(array_filter([
                 "INSERT INTO $this->table",
-                "SET " . static::arrayToString($sets),
+                "(" . static::arrayToString($columns) . ")",
+                "VALUES " . static::arrayToString($values),
             ])),
             $this->params
         );
 
-        if ($rowsAffected === 0) {
+        if ($rowsAffected === 0 || count($values) > 1) {
             return null;
         }
 
