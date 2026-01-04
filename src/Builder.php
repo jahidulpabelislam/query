@@ -112,7 +112,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function limit(int $limit, ?int $page = null): static {
-        if (!is_null($page)) {
+        if ($page !== null) {
             $this->page($page);
         }
 
