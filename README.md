@@ -52,36 +52,36 @@ These are all fluent methods, so you can chain them together.
 
 #### `table()`
 
+If you want to change to another table or didn't set when creating the instance.
+
 ```php
 table(string $table, string|null $alias): static
 ```
 
-If you want to change to another table or didn't set when creating the instance.
-
 #### `column()`
+
+Will select all columns if not set.
 
 ```php
 column(string $column, string|null $alias): static
 ```
 
-Will select all columns if not set.
-
 #### `join()`
+
+- `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
+- `$type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
 
 ```php
 join(JoinClause|string $joinOrTable, string|null $on, string $type = "INNER"): static
 ```
 
-- `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
-- `$type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
-
 #### `where()`
+
+Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
 
 ```php
 where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPlaceholder): static
 ```
-
-Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
 
 **Raw SQL expression**: Pass a complete SQL expression as the first parameter only
 
@@ -141,11 +141,11 @@ limit(int $limit, int|null $page): static
 
 #### `page()`
 
+Used to change the offset, only used if `limit` set.
+
 ```php
 page(int $page): static
 ```
-
-Used to change the offset, only used if `limit` set.
 
 #### Complex WHERE Conditions
 
