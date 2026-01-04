@@ -19,4 +19,8 @@ trait ParamableTrait {
         $this->params = array_merge($this->params, $params);
         return $this;
     }
+
+    public function getParams(): array {
+        return $this->params;
+    }
 }
