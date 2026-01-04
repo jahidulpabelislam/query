@@ -17,64 +17,73 @@ final class InsertTest extends TestCase {
     }
 
     private function createBuilder(?Database $database = null): Builder {
-        return new Builder($database ?: $this->createDatabaseMock(), "test_table");
+        return new Builder($database ?: $this->createDatabaseMock(), "users");
     }
 
-    public function testSingleRowInsertGeneratesCorrectSQL(): void {
+    public function testLegacySingleRow(): void {
         $database = $this->createDatabaseMock();
-        
-        // Capture the SQL query passed to exec
+
+        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO test_table\n(name,email)\nVALUES (:name__row1,:email__row1);"),
+                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
                 ])
             )
-            ->willReturn(1);
-        
-        $database->expects($this->once())
-            ->method("getLastInsertedId")
-            ->willReturn(123);
-        
-        $builder = $this->createBuilder($database);
-        $result = $builder->insert([
+            ->willReturn(1)
+        ;
+
+        // Confirm getLastInsertedId is called - number isn't important
+        $database->expects($this->once())->method("getLastInsertedId")->willReturn(123);
+
+        $result = $this->createBuilder($database)->insert([
             "name" => "John Doe",
             "email" => "john@example.com",
         ]);
-        
+
+        // Confirm the last inserted ID is returned
         $this->assertSame(123, $result);
     }
 
-    public function testSingleRowInsertReturnsLastInsertedId(): void {
+    public function testSingleRow(): void {
         $database = $this->createDatabaseMock();
-        
-        $database->method("exec")
-            ->willReturn(1);
-        
-        $database->expects($this->once())
-            ->method("getLastInsertedId")
-            ->willReturn(456);
-        
-        $builder = $this->createBuilder($database);
-        $result = $builder->insert([
-            "name" => "Jane Doe",
-            "email" => "jane@example.com",
-        ]);
-        
-        $this->assertSame(456, $result);
-    }
 
-    public function testMultiRowInsertGeneratesCorrectSQL(): void {
-        $database = $this->createDatabaseMock();
-        
-        // Capture the SQL query passed to exec
+        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO test_table\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
+                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1);"),
+                $this->equalTo([
+                    "name__row1" => "John Doe",
+                    "email__row1" => "john@example.com",
+                ])
+            )
+            ->willReturn(1)
+        ;
+
+        // Confirm getLastInsertedId is called - number isn't important
+        $database->expects($this->once())->method("getLastInsertedId")->willReturn(123);
+
+        $result = $this->createBuilder($database)->insert([[
+            "name" => "John Doe",
+            "email" => "john@example.com",
+        ]]);
+
+        // Confirm the last inserted ID is returned
+        $this->assertSame(123, $result);
+    }
+
+    public function testMultiRow(): void {
+        $database = $this->createDatabaseMock();
+
+        // Check the SQL generated
+        $database->expects($this->once())
+            ->method("exec")
+            ->with(
+                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -82,155 +91,56 @@ final class InsertTest extends TestCase {
                     "email__row2" => "jane@example.com",
                 ])
             )
-            ->willReturn(2);
-        
-        $database->expects($this->never())
-            ->method("getLastInsertedId");
-        
+            ->willReturn(2)
+        ;
+
+        // Confirm getLastInsertedId isn't called
+        $database->expects($this->never())->method("getLastInsertedId");
+
         $builder = $this->createBuilder($database);
         $result = $builder->insert([
             ["name" => "John Doe", "email" => "john@example.com"],
             ["name" => "Jane Doe", "email" => "jane@example.com"],
         ]);
-        
+
+        // Confirm null is returned for multi-row insert
         $this->assertNull($result);
     }
 
-    public function testMultiRowInsertReturnsNull(): void {
+    public function testFailure(): void {
         $database = $this->createDatabaseMock();
-        
-        $database->method("exec")
-            ->willReturn(3);
-        
-        $database->expects($this->never())
-            ->method("getLastInsertedId");
-        
-        $builder = $this->createBuilder($database);
-        $result = $builder->insert([
-            ["name" => "User 1", "email" => "user1@example.com"],
-            ["name" => "User 2", "email" => "user2@example.com"],
-            ["name" => "User 3", "email" => "user3@example.com"],
-        ]);
-        
-        $this->assertNull($result);
-    }
 
-    public function testInsertWithNoRowsAffectedReturnsNull(): void {
-        $database = $this->createDatabaseMock();
-        
-        $database->method("exec")
-            ->willReturn(0);
-        
-        $database->expects($this->never())
-            ->method("getLastInsertedId");
-        
-        $builder = $this->createBuilder($database);
-        $result = $builder->insert([
+        // Simulate failed insert
+        $database->method("exec")->willReturn(0);
+
+        $database->expects($this->never())->method("getLastInsertedId");
+
+        $result = $this->createBuilder($database)->insert([
             "name" => "Test User",
             "email" => "test@example.com",
         ]);
-        
+
         $this->assertNull($result);
     }
 
-    public function testInsertThrowsExceptionForEmptyRecord(): void {
+    public function testEmptyRecord(): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Record(s) passed to insert() cannot be empty.");
-        
+
         $database = $this->createStub(Database::class);
         $builder = $this->createBuilder($database);
         $builder->insert([]);
     }
 
-    public function testInsertThrowsExceptionForMismatchedColumns(): void {
+    public function testMismatchedColumns(): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("All records passed to insert() must have the same set of columns.");
-        
+
         $database = $this->createStub(Database::class);
         $builder = $this->createBuilder($database);
         $builder->insert([
             ["name" => "John Doe", "email" => "john@example.com"],
-            ["name" => "Jane Doe", "age" => 30], // Different columns
+            ["name" => "Jane Doe", "age" => 30],
         ]);
-    }
-
-    public function testInsertNormalizesNonNumericKeyToSingleRow(): void {
-        $database = $this->createDatabaseMock();
-        
-        // Should treat associative array as single row
-        $database->expects($this->once())
-            ->method("exec")
-            ->with(
-                $this->stringContains("VALUES (:name__row1,:email__row1)"),
-                $this->anything()
-            )
-            ->willReturn(1);
-        
-        $database->method("getLastInsertedId")
-            ->willReturn(789);
-        
-        $builder = $this->createBuilder($database);
-        $result = $builder->insert([
-            "name" => "Test User",
-            "email" => "test@example.com",
-        ]);
-        
-        $this->assertSame(789, $result);
-    }
-
-    public function testInsertWithMultipleColumnsGeneratesCorrectPlaceholders(): void {
-        $database = $this->createDatabaseMock();
-        
-        $database->expects($this->once())
-            ->method("exec")
-            ->with(
-                $this->equalTo("INSERT INTO test_table\n(id,name,email,age)\nVALUES (:id__row1,:name__row1,:email__row1,:age__row1);"),
-                $this->equalTo([
-                    "id__row1" => 1,
-                    "name__row1" => "John Doe",
-                    "email__row1" => "john@example.com",
-                    "age__row1" => 30,
-                ])
-            )
-            ->willReturn(1);
-        
-        $database->method("getLastInsertedId")
-            ->willReturn(1);
-        
-        $builder = $this->createBuilder($database);
-        $builder->insert([
-            "id" => 1,
-            "name" => "John Doe",
-            "email" => "john@example.com",
-            "age" => 30,
-        ]);
-    }
-
-    public function testMultiRowInsertWithThreeRowsGeneratesCorrectSQL(): void {
-        $database = $this->createDatabaseMock();
-        
-        $database->expects($this->once())
-            ->method("exec")
-            ->with(
-                $this->equalTo("INSERT INTO test_table\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2),(:name__row3,:email__row3);"),
-                $this->equalTo([
-                    "name__row1" => "User 1",
-                    "email__row1" => "user1@example.com",
-                    "name__row2" => "User 2",
-                    "email__row2" => "user2@example.com",
-                    "name__row3" => "User 3",
-                    "email__row3" => "user3@example.com",
-                ])
-            )
-            ->willReturn(3);
-        
-        $builder = $this->createBuilder($database);
-        $result = $builder->insert([
-            ["name" => "User 1", "email" => "user1@example.com"],
-            ["name" => "User 2", "email" => "user2@example.com"],
-            ["name" => "User 3", "email" => "user3@example.com"],
-        ]);
-        
-        $this->assertNull($result);
     }
 }
