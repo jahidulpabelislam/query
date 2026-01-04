@@ -90,9 +90,9 @@ $queryBuilder->join(
 
 Adds a expression to the WHERE clause. This method is very flexible and supports multiple calling patterns:
 
-**Note**: By default, multiple `where()` calls on the builder are combined with AND logic.
+**Note**: By default, multiple `where()` calls on the builder are combined with AND logic. Also note parameters will be keyed by the column, so if you use the same column for 2 different values, it will use the last value added.
 
-**Raw SQL expression**: Pass a complete expression as the first parameter only
+**Raw expression**: Pass a complete expression as the first parameter only
 
 ```php
 $queryBuilder->where("status = 'active'");
