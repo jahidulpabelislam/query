@@ -103,8 +103,8 @@ final class InsertTest extends TestCase {
             ["name" => "Jane Doe", "email" => "jane@example.com"],
         ]);
 
-        // Confirm null is returned for multi-row insert
-        $this->assertNull($result);
+        // Confirm row count is returned for multi-row insert
+        $this->assertSame(2, $result);
     }
 
     public function testFailure(): void {
@@ -121,6 +121,23 @@ final class InsertTest extends TestCase {
         ]);
 
         $this->assertNull($result);
+    }
+
+    public function testMultiRowFailure(): void {
+        $database = $this->createDatabaseMock();
+
+        // Simulate failed multi-row insert
+        $database->method("exec")->willReturn(0);
+
+        $database->expects($this->never())->method("getLastInsertedId");
+
+        $result = $this->createBuilder($database)->insert([
+            ["name" => "John Doe", "email" => "john@example.com"],
+            ["name" => "Jane Doe", "email" => "jane@example.com"],
+        ]);
+
+        // Confirm 0 is returned for failed multi-row insert
+        $this->assertSame(0, $result);
     }
 
     public function testEmptyRecord(): void {

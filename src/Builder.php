@@ -302,7 +302,13 @@ class Builder implements WhereableInterface, ParamableInterface {
             $this->params
         );
 
-        if ($rowsAffected === 0 || count($values) > 1) {
+        // For multi-row inserts, return the number of rows affected
+        if (count($records) > 1) {
+            return $rowsAffected;
+        }
+
+        // For single-row inserts, return null on failure or the last inserted ID on success
+        if ($rowsAffected === 0) {
             return null;
         }
 
