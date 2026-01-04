@@ -318,7 +318,7 @@ $count = $queryBuilder
 // $count = 5;
 
 // SELECT COUNT(email) as count FROM users;
-// Using column parameter to count specific column instead of all rows
+// Using column parameter to count non-NULL values in the email column
 $count = $queryBuilder->count("email");
 // $count = 10;
 
