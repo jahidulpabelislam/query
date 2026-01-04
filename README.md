@@ -423,59 +423,6 @@ $collection = [
 ];
 ```
 
-##### More WHERE Examples
-
-```php
-// Using IN operator with array
-// SELECT * FROM users WHERE status IN ('active', 'pending');
-$collection = $queryBuilder
-    ->where("status", "IN", ["active", "pending"])
-    ->select();
-
-// Using BETWEEN operator
-// SELECT * FROM users WHERE age BETWEEN 18 AND 65;
-$collection = $queryBuilder
-    ->where("age", "BETWEEN", [18, 65])
-    ->select();
-
-// Using LIKE operator
-// SELECT * FROM users WHERE email LIKE '%@example.com';
-$collection = $queryBuilder
-    ->where("email", "LIKE", "%@example.com")
-    ->select();
-
-// Using OR conditions
-// SELECT * FROM users WHERE (status = 'active' OR status = 'pending');
-$collection = $queryBuilder
-    ->where(
-        $queryBuilder->newOrCondition()
-            ->where("status", "=", "active")
-            ->where("status", "=", "pending")
-    )
-    ->select();
-
-// Complex nested conditions
-// SELECT * FROM users WHERE status = 'active' AND (role = 'admin' OR role = 'moderator') AND age > 18;
-$collection = $queryBuilder
-    ->where("status", "=", "active")
-    ->where(
-        $queryBuilder->newOrCondition()
-            ->where("role", "=", "admin")
-            ->where("role", "=", "moderator")
-    )
-    ->where("age", ">", 18)
-    ->select();
-
-// Using subquery
-// SELECT * FROM users WHERE id IN (SELECT customer_id FROM orders WHERE status = 'completed');
-$subquery = new \JPI\Database\Query\Builder($database, "orders");
-$subquery->column("customer_id")->where("status", "=", "completed");
-
-$collection = $queryBuilder
-    ->where("id", "IN", $subquery)
-    ->select();
-```
-
 #### count
 
 As the name implies this method will just return the count as an integer. By default it will do `COUNT(*)`, but you can pass a column name or expression as the first parameter to count non-NULL values in a specific column or use expressions like `DISTINCT`.
