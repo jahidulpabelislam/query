@@ -44,7 +44,7 @@ $queryBuilder = new \JPI\Database\Query\Builder($database, $table);
 
 ### Action Methods:
 
-These are the methods to call to end with `select(bool $withPagination = true)`, `count(string $column = "*"): int`, `insert(array $values): int|null`, `update(array $values): int` & `delete: int`, all are pretty self-explanatory.
+These are the methods to call to end with `select`, `count`, `insert`, `update` & `delete`, all are pretty self-explanatory.
 
 ### Builder methods
 
@@ -70,11 +70,11 @@ Assuming a `\JPI\Database\Query\Builder` instance has been created for the `user
 
 This has 4 return types depending on how you use it:
 
-- if you've set `limit` of `1` this will return an associative array of key (column) value pairs or if not found then `null`
-- if paged `\JPI\Database\Query\PaginatedResult`
-- else `\JPI\Database\Query\Result`
+- if you've set `limit` of `1` this will return an instance of `\JPI\Database\Query\Result\Row` or `null` if not found. The `Row` class can be used as an associative array of key (column) value pairs
+- if paged/limited and the `withPagination` param (first param) isn't `false` then `\JPI\Database\Query\Result\PaginatedCollection`
+- else `\JPI\Database\Query\Result\Collection`
 
-`PaginatedResult` & `Result` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details.
+`PaginatedCollection` & `Collection` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. Both of these contain multiple instances of `Row`. `PaginatedCollection` has meta data on the limit used, page number and total count if not limited, and the collection is immutable.
 
 ```php
 // SELECT * FROM users;
@@ -274,7 +274,7 @@ $collection = [
 
 #### count
 
-As the name implies this method will just return the count as an integer.
+As the name implies this method will just return the count as an integer. By default it will do `COUNT(*)`, but you can pass a column name or expression as the first parameter to count non-NULL values in a specific column or use expressions like `DISTINCT`.
 
 For obvious reasons only the `table` & `where` builder methods are supported for this action.
 
@@ -288,6 +288,16 @@ $count = $queryBuilder
     ->where("status", "=", "active")
     ->count();
 // $count = 5;
+
+// SELECT COUNT(email) as count FROM users;
+// Using column parameter to count non-NULL values in the email column
+$count = $queryBuilder->count("email");
+// $count = 10;
+
+// SELECT COUNT(DISTINCT status) as count FROM users;
+// Can use expressions in the column parameter
+$count = $queryBuilder->count("DISTINCT status");
+// $count = 2;
 ```
 
 #### insert
