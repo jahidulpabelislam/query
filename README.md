@@ -60,7 +60,7 @@ table(string $table, string|null $alias): static
 
 #### `column()`
 
-Will select all columns if not set.
+To only select a particular column, can be called to select multiple columns, also used to add aggregate functions. If not called will select all columns.
 
 ```php
 column(string $column, string|null $alias): static
@@ -68,12 +68,12 @@ column(string $column, string|null $alias): static
 
 #### `join()`
 
-- `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
-- `$type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
-
 ```php
 join(JoinClause|string $joinOrTable, string|null $on, string $type = "INNER"): static
 ```
+
+- `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
+- `$type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
 
 #### `where()`
 
@@ -134,6 +134,8 @@ orderBy(string $column, bool $ascDirection = true): static
 ```
 
 #### `limit()`
+
+Add a limit to the query, and optionally set the page at the same time - this sets the `OFFSET`.
 
 ```php
 limit(int $limit, int|null $page): static
