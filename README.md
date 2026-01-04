@@ -74,7 +74,7 @@ This has 4 return types depending on how you use it:
 - if paged/limited and the `withPagination` param (first param) isn't `false` then `\JPI\Database\Query\Result\PaginatedCollection`
 - else `\JPI\Database\Query\Result\Collection`
 
-`PaginatedCollection` & `Collection` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. Both of these contain multiple instances of `Row`. `PaginatedCollection` has meta data on the limit used, page number and total count if not limited, and means collection is immutable.
+`PaginatedCollection` & `Collection` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. Both of these contain multiple instances of `Row`. `PaginatedCollection` has meta data on the limit used, page number and total count if not limited, and the collection is immutable.
 
 ```php
 // SELECT * FROM users;
