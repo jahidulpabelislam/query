@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
+use InvalidArgumentException;
 use JPI\Database;
 use JPI\Database\Query\Clause\Join as JoinClause;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
@@ -254,18 +255,36 @@ class Builder implements WhereableInterface, ParamableInterface {
         return (int)$row["count"];
     }
 
+    /**
+     * @throws InvalidArgumentException If records are invalid
+     */
     public function insert(array $records): ?int {
         if (!is_numeric(array_key_first($records))) {
             $records = [$records];
         }
 
+        if (empty($records[0])) {
+            throw new InvalidArgumentException("Record(s) passed to insert() cannot be empty.");
+        }
+
         $values = [];
         $columns = array_keys($records[0]);
+        $expectedColumns = $columns;
+        sort($expectedColumns);
+
         foreach ($records as $i => $record) {
+            // Validate that each record has the same set of columns
+            $recordColumns = array_keys($record);
+            sort($recordColumns);
+            if ($recordColumns !== $expectedColumns) {
+                throw new InvalidArgumentException("All records passed to insert() must have the same set of columns.");
+            }
+
             $recordPlaceholders = [];
-            foreach ($record as $column => $value) {
+            // Generate placeholders in the canonical column order
+            foreach ($columns as $column) {
                 $key = "{$column}_" . ($i + 1);
-                $this->param($key, $value);
+                $this->param($key, $record[$column]);
                 $recordPlaceholders[] = ":$key";
             }
 
