@@ -201,6 +201,8 @@ final class WhereClauseTest extends TestCase {
         ], $this->getParams($builder));
     }
 
+    // Subquery tests use real Builder instances (not partial mocks) because they need to call
+    // Builder::getSelectQuery() and other real methods to generate the subquery SQL
     #[AllowMockObjectsWithoutExpectations]
     public function testSubqueryWithEqualsOperator(): void {
         // Basic subquery with = operator
@@ -321,8 +323,10 @@ final class WhereClauseTest extends TestCase {
         $subquery = new Builder($database, "popular_articles");
         $subquery->column("article_id");
         $subquery->where("views", ">", 5000);
-        $subquery->where("published", "=", 1);  // Use 1 instead of true for type compatibility
-        $subquery->orderBy("views", false);  // false = DESC
+        // Using 1 instead of boolean true because the Builder::where() signature doesn't accept bool
+        $subquery->where("published", "=", 1);
+        // Second parameter false produces DESC order (true would produce ASC)
+        $subquery->orderBy("views", false);
         $subquery->limit(10);
 
         $where = new Where($builder);
