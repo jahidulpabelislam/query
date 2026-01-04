@@ -241,12 +241,12 @@ class Builder implements WhereableInterface, ParamableInterface {
         return new static::$paginatedCollectionClass($this->createResults($rows), $totalCount, $limit, $page);
     }
 
-    public function count(): int {
+    public function count(string $column = "*"): int {
         // Clear/reset
         $this->columns = [];
         $this->orderBy->clear();
 
-        $this->column("COUNT(*)", "count");
+        $this->column("COUNT($column)", "count");
         $this->limit(1, 1);
 
         $row = $this->database->selectFirst($this->getSelectQuery(), $this->params);
