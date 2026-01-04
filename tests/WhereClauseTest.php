@@ -239,4 +239,14 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame($expected, (string)$where);
         $this->assertEmpty($builder->getParams());
     }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testEmptyStringValue(): void {
+        // Empty string should be treated as a parameter value, not a placeholder
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "=", "");
+        $this->assertSame("WHERE column = :column", (string)$where);
+        $this->assertSame(["column" => ""], $builder->getParams());
+    }
 }
