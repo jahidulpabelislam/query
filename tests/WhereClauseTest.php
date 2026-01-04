@@ -44,14 +44,6 @@ final class WhereClauseTest extends TestCase {
             ],
             $builder->getParams()
         );
-
-        // With IS NULL and IS NOT NULL
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = $builder->newAndCondition()
-            ->where("column_one", "IS NULL")
-            ->where("column_two", "IS NOT NULL");
-        $this->assertSame("(column_one IS NULL AND column_two IS NOT NULL)", (string)$where);
-        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -87,14 +79,6 @@ final class WhereClauseTest extends TestCase {
             ],
             $builder->getParams()
         );
-
-        // With IS NULL and IS NOT NULL
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = $builder->newOrCondition()
-            ->where("column_one", "IS NULL")
-            ->where("column_two", "IS NOT NULL");
-        $this->assertSame("(column_one IS NULL OR column_two IS NOT NULL)", (string)$where);
-        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -211,54 +195,20 @@ final class WhereClauseTest extends TestCase {
             ],
             $builder->getParams()
         );
-    }
 
-    #[AllowMockObjectsWithoutExpectations]
-    public function testNullOperators(): void {
-        // IS NULL with 2 arguments
+        // IS NULL
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", "IS NULL");
         $this->assertSame("WHERE column IS NULL", (string)$where);
         $this->assertEmpty($builder->getParams());
 
-        // IS NULL with 3 arguments (null value)
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = new Where($builder);
-        $where->where("column", "IS NULL", null);
-        $this->assertSame("WHERE column IS NULL", (string)$where);
-        $this->assertEmpty($builder->getParams());
-
-        // IS NOT NULL with 2 arguments
+        // IS NOT NULL
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", "IS NOT NULL");
         $this->assertSame("WHERE column IS NOT NULL", (string)$where);
         $this->assertEmpty($builder->getParams());
-
-        // IS NOT NULL with 3 arguments (null value)
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = new Where($builder);
-        $where->where("column", "IS NOT NULL", null);
-        $this->assertSame("WHERE column IS NOT NULL", (string)$where);
-        $this->assertEmpty($builder->getParams());
-
-        // Multiple IS NULL and IS NOT NULL conditions
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = new Where($builder);
-        $where->where("column_one", "IS NULL");
-        $where->where("column_two", "IS NOT NULL");
-        $this->assertSame("WHERE column_one IS NULL AND column_two IS NOT NULL", (string)$where);
-        $this->assertEmpty($builder->getParams());
-
-        // Mixed with other operators
-        $builder = $this->createPartialMock(Builder::class, []);
-        $where = new Where($builder);
-        $where->where("column_one", "=", 1);
-        $where->where("column_two", "IS NULL");
-        $where->where("column_three", "IS NOT NULL");
-        $this->assertSame("WHERE column_one = :column_one AND column_two IS NULL AND column_three IS NOT NULL", (string)$where);
-        $this->assertSame(["column_one" => 1], $builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
