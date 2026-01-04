@@ -70,11 +70,11 @@ Assuming a `\JPI\Database\Query\Builder` instance has been created for the `user
 
 This has 4 return types depending on how you use it:
 
-- if you've set `limit` of `1` this will return an associative array of key (column) value pairs or if not found then `null`
+- if you've set `limit` of `1` this will return an instance of `\JPI\Database\Query\Result\Row` or `null` if not found. The `Row` class can be used an associative array of key (column) value pairs
 - if paged/limited and the `withPagination` param (first param) isn't `false` then `\JPI\Database\Query\PaginatedResult`
 - else `\JPI\Database\Query\Result`
 
-`PaginatedResult` & `Result` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. `PaginatedResult` has meta data on the limit used, page number and total count if not limited, and means result is immutable.
+`PaginatedResult` & `Result` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. Both of these contain multiple instances of `Row`. `PaginatedResult` has meta data on the limit used, page number and total count if not limited, and means result is immutable.
 
 ```php
 // SELECT * FROM users;
