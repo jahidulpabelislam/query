@@ -304,7 +304,7 @@ Only the `table` builder method is supported for this action.
 
 ```php
 // Single row insert
-// INSERT INTO users SET first_name= "Jahidul", last_name= "Islam", email = "jahidul@jahidulpabelislam.com", password = "password";
+// INSERT INTO users (first_name, last_name, email, password) VALUES ("Jahidul", "Islam", "jahidul@jahidulpabelislam.com", "password");
 $id = $queryBuilder->insert([
     "first_name" => "Jahidul",
     "last_name" => "Islam",
