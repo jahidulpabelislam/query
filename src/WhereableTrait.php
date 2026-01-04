@@ -37,6 +37,7 @@ trait WhereableTrait {
 
         // If value is a builder, assume we want the SELECT
         if ($valueOrPlaceholder instanceof Builder) {
+            $this->params($valueOrPlaceholder->getParams()); // Need to propagate params
             $valueOrPlaceholder = "(" . rtrim($valueOrPlaceholder->getSelectQuery(), ";") . ")";
         }
         else if (is_array($valueOrPlaceholder)) {
