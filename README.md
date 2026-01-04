@@ -270,6 +270,34 @@ $collection = [
         ...
     ],
 ];
+
+// SELECT * FROM users LIMIT 10;
+// Using withPagination parameter set to false to get a simple Collection instead of PaginatedResult
+$collection = $queryBuilder
+    ->limit(10)
+    ->select(false);
+/**
+$collection = [
+    [
+        "id" => 1,
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+        "email" => "jahidul@jahidulpabelislam.com",
+        "password" => "password123",
+        ...
+    ],
+    [
+        "id" => 2,
+        "first_name" => "Test",
+        "last_name" => "Example",
+        "email" => "test@example.com",
+        "password" => "password123",
+        ...
+    ],
+    // ... up to 10 rows
+];
+// No pagination metadata included when withPagination is false
+*/
 ```
 
 #### count
@@ -288,6 +316,16 @@ $count = $queryBuilder
     ->where("status", "=", "active")
     ->count();
 // $count = 5;
+
+// SELECT COUNT(email) as count FROM users;
+// Using column parameter to count specific column instead of all rows
+$count = $queryBuilder->count("email");
+// $count = 10;
+
+// SELECT COUNT(DISTINCT status) as count FROM users;
+// Can use expressions in the column parameter
+$count = $queryBuilder->count("DISTINCT status");
+// $count = 2;
 ```
 
 #### insert
