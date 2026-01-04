@@ -79,24 +79,23 @@ join(JoinClause|string $joinOrTable, string|null $on, string $type = "INNER"): s
 
 Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
 
+**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
+
+**Note**: By default, multiple `where()` calls on the builder are combined with AND logic.
+
 **Raw SQL expression**: Pass a complete SQL expression as the first parameter only
 
 ```php
 ->where("status = 'active'")
-// Generates: WHERE status = 'active'
 ->where("created_at > NOW()")
-// Generates: WHERE created_at > NOW()
 ```
 
 **Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
 
 ```php
 ->where("status", "=", "active")
-// Generates: WHERE status = :status
 ->where("age", ">", 18)
-// Generates: WHERE age > :age
 ->where("name", "LIKE", "%john%")
-// Generates: WHERE name LIKE :name
 ```
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
@@ -105,32 +104,27 @@ Adds a WHERE condition to the query. This method is very flexible and supports m
 
 ```php
 ->where("status", "IN", ["active", "pending"])
-// Generates: WHERE status IN (:status_1, :status_2)
 ->where("id", "NOT IN", [1, 2, 3])
-// Generates: WHERE id NOT IN (:id_1, :id_2, :id_3)
 ```
 
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
 ```php
+// age BETWEEN :18 AND 65
 ->where("age", "BETWEEN", [18, 65])
-// Generates: WHERE age BETWEEN :age_1 AND :age_2
 ```
 
 **Subqueries**: Pass a Builder instance as the value to use a subquery
 
 ```php
-$subquery = new \JPI\Database\Query\Builder($database, "orders");
-$subquery->column("customer_id")->where("status", "=", "completed");
-$queryBuilder->where("id", "IN", $subquery);
-// Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
+// id IN (SELECT customer_id FROM orders WHERE status = "completed")
+$subQuery = new \JPI\Database\Query\Builder($database, "orders");
+$subQuery
+    ->column("customer_id")
+    ->where("status", "=", "completed")
+;
+$queryBuilder->where("id", "IN", $subQuery);
 ```
-
-**Complex conditions**: Pass an `AndCondition` or `OrCondition` instance to create complex nested conditions (see below)
-
-**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
-
-**Note**: By default, multiple `where()` calls on the builder are combined with AND logic. The main `where()` clause itself is an `AndCondition`, which is why you can chain multiple `where()` calls.
 
 #### `orderBy()`
 
@@ -163,8 +157,7 @@ For more complex WHERE clauses that require OR logic or nested conditions, you c
 `AndCondition` groups multiple conditions together with AND logic. Create one using `$queryBuilder->newAndCondition()`.
 
 ```php
-// Create an AND condition
-// (status = :status AND age > :age)
+// (status = "active" AND age > 18)
 $andCondition = $queryBuilder->newAndCondition()
     ->where("status", "=", "active")
     ->where("age", ">", 18);
@@ -175,7 +168,6 @@ $andCondition = $queryBuilder->newAndCondition()
 `OrCondition` groups multiple conditions together with OR logic. Create one using `$queryBuilder->newOrCondition()`.
 
 ```php
-// Create an OR condition
 // (status = "active" OR status = "pending")
 $orCondition = $queryBuilder->newOrCondition()
     ->where("status", "=", "active")
