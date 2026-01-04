@@ -79,10 +79,6 @@ join(JoinClause|string $joinOrTable, string|null $on, string $type = "INNER"): s
 
 Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
 
-```php
-where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPlaceholder): static
-```
-
 **Raw SQL expression**: Pass a complete SQL expression as the first parameter only
 
 ```php
@@ -110,17 +106,18 @@ where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPl
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
 ```php
+// age BETWEEN :age_1 AND :age_2
 ->where("age", "BETWEEN", [18, 65])
-// Generates: WHERE age BETWEEN :age_1 AND :age_2
+
 ```
 
 **Subqueries**: Pass a Builder instance as the value to use a subquery
 
 ```php
+// id IN (SELECT customer_id FROM orders WHERE status = :status)
 $subquery = new \JPI\Database\Query\Builder($database, "orders");
 $subquery->column("customer_id")->where("status", "=", "completed");
 $queryBuilder->where("id", "IN", $subquery);
-// Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
 ```
 
 **Complex conditions**: Pass an `AndCondition` or `OrCondition` instance to create complex nested conditions (see below)
@@ -161,13 +158,10 @@ For more complex WHERE clauses that require OR logic or nested conditions, you c
 
 ```php
 // Create an AND condition
+// (status = :status AND age > :age)
 $andCondition = $queryBuilder->newAndCondition()
     ->where("status", "=", "active")
     ->where("age", ">", 18);
-
-// Use it in a WHERE clause
-$queryBuilder->where($andCondition);
-// Generates: WHERE (status = :status AND age > :age)
 ```
 
 ##### OrCondition
@@ -176,13 +170,10 @@ $queryBuilder->where($andCondition);
 
 ```php
 // Create an OR condition
+// (status = "active" OR status = "pending")
 $orCondition = $queryBuilder->newOrCondition()
     ->where("status", "=", "active")
     ->where("status", "=", "pending");
-
-// Use it in a WHERE clause
-$queryBuilder->where($orCondition);
-// Generates: WHERE (status = :status OR status = :status_1)
 ```
 
 ##### Combining AND and OR Conditions
@@ -201,7 +192,6 @@ $queryBuilder
             )
             ->where("status", "=", "premium")
     );
-// Generates: WHERE ((status = :status AND age > :age) OR status = :status_1)
 
 // Another example: status = 'active' AND (role = 'admin' OR role = 'moderator')
 $queryBuilder
@@ -211,7 +201,6 @@ $queryBuilder
             ->where("role", "=", "admin")
             ->where("role", "=", "moderator")
     );
-// Generates: WHERE status = :status AND (role = :role OR role = :role_1)
 ```
 
 ### Examples
