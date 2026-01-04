@@ -388,7 +388,7 @@ $collection = [
 
 ```php
 // Using IN operator with array
-// SELECT * FROM users WHERE status IN ("active", "pending");
+// SELECT * FROM users WHERE status IN ('active', 'pending');
 $collection = $queryBuilder
     ->where("status", "IN", ["active", "pending"])
     ->select();
@@ -400,13 +400,13 @@ $collection = $queryBuilder
     ->select();
 
 // Using LIKE operator
-// SELECT * FROM users WHERE email LIKE "%@example.com";
+// SELECT * FROM users WHERE email LIKE '%@example.com';
 $collection = $queryBuilder
     ->where("email", "LIKE", "%@example.com")
     ->select();
 
 // Using OR conditions
-// SELECT * FROM users WHERE (status = "active" OR status = "pending");
+// SELECT * FROM users WHERE (status = 'active' OR status = 'pending');
 $collection = $queryBuilder
     ->where(
         $queryBuilder->newOrCondition()
@@ -416,7 +416,7 @@ $collection = $queryBuilder
     ->select();
 
 // Complex nested conditions
-// SELECT * FROM users WHERE status = "active" AND (role = "admin" OR role = "moderator") AND age > 18;
+// SELECT * FROM users WHERE status = 'active' AND (role = 'admin' OR role = 'moderator') AND age > 18;
 $collection = $queryBuilder
     ->where("status", "=", "active")
     ->where(
@@ -428,7 +428,7 @@ $collection = $queryBuilder
     ->select();
 
 // Using subquery
-// SELECT * FROM users WHERE id IN (SELECT customer_id FROM orders WHERE status = "completed");
+// SELECT * FROM users WHERE id IN (SELECT customer_id FROM orders WHERE status = 'completed');
 $subquery = new \JPI\Database\Query\Builder($database, "orders");
 $subquery->column("customer_id")->where("status", "=", "completed");
 
