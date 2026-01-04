@@ -50,46 +50,102 @@ These are the methods to call to end with `select`, `count: int`, `insert($value
 
 These are all fluent methods, so you can chain them together.
 
-- `table(string $table, string|null $alias)`: if you want to change to another table or didn't set when creating the instance
-- `column(string $column, string|null $alias)`:  will select all columns if not set
-- `join($joinOrTable, string|null $on, string $type)`:
-    - `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
-    - `type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
-- `where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPlaceholder)`: adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
-    - **Raw SQL expression**: Pass a complete SQL expression as the first parameter only
-        ```php
-        ->where("status = 'active'")
-        ->where("created_at > NOW()")
-        ```
-    - **Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
-        ```php
-        ->where("status", "=", "active")
-        ->where("age", ">", 18)
-        ->where("name", "LIKE", "%john%")
-        ```
-    - **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
-    - **Array values**: When passing an array as the value, the operator is automatically set to `IN` (or `NOT IN` if specified)
-        ```php
-        ->where("status", "IN", ["active", "pending"])
-        ->where("id", "NOT IN", [1, 2, 3])
-        ```
-    - **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
-        ```php
-        ->where("age", "BETWEEN", [18, 65])
-        // Generates: WHERE age BETWEEN :age_1 AND :age_2
-        ```
-    - **Subqueries**: Pass a Builder instance as the value to use a subquery
-        ```php
-        $subquery = new \JPI\Database\Query\Builder($database, "orders");
-        $subquery->column("customer_id")->where("status", "=", "completed");
-        ->where("id", "IN", $subquery)
-        // Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
-        ```
-    - **Complex conditions**: Pass an `AndCondition` or `OrCondition` instance to create complex nested conditions (see below)
-    - **Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
-- `orderBy(string $column, bool $ascDirection = true)`
-- `limit(int $limit, int|null $page)`
-- `page(int)`: used to change the offset, only used if `limit` set
+#### `table()`
+
+```php
+table(string $table, string|null $alias): static
+```
+
+If you want to change to another table or didn't set when creating the instance.
+
+#### `column()`
+
+```php
+column(string $column, string|null $alias): static
+```
+
+Will select all columns if not set.
+
+#### `join()`
+
+```php
+join(JoinClause|string $joinOrTable, string|null $on, string $type = "INNER"): static
+```
+
+- `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
+- `$type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
+
+#### `where()`
+
+```php
+where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPlaceholder): static
+```
+
+Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
+
+**Raw SQL expression**: Pass a complete SQL expression as the first parameter only
+
+```php
+->where("status = 'active'")
+->where("created_at > NOW()")
+```
+
+**Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
+
+```php
+->where("status", "=", "active")
+->where("age", ">", 18)
+->where("name", "LIKE", "%john%")
+```
+
+**Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
+
+**Array values**: When passing an array as the value, the operator is automatically set to `IN` (or `NOT IN` if specified)
+
+```php
+->where("status", "IN", ["active", "pending"])
+->where("id", "NOT IN", [1, 2, 3])
+```
+
+**BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
+
+```php
+->where("age", "BETWEEN", [18, 65])
+// Generates: WHERE age BETWEEN :age_1 AND :age_2
+```
+
+**Subqueries**: Pass a Builder instance as the value to use a subquery
+
+```php
+$subquery = new \JPI\Database\Query\Builder($database, "orders");
+$subquery->column("customer_id")->where("status", "=", "completed");
+->where("id", "IN", $subquery)
+// Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
+```
+
+**Complex conditions**: Pass an `AndCondition` or `OrCondition` instance to create complex nested conditions (see below)
+
+**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
+
+#### `orderBy()`
+
+```php
+orderBy(string $column, bool $ascDirection = true): static
+```
+
+#### `limit()`
+
+```php
+limit(int $limit, int|null $page): static
+```
+
+#### `page()`
+
+```php
+page(int $page): static
+```
+
+Used to change the offset, only used if `limit` set.
 
 #### Complex WHERE Conditions
 
