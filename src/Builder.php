@@ -95,7 +95,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     public function where(
         Stringable|string $columnOrExpression,
         ?string $operator = null,
-        Stringable|string|int|float|array|null $valueOrPlaceholder = null
+        Builder|Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         $this->where->where($columnOrExpression, $operator, $valueOrPlaceholder);
         return $this;
@@ -112,7 +112,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function limit(int $limit, ?int $page = null): static {
-        if (!is_null($page)) {
+        if ($page !== null) {
             $this->page($page);
         }
 

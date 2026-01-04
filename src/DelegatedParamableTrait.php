@@ -20,4 +20,8 @@ trait DelegatedParamableTrait {
         $this->query->params($params);
         return $this;
     }
+
+    public function getParams(): array {
+        return $this->query->getParams();
+    }
 }
