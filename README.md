@@ -292,11 +292,18 @@ $count = $queryBuilder
 
 #### insert
 
-This method will just return the id of the row created unless it fails then `null`.
+This method supports inserting one or more rows into the table.
+
+**Single Row Insert:**
+When inserting a single row successfully, the method returns the last inserted ID (as an integer). If the insert fails, it returns `null`.
+
+**Multi-Row Insert:**
+When inserting multiple rows, the method returns `null` (even if successful) since there is no single "last inserted ID" that makes sense for batch inserts.
 
 Only the `table` builder method is supported for this action.
 
 ```php
+// Single row insert
 // INSERT INTO users SET first_name= "Jahidul", last_name= "Islam", email = "jahidul@jahidulpabelislam.com", password = "password";
 $id = $queryBuilder->insert([
     "first_name" => "Jahidul",
@@ -305,6 +312,24 @@ $id = $queryBuilder->insert([
     "password" => "password",
 ]);
 // $id = 1;
+
+// Multi-row insert
+// INSERT INTO users (first_name, last_name, email, password) VALUES ("Jahidul", "Islam", "jahidul@jahidulpabelislam.com", "password"), ("Test", "User", "test@example.com", "password123");
+$id = $queryBuilder->insert([
+    [
+        "first_name" => "Jahidul",
+        "last_name" => "Islam",
+        "email" => "jahidul@jahidulpabelislam.com",
+        "password" => "password",
+    ],
+    [
+        "first_name" => "Test",
+        "last_name" => "User",
+        "email" => "test@example.com",
+        "password" => "password123",
+    ],
+]);
+// $id = null (for multi-row inserts, null is always returned)
 ```
 
 #### update
