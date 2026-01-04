@@ -256,6 +256,9 @@ class Builder implements WhereableInterface, ParamableInterface {
 
     public function insert(array $records): ?int {
         if (!is_numeric(array_key_first($records))) {
+            if (empty($records)) {
+                return null;
+            }
             $records = [$records];
         }
 
