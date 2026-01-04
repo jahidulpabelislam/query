@@ -216,22 +216,6 @@ $queryBuilder
 
 **Note**: By default, multiple `where()` calls on the builder are combined with AND logic. The main `where()` clause itself is an `AndCondition`, which is why you can chain multiple `where()` calls.
 
-#### WhereableTrait
-
-The `WhereableTrait` provides the core functionality for the `where()` method and is used by:
-- `Builder` class - for the main query WHERE clause
-- `AndCondition` class - for grouping conditions with AND logic
-- `OrCondition` class - for grouping conditions with OR logic
-
-Key features handled by `WhereableTrait`:
-- **Automatic parameter binding**: All values are automatically bound as PDO parameters to prevent SQL injection
-- **Operator-specific logic**:
-    - `IN` and `NOT IN`: Automatically handles arrays by creating multiple parameters
-    - `BETWEEN`: Expects a 2-element array and generates `BETWEEN :param_1 AND :param_2`
-    - Single-element arrays are converted to use `=` or `<>` operators
-- **Subquery support**: Accepts `Builder` instances as values and extracts their SELECT query
-- **Raw SQL expressions**: When only the first parameter is passed, it's treated as a raw SQL expression (use with caution)
-
 ### Examples
 
 Assuming a `\JPI\Database\Query\Builder` instance has been created for the `users` database table and set to a variable named `$queryBuilder`.
