@@ -16,7 +16,7 @@ trait WhereableTrait {
     public function where(
         Stringable|string $columnOrExpression,
         ?string $operator = null,
-        Stringable|string|int|float|array|null $valueOrPlaceholder = null
+        Builder|Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
         if ($operator === null && $valueOrPlaceholder === null) {
             $this[] = $columnOrExpression;
@@ -35,7 +35,11 @@ trait WhereableTrait {
             $valueOrPlaceholder = reset($valueOrPlaceholder);
         }
 
-        if (is_array($valueOrPlaceholder)) {
+        // If value is a builder, assume we want the SELECT
+        if ($valueOrPlaceholder instanceof Builder) {
+            $valueOrPlaceholder = "(" . rtrim($valueOrPlaceholder->getSelectQuery(), ";") . ")";
+        }
+        else if (is_array($valueOrPlaceholder)) {
             $operator = $operator ?: "IN";
             $ins = [];
             foreach ($valueOrPlaceholder as $i => $value) {
@@ -43,17 +47,14 @@ trait WhereableTrait {
                 $ins[] = ":$key";
                 $this->param($key, $value);
             }
-            $placeholder = "(" . implode(", ", $ins) . ")";
+            $valueOrPlaceholder = "(" . implode(", ", $ins) . ")";
         }
         else if ($valueOrPlaceholder !== null && (!is_string($valueOrPlaceholder) || $valueOrPlaceholder[0] !== ":")) {
-            $placeholder = ":$columnOrExpression";
             $this->param($columnOrExpression, $valueOrPlaceholder);
-        }
-        else {
-            $placeholder = $valueOrPlaceholder;
+            $valueOrPlaceholder = ":$columnOrExpression";
         }
 
-        $this[] = trim("$columnOrExpression $operator $placeholder", " ");
+        $this[] = trim("$columnOrExpression $operator $valueOrPlaceholder", " ");
         return $this;
     }
 }
