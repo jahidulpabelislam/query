@@ -283,7 +283,9 @@ class Builder implements WhereableInterface, ParamableInterface {
             $recordPlaceholders = [];
             // Generate placeholders in the canonical column order
             foreach ($columns as $column) {
-                $key = "{$column}_" . ($i + 1);
+                // Use a delimiter pattern unlikely to collide with column names.
+                // This avoids cases like "column_1" (column name) colliding with "column_1_1" (generated placeholder).
+                $key = "{$column}__row" . ($i + 1);
                 $this->param($key, $record[$column]);
                 $recordPlaceholders[] = ":$key";
             }
