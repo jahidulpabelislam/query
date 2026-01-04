@@ -55,12 +55,124 @@ These are all fluent methods, so you can chain them together.
 - `join($joinOrTable, string|null $on, string $type)`:
     - `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
     - `type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
-- `where`:
-    - you can pass in the whole clause using the first parameter
-    - or you can pass column, expression and value separately
+- `where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPlaceholder)`: adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
+    - **Raw SQL expression**: Pass a complete SQL expression as the first parameter only
+        ```php
+        ->where("status = 'active'")
+        ->where("created_at > NOW()")
+        ```
+    - **Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
+        ```php
+        ->where("status", "=", "active")
+        ->where("age", ">", 18)
+        ->where("name", "LIKE", "%john%")
+        ```
+    - **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
+    - **Array values**: When passing an array as the value, the operator is automatically set to `IN` (or `NOT IN` if specified)
+        ```php
+        ->where("status", "IN", ["active", "pending"])
+        ->where("id", "NOT IN", [1, 2, 3])
+        ```
+    - **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
+        ```php
+        ->where("age", "BETWEEN", [18, 65])
+        // Generates: WHERE age BETWEEN :age_1 AND :age_2
+        ```
+    - **Subqueries**: Pass a Builder instance as the value to use a subquery
+        ```php
+        $subquery = new Builder($database, "orders");
+        $subquery->column("customer_id")->where("status", "=", "completed");
+        ->where("id", "IN", $subquery)
+        // Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
+        ```
+    - **Complex conditions**: Pass an `AndCondition` or `OrCondition` instance to create complex nested conditions (see below)
+    - **Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
 - `orderBy(string $column, bool $ascDirection = true)`
 - `limit(int $limit, int|null $page)`
 - `page(int)`: used to change the offset, only used if `limit` set
+
+#### Complex WHERE Conditions
+
+For more complex WHERE clauses that require OR logic or nested conditions, you can use `AndCondition` and `OrCondition` classes.
+
+##### AndCondition
+
+`AndCondition` groups multiple conditions together with AND logic. Create one using `$queryBuilder->newAndCondition()`.
+
+```php
+// Create an AND condition
+$andCondition = $queryBuilder->newAndCondition()
+    ->where("status", "=", "active")
+    ->where("age", ">", 18);
+
+// Use it in a WHERE clause
+$queryBuilder->where($andCondition);
+// Generates: WHERE (status = :status AND age > :age)
+```
+
+##### OrCondition
+
+`OrCondition` groups multiple conditions together with OR logic. Create one using `$queryBuilder->newOrCondition()`.
+
+```php
+// Create an OR condition
+$orCondition = $queryBuilder->newOrCondition()
+    ->where("status", "=", "active")
+    ->where("status", "=", "pending");
+
+// Use it in a WHERE clause
+$queryBuilder->where($orCondition);
+// Generates: WHERE (status = :status OR status = :status_1)
+```
+
+##### Combining AND and OR Conditions
+
+You can nest `AndCondition` and `OrCondition` to create complex logic:
+
+```php
+// Complex example: (status = 'active' AND age > 18) OR (status = 'premium')
+$queryBuilder
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where(
+                $queryBuilder->newAndCondition()
+                    ->where("status", "=", "active")
+                    ->where("age", ">", 18)
+            )
+            ->where("status", "=", "premium")
+    );
+// Generates: WHERE ((status = :status AND age > :age) OR status = :status_1)
+```
+
+```php
+// Another example: status = 'active' AND (role = 'admin' OR role = 'moderator')
+$queryBuilder
+    ->where("status", "=", "active")
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where("role", "=", "admin")
+            ->where("role", "=", "moderator")
+    );
+// Generates: WHERE status = :status AND (role = :role OR role = :role_1)
+```
+
+**Note**: By default, multiple `where()` calls on the builder are combined with AND logic. The main `where()` clause itself is an `AndCondition`, which is why you can chain multiple `where()` calls.
+
+#### WhereableTrait
+
+The `WhereableTrait` provides the core functionality for the `where()` method and is used by:
+- `Builder` class - for the main query WHERE clause
+- `AndCondition` class - for grouping conditions with AND logic
+- `OrCondition` class - for grouping conditions with OR logic
+
+Key features handled by `WhereableTrait`:
+- **Automatic parameter binding**: All values are automatically bound as PDO parameters to prevent SQL injection
+- **Operator-specific logic**:
+    - `IN` and `NOT IN`: Automatically handles arrays by creating multiple parameters
+    - `BETWEEN`: Expects a 2-element array and generates `BETWEEN :param_1 AND :param_2`
+    - Single-element arrays are converted to use `=` or `<>` operators
+- **Subquery support**: Accepts `Builder` instances as values and extracts their SELECT query
+- **Raw SQL expressions**: When only the first parameter is passed, it's treated as a raw SQL expression (use with caution)
 
 ### Examples
 
@@ -270,6 +382,59 @@ $collection = [
         ...
     ],
 ];
+```
+
+##### More WHERE Examples
+
+```php
+// Using IN operator with array
+// SELECT * FROM users WHERE status IN ("active", "pending");
+$collection = $queryBuilder
+    ->where("status", "IN", ["active", "pending"])
+    ->select();
+
+// Using BETWEEN operator
+// SELECT * FROM users WHERE age BETWEEN 18 AND 65;
+$collection = $queryBuilder
+    ->where("age", "BETWEEN", [18, 65])
+    ->select();
+
+// Using LIKE operator
+// SELECT * FROM users WHERE email LIKE "%@example.com";
+$collection = $queryBuilder
+    ->where("email", "LIKE", "%@example.com")
+    ->select();
+
+// Using OR conditions
+// SELECT * FROM users WHERE (status = "active" OR status = "pending");
+$collection = $queryBuilder
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where("status", "=", "active")
+            ->where("status", "=", "pending")
+    )
+    ->select();
+
+// Complex nested conditions
+// SELECT * FROM users WHERE status = "active" AND (role = "admin" OR role = "moderator") AND age > 18;
+$collection = $queryBuilder
+    ->where("status", "=", "active")
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where("role", "=", "admin")
+            ->where("role", "=", "moderator")
+    )
+    ->where("age", ">", 18)
+    ->select();
+
+// Using subquery
+// SELECT * FROM users WHERE id IN (SELECT customer_id FROM orders WHERE status = "completed");
+$subquery = new \JPI\Database\Query\Builder($database, "orders");
+$subquery->column("customer_id")->where("status", "=", "completed");
+
+$collection = $queryBuilder
+    ->where("id", "IN", $subquery)
+    ->select();
 ```
 
 #### count
