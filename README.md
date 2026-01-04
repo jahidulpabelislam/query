@@ -302,7 +302,7 @@ $collection = [
 
 #### count
 
-As the name implies this method will just return the count as an integer. By default it will do `COUNT(*), but you can pass a column as an argument if you want a specific column.
+As the name implies this method will just return the count as an integer. By default it will do `COUNT(*)`, but you can pass a column as an argument if you want a specific column.
 
 For obvious reasons only the `table` & `where` builder methods are supported for this action.
 
