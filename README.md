@@ -44,7 +44,7 @@ $queryBuilder = new \JPI\Database\Query\Builder($database, $table);
 
 ### Action Methods:
 
-These are the methods to call to end with `select`, `count: int`, `insert($values array): int|null`, `update($values array): int` & `delete: int`, all are pretty self-explanatory.
+These are the methods to call to end with `select`, `count(string $column = "*"): int`, `insert($values array): int|null`, `update($values array): int` & `delete: int`, all are pretty self-explanatory.
 
 ### Builder methods
 
