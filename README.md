@@ -69,11 +69,22 @@ column(string $column, string|null $alias): static
 #### `join()`
 
 ```php
-join(JoinClause|string $joinOrTable, string|null $on, string $type = "INNER"): static
+join(): static
 ```
 
-- `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
-- `$type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
+By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods  if you want those.
+
+```php
+// Join with a single expression, but can add more to the 2nd parameter
+$queryBuilder->join("another_table", "column_one = another_table_column_one");
+
+// Nicer syntax adding multiple expressions
+$queryBuilder->join(
+    $queryBuilder->newJoinClause("another_table")
+        ->on("column_one = another_table_column_one")
+        ->on("another_table_column_two > 'active'")
+);
+```
 
 #### `where()`
 
@@ -86,16 +97,16 @@ Adds a WHERE condition to the query. This method is very flexible and supports m
 **Raw SQL expression**: Pass a complete SQL expression as the first parameter only
 
 ```php
-->where("status = 'active'")
-->where("created_at > NOW()")
+$queryBuilder->where("status = 'active'");
+$queryBuilder->where("created_at > NOW()");
 ```
 
 **Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
 
 ```php
-->where("status", "=", "active")
-->where("age", ">", 18)
-->where("name", "LIKE", "%john%")
+$queryBuilder->where("status", "=", "active");
+$queryBuilder->where("age", ">", 18);
+$queryBuilder->where("name", "LIKE", "%john%");
 ```
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
@@ -103,15 +114,15 @@ Adds a WHERE condition to the query. This method is very flexible and supports m
 **Array values**: When passing an array as the value, the operator is automatically set to `IN` (or `NOT IN` if specified)
 
 ```php
-->where("status", "IN", ["active", "pending"])
-->where("id", "NOT IN", [1, 2, 3])
+$queryBuilder->where("status", "IN", ["active", "pending"]);
+$queryBuilder->where("id", "NOT IN", [1, 2, 3]);
 ```
 
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
 ```php
 // age BETWEEN :18 AND 65
-->where("age", "BETWEEN", [18, 65])
+$queryBuilder->where("age", "BETWEEN", [18, 65]);
 ```
 
 **Subqueries**: Pass a Builder instance as the value to use a subquery
