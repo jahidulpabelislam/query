@@ -199,15 +199,15 @@ final class WhereClauseTest extends TestCase {
         // IS NULL
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
-        $where->where("column", "IS NULL");
-        $this->assertSame("WHERE column IS NULL", (string)$where);
+        $where->where("column_one", "IS NULL");
+        $this->assertSame("WHERE column_one IS NULL", (string)$where);
         $this->assertEmpty($builder->getParams());
 
         // IS NOT NULL
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
-        $where->where("column", "IS NOT NULL");
-        $this->assertSame("WHERE column IS NOT NULL", (string)$where);
+        $where->where("column_one", "IS NOT NULL");
+        $this->assertSame("WHERE column_one IS NOT NULL", (string)$where);
         $this->assertEmpty($builder->getParams());
     }
 
