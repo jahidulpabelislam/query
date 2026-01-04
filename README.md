@@ -50,7 +50,7 @@ These are the methods to call to end with `select`, `count`, `insert`, `update` 
 
 These are all fluent methods, so you can chain them together.
 
-#### `table()`
+#### `table`
 
 If you want to change to another table or didn't set when creating the instance.
 
@@ -58,7 +58,7 @@ If you want to change to another table or didn't set when creating the instance.
 table(string $table, string|null $alias): static
 ```
 
-#### `column()`
+#### `column`
 
 To only select a particular column, can be called to select multiple columns, also used to add aggregate functions. If not called will select all columns.
 
@@ -66,7 +66,7 @@ To only select a particular column, can be called to select multiple columns, al
 column(string $column, string|null $alias): static
 ```
 
-#### `join()`
+#### `join`
 
 ```php
 join(): static
@@ -86,7 +86,7 @@ $queryBuilder->join(
 );
 ```
 
-#### `where()`
+#### `where`
 
 Adds a WHERE condition to the query. This method is very flexible and supports multiple calling patterns:
 
@@ -137,13 +137,13 @@ $subQuery
 $queryBuilder->where("id", "IN", $subQuery);
 ```
 
-#### `orderBy()`
+#### `orderBy`
 
 ```php
 orderBy(string $column, bool $ascDirection = true): static
 ```
 
-#### `limit()`
+#### `limit`
 
 Add a limit to the query, and optionally set the page at the same time - this sets the `OFFSET`.
 
@@ -151,7 +151,7 @@ Add a limit to the query, and optionally set the page at the same time - this se
 limit(int $limit, int|null $page): static
 ```
 
-#### `page()`
+#### `page`
 
 Used to change the offset, only used if `limit` set.
 
