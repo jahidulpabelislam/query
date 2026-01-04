@@ -103,6 +103,8 @@ $queryBuilder->where("created_at > NOW()");
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
 
+**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection.
+
 ```php
 $queryBuilder->where("status", "=", "active");
 $queryBuilder->where("age", ">", 18);
@@ -134,8 +136,6 @@ $subQuery
 ;
 $queryBuilder->where("id", "IN", $subQuery);
 ```
-
-**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection.
 
 #### `orderBy`
 
