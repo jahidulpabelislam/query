@@ -11,34 +11,24 @@ use PHPUnit\Framework\TestCase;
 
 final class WhereClauseTest extends TestCase {
 
-    /**
-     * Helper method to access protected params property using reflection
-     */
-    private function getParams(Builder $builder): array {
-        $reflection = new \ReflectionClass($builder);
-        $property = $reflection->getProperty("params");
-        $property->setAccessible(true);
-        return $property->getValue($builder);
-    }
-
     #[AllowMockObjectsWithoutExpectations]
     public function testAnd(): void {
         // Empty
         $builder = $this->createPartialMock(Builder::class, []);
         $this->assertSame("", (string)$builder->newAndCondition());
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Basic single manual where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = $builder->newAndCondition()->where("column = 1");
         $this->assertSame("column = 1", (string)$where);
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Basic single = where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = $builder->newAndCondition()->where("column", "=", 1);
         $this->assertSame("column = :column", (string)$where);
-        $this->assertSame(["column" => 1], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $builder->getParams());
 
         // Multiple
         $builder = $this->createPartialMock(Builder::class, []);
@@ -52,7 +42,7 @@ final class WhereClauseTest extends TestCase {
                 "column_1" => 5,
                 "column_2" => 6,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
     }
 
@@ -61,19 +51,19 @@ final class WhereClauseTest extends TestCase {
         // Empty
         $builder = $this->createPartialMock(Builder::class, []);
         $this->assertSame("", (string)$builder->newOrCondition());
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Basic single manual where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = $builder->newOrCondition()->where("column = 1");
         $this->assertSame("column = 1", (string)$where);
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Basic single = where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = $builder->newOrCondition()->where("column", "=", 1);
         $this->assertSame("column = :column", (string)$where);
-        $this->assertSame(["column" => 1], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $builder->getParams());
 
         // Multiple
         $builder = $this->createPartialMock(Builder::class, []);
@@ -87,7 +77,7 @@ final class WhereClauseTest extends TestCase {
                 "column_1" => 5,
                 "column_2" => 6,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
     }
 
@@ -97,21 +87,21 @@ final class WhereClauseTest extends TestCase {
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $this->assertSame("", (string)$where);
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Basic single manual where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column = 1");
         $this->assertSame("WHERE column = 1", (string)$where);
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Basic single = where
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", "=", 1);
         $this->assertSame("WHERE column = :column", (string)$where);
-        $this->assertSame(["column" => 1], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $builder->getParams());
 
         // Multiple
         $builder = $this->createPartialMock(Builder::class, []);
@@ -125,7 +115,7 @@ final class WhereClauseTest extends TestCase {
                 "column_1" => 5,
                 "column_2" => 6,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
 
         // Multiple + inner or
@@ -138,7 +128,7 @@ final class WhereClauseTest extends TestCase {
                 ->where("column = 9")
         );
         $this->assertSame("WHERE column = :column AND (column = 8 OR column = 9)", (string)$where);
-        $this->assertSame(["column" => 7], $this->getParams($builder));
+        $this->assertSame(["column" => 7], $builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -148,7 +138,7 @@ final class WhereClauseTest extends TestCase {
         $where = new Where($builder);
         $where->where("column", "IN", [1]);
         $this->assertSame("WHERE column = :column", (string)$where);
-        $this->assertSame(["column" => 1], $this->getParams($builder));
+        $this->assertSame(["column" => 1], $builder->getParams());
 
         // IN
         $builder = $this->createPartialMock(Builder::class, []);
@@ -160,7 +150,7 @@ final class WhereClauseTest extends TestCase {
                 "column_1" => 1,
                 "column_2" => 2,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
 
         // NOT IN
@@ -174,7 +164,7 @@ final class WhereClauseTest extends TestCase {
                 "column_2" => 8,
                 "column_3" => 9,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
 
         // BETWEEN
@@ -185,7 +175,7 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame([
             "column_one_1" => 100,
             "column_one_2" => 200,
-        ], $this->getParams($builder));
+        ], $builder->getParams());
 
         // Multiple BETWEEN
         $builder = $this->createPartialMock(Builder::class, []);
@@ -198,7 +188,7 @@ final class WhereClauseTest extends TestCase {
             "column_one_2" => 2,
             "column_two_1" => 3,
             "column_two_2" => 4,
-        ], $this->getParams($builder));
+        ], $builder->getParams());
     }
 
     // Subquery tests use real Builder instances (not partial mocks) because they need to call
@@ -214,11 +204,11 @@ final class WhereClauseTest extends TestCase {
 
         $where = new Where($builder);
         $where->where("main_column", "=", $subquery);
-        
+
         $expected = "WHERE main_column = (SELECT sub_column\nFROM sub_table\nWHERE sub_column = :sub_column)";
         $this->assertSame($expected, (string)$where);
         // Note: Subquery params are not automatically merged into main builder
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -232,11 +222,11 @@ final class WhereClauseTest extends TestCase {
 
         $where = new Where($builder);
         $where->where("id", "IN", $subquery);
-        
+
         $expected = "WHERE id IN (SELECT user_id\nFROM orders\nWHERE status = :status)";
         $this->assertSame($expected, (string)$where);
         // Note: Subquery params are not automatically merged into main builder
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -249,10 +239,10 @@ final class WhereClauseTest extends TestCase {
 
         $where = new Where($builder);
         $where->where("id", "NOT IN", $subquery);
-        
+
         $expected = "WHERE id NOT IN (SELECT product_id\nFROM banned_products)";
         $this->assertSame($expected, (string)$where);
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -267,13 +257,13 @@ final class WhereClauseTest extends TestCase {
         $where = $builder->newAndCondition()
             ->where("active", "=", 1)
             ->where("department_id", "IN", $subquery);
-        
+
         $expected = "(active = :active AND department_id IN (SELECT id\nFROM departments\nWHERE name = :name))";
         $this->assertSame($expected, (string)$where);
         // Only main query params are in main builder
         $this->assertSame([
             "active" => 1,
-        ], $this->getParams($builder));
+        ], $builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -287,10 +277,10 @@ final class WhereClauseTest extends TestCase {
         $where = $builder->newOrCondition()
             ->where("views", ">", 1000)
             ->where("id", "IN", $subquery);
-        
+
         $expected = "(views > :views OR id IN (SELECT post_id\nFROM featured_posts))";
         $this->assertSame($expected, (string)$where);
-        $this->assertSame(["views" => 1000], $this->getParams($builder));
+        $this->assertSame(["views" => 1000], $builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -298,20 +288,20 @@ final class WhereClauseTest extends TestCase {
         // Multiple subqueries in same WHERE clause
         $database = $this->createMock(\JPI\Database::class);
         $builder = new Builder($database, "users");
-        
+
         $subquery1 = new Builder($database, "premium_users");
         $subquery1->column("user_id");
-        
+
         $subquery2 = new Builder($database, "banned_users");
         $subquery2->column("user_id");
 
         $where = new Where($builder);
         $where->where("id", "IN", $subquery1);
         $where->where("id", "NOT IN", $subquery2);
-        
+
         $expected = "WHERE id IN (SELECT user_id\nFROM premium_users) AND id NOT IN (SELECT user_id\nFROM banned_users)";
         $this->assertSame($expected, (string)$where);
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -319,7 +309,7 @@ final class WhereClauseTest extends TestCase {
         // Complex subquery with WHERE, ORDER BY, and LIMIT
         $database = $this->createMock(\JPI\Database::class);
         $builder = new Builder($database, "articles");
-        
+
         $subquery = new Builder($database, "popular_articles");
         $subquery->column("article_id");
         $subquery->where("views", ">", 5000);
@@ -332,12 +322,12 @@ final class WhereClauseTest extends TestCase {
         $where = new Where($builder);
         $where->where("id", "IN", $subquery);
         $where->where("category", "=", "tech");
-        
+
         $expected = "WHERE id IN (SELECT article_id\nFROM popular_articles\nWHERE views > :views AND published = :published\nORDER BY views DESC\nLIMIT 10) AND category = :category";
         $this->assertSame($expected, (string)$where);
         // Only main query params are in main builder
         $this->assertSame([
             "category" => "tech",
-        ], $this->getParams($builder));
+        ], $builder->getParams());
     }
 }
