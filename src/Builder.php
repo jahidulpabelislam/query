@@ -256,14 +256,15 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     /**
-     * @throws InvalidArgumentException If records have inconsistent columns
+     * @throws InvalidArgumentException If records are invalid
      */
     public function insert(array $records): ?int {
         if (!is_numeric(array_key_first($records))) {
-            if (empty($records)) {
-                return null;
-            }
             $records = [$records];
+        }
+
+        if (empty($records[0])) {
+            throw new InvalidArgumentException("Record(s) passed to insert() cannot be empty.");
         }
 
         $values = [];
