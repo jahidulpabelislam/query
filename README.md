@@ -80,7 +80,7 @@ These are all fluent methods, so you can chain them together.
         ```
     - **Subqueries**: Pass a Builder instance as the value to use a subquery
         ```php
-        $subquery = new Builder($database, "orders");
+        $subquery = new \JPI\Database\Query\Builder($database, "orders");
         $subquery->column("customer_id")->where("status", "=", "completed");
         ->where("id", "IN", $subquery)
         // Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
