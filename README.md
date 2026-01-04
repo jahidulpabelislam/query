@@ -202,9 +202,7 @@ $queryBuilder
             ->where("status", "=", "premium")
     );
 // Generates: WHERE ((status = :status AND age > :age) OR status = :status_1)
-```
 
-```php
 // Another example: status = 'active' AND (role = 'admin' OR role = 'moderator')
 $queryBuilder
     ->where("status", "=", "active")
