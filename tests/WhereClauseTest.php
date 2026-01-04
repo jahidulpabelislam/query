@@ -236,4 +236,30 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame("WHERE column = :column AND (column = 8 OR column = 9)", (string)$where);
         $this->assertSame(["column" => 7], $this->getParams($builder));
     }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testOperators(): void {
+        // BETWEEN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column_one", "BETWEEN", [100, 200]);
+        $this->assertSame("WHERE column_one BETWEEN :column_one_1 AND :column_one_2", (string)$where);
+        $this->assertSame([
+            "column_one_1" => 100,
+            "column_one_2" => 200,
+        ], $this->getParams($builder));
+
+        // Multiple BETWEEN
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column_one", "BETWEEN", [1, 2]);
+        $where->where("column_two", "BETWEEN", [3, 4]);
+        $this->assertSame("WHERE column_one BETWEEN :column_one_1 AND :column_one_2 AND column_two BETWEEN :column_two_1 AND :column_two_2", (string)$where);
+        $this->assertSame([
+            "column_one_1" => 1,
+            "column_one_2" => 2,
+            "column_two_1" => 3,
+            "column_two_2" => 4,
+        ], $this->getParams($builder));
+    }
 }
