@@ -127,6 +127,8 @@ $queryBuilder->where("id", "IN", $subquery);
 
 **Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection
 
+**Note**: By default, multiple `where()` calls on the builder are combined with AND logic. The main `where()` clause itself is an `AndCondition`, which is why you can chain multiple `where()` calls.
+
 #### `orderBy()`
 
 ```php
@@ -213,8 +215,6 @@ $queryBuilder
     );
 // Generates: WHERE status = :status AND (role = :role OR role = :role_1)
 ```
-
-**Note**: By default, multiple `where()` calls on the builder are combined with AND logic. The main `where()` clause itself is an `AndCondition`, which is why you can chain multiple `where()` calls.
 
 ### Examples
 
