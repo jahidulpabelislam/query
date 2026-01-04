@@ -270,34 +270,6 @@ $collection = [
         ...
     ],
 ];
-
-// SELECT * FROM users LIMIT 10;
-// Using withPagination parameter set to false to get a simple Collection instead of PaginatedCollection
-$collection = $queryBuilder
-    ->limit(10)
-    ->select(false);
-/**
-$collection = [
-    [
-        "id" => 1,
-        "first_name" => "Jahidul",
-        "last_name" => "Islam",
-        "email" => "jahidul@jahidulpabelislam.com",
-        "password" => "password123",
-        ...
-    ],
-    [
-        "id" => 2,
-        "first_name" => "Test",
-        "last_name" => "Example",
-        "email" => "test@example.com",
-        "password" => "password123",
-        ...
-    ],
-    // ... up to 10 rows
-];
-// No pagination metadata included when withPagination is false
-*/
 ```
 
 #### count
