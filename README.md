@@ -83,15 +83,20 @@ Adds a WHERE condition to the query. This method is very flexible and supports m
 
 ```php
 ->where("status = 'active'")
+// Generates: WHERE status = 'active'
 ->where("created_at > NOW()")
+// Generates: WHERE created_at > NOW()
 ```
 
 **Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
 
 ```php
 ->where("status", "=", "active")
+// Generates: WHERE status = :status
 ->where("age", ">", 18)
+// Generates: WHERE age > :age
 ->where("name", "LIKE", "%john%")
+// Generates: WHERE name LIKE :name
 ```
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
@@ -100,24 +105,25 @@ Adds a WHERE condition to the query. This method is very flexible and supports m
 
 ```php
 ->where("status", "IN", ["active", "pending"])
+// Generates: WHERE status IN (:status_1, :status_2)
 ->where("id", "NOT IN", [1, 2, 3])
+// Generates: WHERE id NOT IN (:id_1, :id_2, :id_3)
 ```
 
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
 ```php
-// age BETWEEN :age_1 AND :age_2
 ->where("age", "BETWEEN", [18, 65])
-
+// Generates: WHERE age BETWEEN :age_1 AND :age_2
 ```
 
 **Subqueries**: Pass a Builder instance as the value to use a subquery
 
 ```php
-// id IN (SELECT customer_id FROM orders WHERE status = :status)
 $subquery = new \JPI\Database\Query\Builder($database, "orders");
 $subquery->column("customer_id")->where("status", "=", "completed");
 $queryBuilder->where("id", "IN", $subquery);
+// Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
 ```
 
 **Complex conditions**: Pass an `AndCondition` or `OrCondition` instance to create complex nested conditions (see below)
