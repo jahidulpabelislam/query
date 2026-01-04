@@ -303,7 +303,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         );
 
         // For multi-row inserts, return the number of rows affected
-        if (count($values) > 1) {
+        if (count($records) > 1) {
             return $rowsAffected;
         }
 
