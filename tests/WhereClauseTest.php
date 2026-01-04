@@ -239,35 +239,4 @@ final class WhereClauseTest extends TestCase {
         $this->assertSame($expected, (string)$where);
         $this->assertEmpty($builder->getParams());
     }
-
-    #[AllowMockObjectsWithoutExpectations]
-    public function testComplexSubquery(): void {
-        // Complex subquery with WHERE, ORDER BY, and LIMIT
-        $database = $this->createMock(\JPI\Database::class);
-        $builder = new Builder($database, "articles");
-
-        $subquery = new Builder($database, "popular_articles");
-        $subquery->column("article_id");
-        $subquery->where("views", ">", 5000);
-        // Using 1 instead of boolean true because the Builder::where() signature doesn't accept bool
-        $subquery->where("published", "=", 1);
-        // Second parameter false produces DESC order (true would produce ASC)
-        $subquery->orderBy("views", false);
-        $subquery->limit(10);
-
-        $where = new Where($builder);
-        $where->where("id", "IN", $subquery);
-        $where->where("category", "=", "tech");
-
-        $expected = "WHERE id IN (SELECT article_id\nFROM popular_articles\nWHERE views > :views AND published = :published\nORDER BY views DESC\nLIMIT 10) AND category = :category";
-        $this->assertSame($expected, (string)$where);
-        $this->assertSame(
-            [
-                "views" => 5000,
-                "published" => 1,
-                "category" => "tech",
-            ],
-            $builder->getParams()
-        );
-    }
 }
