@@ -74,7 +74,7 @@ This has 4 return types depending on how you use it:
 - if paged/limited & `withPagination` param (first param) isn't `false` then `\JPI\Database\Query\PaginatedResult`
 - else `\JPI\Database\Query\Result`
 
-`PaginatedResult` & `Result` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. `PaginatedResult` has meta data on the limit used, page number and total count if not limitted, and means result is immutable.
+`PaginatedResult` & `Result` work like a normal array just with some extra methods, see https://github.com/jahidulpabelislam/utils?tab=readme-ov-file#collection for more details. `PaginatedResult` has meta data on the limit used, page number and total count if not limited, and means result is immutable.
 
 ```php
 // SELECT * FROM users;
