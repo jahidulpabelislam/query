@@ -70,7 +70,7 @@ Assuming a `\JPI\Database\Query\Builder` instance has been created for the `user
 
 This has 4 return types depending on how you use it:
 
-- if you've set `limit` of `1` this will return an instance of `\JPI\Database\Query\Result\Row` or `null` if not found. The `Row` class can be used an associative array of key (column) value pairs
+- if you've set `limit` of `1` this will return an instance of `\JPI\Database\Query\Result\Row` or `null` if not found. The `Row` class can be used as an associative array of key (column) value pairs
 - if paged/limited and the `withPagination` param (first param) isn't `false` then `\JPI\Database\Query\Result\PaginatedCollection`
 - else `\JPI\Database\Query\Result\Collection`
 
