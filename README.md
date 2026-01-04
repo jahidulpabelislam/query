@@ -92,7 +92,7 @@ Adds a expression to the WHERE clause. This method is very flexible and supports
 
 **Note**: By default, multiple `where()` calls on the builder are combined with AND logic.
 
-**Raw SQL expression**: Pass a complete SQL expression as the first parameter only
+**Raw SQL expression**: Pass a complete expression as the first parameter only
 
 ```php
 $queryBuilder->where("status = 'active'");
