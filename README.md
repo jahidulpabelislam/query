@@ -119,7 +119,7 @@ where(string|Stringable $columnOrExpression, ?string $operator, mixed $valueOrPl
 ```php
 $subquery = new \JPI\Database\Query\Builder($database, "orders");
 $subquery->column("customer_id")->where("status", "=", "completed");
-->where("id", "IN", $subquery)
+$queryBuilder->where("id", "IN", $subquery);
 // Generates: WHERE id IN (SELECT customer_id FROM orders WHERE status = :status)
 ```
 
