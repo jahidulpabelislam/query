@@ -101,13 +101,13 @@ $queryBuilder->where("created_at > NOW()");
 
 **Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
 
+**Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
+
 ```php
 $queryBuilder->where("status", "=", "active");
 $queryBuilder->where("age", ">", 18);
 $queryBuilder->where("name", "LIKE", "%john%");
 ```
-
-**Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
 
 **Array values**: When passing an array as the value, the operator is automatically set to `IN` (or `NOT IN` if specified)
 
