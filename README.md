@@ -134,8 +134,7 @@ $queryBuilder->where("age", "BETWEEN", [18, 65]);
 $subQuery = new \JPI\Database\Query\Builder($database, "orders");
 $subQuery
     ->column("customer_id")
-    ->where("status", "=", "completed")
-;
+    ->where("status", "=", "completed");
 $queryBuilder->where("id", "IN", $subQuery);
 ```
 
@@ -181,10 +180,10 @@ $andCondition = $queryBuilder->newAndCondition()
 `OrCondition` groups multiple conditions together with OR logic. Create one using `$queryBuilder->newOrCondition()`.
 
 ```php
-// (status = "active" OR status = "pending")
+// (status = "active" OR role = "admin")
 $orCondition = $queryBuilder->newOrCondition()
     ->where("status", "=", "active")
-    ->where("status", "=", "pending");
+    ->where("role", "=", "admin");
 ```
 
 ##### Combining AND and OR Conditions
@@ -192,7 +191,16 @@ $orCondition = $queryBuilder->newOrCondition()
 You can nest `AndCondition` and `OrCondition` to create complex logic:
 
 ```php
-// Complex example: (status = 'active' AND age > 18) OR (status = 'premium')
+// status = 'active' AND (role = 'admin' OR type = 'premium')
+$queryBuilder
+    ->where("status", "=", "active")
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where("role", "=", "admin")
+            ->where("type", "=", "premium")
+    );
+
+// ((status = 'active' AND age > 18) OR type = 'premium')
 $queryBuilder
     ->where(
         $queryBuilder->newOrCondition()
@@ -201,16 +209,7 @@ $queryBuilder
                     ->where("status", "=", "active")
                     ->where("age", ">", 18)
             )
-            ->where("status", "=", "premium")
-    );
-
-// Another example: status = 'active' AND (role = 'admin' OR role = 'moderator')
-$queryBuilder
-    ->where("status", "=", "active")
-    ->where(
-        $queryBuilder->newOrCondition()
-            ->where("role", "=", "admin")
-            ->where("role", "=", "moderator")
+            ->where("type", "=", "premium")
     );
 ```
 
