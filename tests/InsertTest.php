@@ -171,13 +171,22 @@ final class InsertTest extends TestCase {
         $this->assertSame(0, $result);
     }
 
-    public function testEmptyRecord(): void {
+    public function testEmptyRecords(): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Record(s) passed to insert() cannot be empty.");
 
         $database = $this->createStub(Database::class);
         $builder = $this->createBuilder($database);
         $builder->insert([]);
+    }
+
+    public function testEmptyInnerRecord(): void {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Record(s) passed to insert() cannot be empty.");
+
+        $database = $this->createStub(Database::class);
+        $builder = $this->createBuilder($database);
+        $builder->insert([[]]);
     }
 
     public function testMismatchedColumns(): void {
@@ -189,6 +198,18 @@ final class InsertTest extends TestCase {
         $builder->insert([
             ["name" => "John Doe", "email" => "john@example.com"],
             ["name" => "Jane Doe", "age" => 30],
+        ]);
+    }
+
+    public function testMissingSecondRecord(): void {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("All records passed to insert() must have the same set of columns.");
+
+        $database = $this->createStub(Database::class);
+        $builder = $this->createBuilder($database);
+        $builder->insert([
+            ["name" => "John Doe", "email" => "john@example.com"],
+            [],
         ]);
     }
 }
