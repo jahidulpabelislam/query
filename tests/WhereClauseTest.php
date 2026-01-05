@@ -195,28 +195,53 @@ final class WhereClauseTest extends TestCase {
             ],
             $builder->getParams()
         );
+
+        // IS NULL
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column_one", "IS NULL");
+        $this->assertSame("WHERE column_one IS NULL", (string)$where);
+        $this->assertEmpty($builder->getParams());
+
+        // IS NOT NULL
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column_one", "IS NOT NULL");
+        $this->assertSame("WHERE column_one IS NOT NULL", (string)$where);
+        $this->assertEmpty($builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
     public function testValues(): void {
+        // Test empty string value
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", "=", "");
         $this->assertSame("WHERE column = :column", (string)$where);
         $this->assertSame(["column" => ""], $builder->getParams());
+
+        // Test using parameter placeholder
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "=", ":value");
+        $this->assertSame("WHERE column = :value", (string)$where);
+        $this->assertEmpty($builder->getParams()); // Should be empty at this point
+
+        $where->param("value", "test_value");
+        $this->assertSame(["value" => "test_value"], $builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
     public function testSubquery(): void {
         $database = $this->createMock(\JPI\Database::class);
 
-        $subquery = new Builder($database, "orders");
-        $subquery->column("customer_id");
-        $subquery->where("status", "=", "completed");
+        $subQuery = new Builder($database, "orders");
+        $subQuery->column("customer_id");
+        $subQuery->where("status", "=", "completed");
 
         $builder = new Builder($database, "customers");
         $where = new Where($builder);
-        $where->where("id", "IN", $subquery);
+        $where->where("id", "IN", $subQuery);
 
         $expected = "WHERE id IN (SELECT customer_id\nFROM orders\nWHERE status = :status)";
         $this->assertSame($expected, (string)$where);
@@ -233,16 +258,16 @@ final class WhereClauseTest extends TestCase {
         // Multiple subqueries in same WHERE clause
         $database = $this->createMock(\JPI\Database::class);
 
-        $subquery1 = new Builder($database, "premium_users");
-        $subquery1->column("user_id");
+        $subQuery1 = new Builder($database, "premium_users");
+        $subQuery1->column("user_id");
 
-        $subquery2 = new Builder($database, "banned_users");
-        $subquery2->column("user_id");
+        $subQuery2 = new Builder($database, "banned_users");
+        $subQuery2->column("user_id");
 
         $builder = new Builder($database, "users");
         $where = new Where($builder);
-        $where->where("id", "IN", $subquery1);
-        $where->where("id", "NOT IN", $subquery2);
+        $where->where("id", "IN", $subQuery1);
+        $where->where("id", "NOT IN", $subQuery2);
 
         $expected = "WHERE id IN (SELECT user_id\nFROM premium_users) AND id NOT IN (SELECT user_id\nFROM banned_users)";
         $this->assertSame($expected, (string)$where);
