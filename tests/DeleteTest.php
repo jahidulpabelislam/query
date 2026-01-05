@@ -5,19 +5,8 @@ declare(strict_types=1);
 namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
-use JPI\Database\Query\Builder;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-final class DeleteTest extends TestCase {
-
-    private function createDatabaseMock(): Database&MockObject {
-        return $this->createMock(Database::class);
-    }
-
-    private function createBuilder(?Database $database = null): Builder {
-        return new Builder($database ?: $this->createDatabaseMock(), "users");
-    }
+final class DeleteTest extends BaseTestCase {
 
     public function testBasicDelete(): void {
         $database = $this->createDatabaseMock();

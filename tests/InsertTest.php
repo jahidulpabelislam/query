@@ -6,19 +6,8 @@ namespace JPI\Database\Query\Tests;
 
 use InvalidArgumentException;
 use JPI\Database;
-use JPI\Database\Query\Builder;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-final class InsertTest extends TestCase {
-
-    private function createDatabaseMock(): Database&MockObject {
-        return $this->createMock(Database::class);
-    }
-
-    private function createBuilder(?Database $database = null): Builder {
-        return new Builder($database ?: $this->createDatabaseMock(), "users");
-    }
+final class InsertTest extends BaseTestCase {
 
     public function testLegacySingleRow(): void {
         $database = $this->createDatabaseMock();
