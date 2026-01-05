@@ -10,7 +10,7 @@ trait ParamableTrait {
 
     protected array $params = [];
 
-    public function param(string $key, Stringable|string|int|float $value): static {
+    public function param(string $key, Stringable|string|int|float|null $value): static {
         $this->params[$key] = $value;
         return $this;
     }

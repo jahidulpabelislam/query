@@ -11,7 +11,7 @@ use Stringable;
  */
 trait WhereableTrait {
 
-    abstract public function param(string $key, Stringable|string|int|float $value): static;
+    abstract public function param(string $key, Stringable|string|int|float|null $value): static;
 
     abstract public function params(array $params): static;
 
