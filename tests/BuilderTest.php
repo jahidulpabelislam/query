@@ -6,23 +6,38 @@ namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
 use JPI\Database\Query\Builder;
-use JPI\Database\Query\Clause\Where;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class BuilderTest extends TestCase {
 
-    /**
-     * Helper method to access protected params property using reflection
-     */
-    private function getParams(Builder $builder): array {
-        $reflection = new \ReflectionClass($builder);
-        $property = $reflection->getProperty("params");
-        $property->setAccessible(true);
-        return $property->getValue($builder);
+    private function createDatabase(): Database&Stub {
+        $database = $this->createStub(Database::class);
+        $database->method("selectAll")
+            ->willReturn([
+                ["column_one" => "Value 11", "column_two" => "Value 12"],
+                ["column_one" => "Value 21", "column_two" => "Value 22"],
+            ])
+        ;
+
+        $database->method("selectFirst")
+            ->willReturnCallback(function (string $query, array $params) {
+                if (str_contains($query, "as count")) {
+                    return ["count" => 2];
+                }
+                return ["column_one" => "Value 11", "column_two" => "Value 12"];
+            })
+        ;
+
+        return $database;
     }
 
-    public function testAll(): void {
-        $database = $this->createStub(Database::class);
+    private function createBuilder(?Database $database = null): Builder {
+        return new Builder($database ?: $this->createDatabase(), "table_one");
+    }
+
+    public function testSelectBuilding(): void {
+        $database = $this->createDatabase();
 
         $builder = new Builder($database, "table_one");
 
@@ -32,7 +47,7 @@ final class BuilderTest extends TestCase {
 FROM table_one;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Changing table
         $builder->table("table");
@@ -41,7 +56,7 @@ FROM table_one;",
 FROM table;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Single column
         $builder->column("column");
@@ -50,7 +65,7 @@ FROM table;",
 FROM table;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // + another column with an alias
         $builder->column("column_two", "column_two_alias");
@@ -59,7 +74,7 @@ FROM table;",
 FROM table;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // + single where clause
         $builder->where("column_one", "=", 1);
@@ -69,7 +84,7 @@ FROM table
 WHERE column_one = :column_one;",
             $builder->getSelectQuery()
         );
-        $this->assertSame(["column_one" => 1], $this->getParams($builder));
+        $this->assertSame(["column_one" => 1], $builder->getParams());
 
         // + another where clause
         $builder->where("column_two", "=", 2);
@@ -84,15 +99,15 @@ WHERE column_one = :column_one AND column_two = :column_two;",
                 "column_one" => 1,
                 "column_two" => 2,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
 
         // + inner OR where
-        $orWhere = new Where\OrCondition($builder);
-        $orWhere->where("column_three", "=", 3)
-            ->where("column_four", "=", 4)
-        ;
-        $builder->where($orWhere);
+        $builder->where(
+            $builder->newOrCondition()
+                ->where("column_three", "=", 3)
+                ->where("column_four", "=", 4)
+        );
         $this->assertSame(
             "SELECT column,column_two as column_two_alias
 FROM table
@@ -106,7 +121,7 @@ WHERE column_one = :column_one AND column_two = :column_two AND (column_three = 
                 "column_three" => 3,
                 "column_four" => 4,
             ],
-            $this->getParams($builder)
+            $builder->getParams()
         );
 
         // Order by
@@ -118,7 +133,7 @@ FROM table_one
 ORDER BY column_one ASC;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // + another order by
         $builder->orderBy("column_two", false);
@@ -128,7 +143,7 @@ FROM table_one
 ORDER BY column_one ASC, column_two DESC;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Limit
         $builder = new Builder($database, "table_one");
@@ -139,7 +154,7 @@ FROM table_one
 LIMIT 5;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // Limit + page
         $builder->limit(5, 2);
@@ -149,7 +164,7 @@ FROM table_one
 LIMIT 5 OFFSET 5;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // With an inner join
         $builder = new Builder($database, "table_one");
@@ -160,7 +175,7 @@ FROM table_one
 INNER JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // With 2 ON conditions on an inner join
         $builder = new Builder($database, "table_one");
@@ -175,7 +190,7 @@ FROM table_one
 INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // With a right join - using helper/alias method
         $builder = new Builder($database, "table_one");
@@ -186,7 +201,7 @@ FROM table_one
 RIGHT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // With a left join - using helper/alias method
         $builder = new Builder($database, "table_one");
@@ -197,7 +212,7 @@ FROM table_one
 LEFT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
 
         // 2 joins
         $builder = new Builder($database, "table_one");
@@ -209,6 +224,45 @@ FROM table_one
 INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_one = column_two;",
             $builder->getSelectQuery()
         );
-        $this->assertEmpty($this->getParams($builder));
+        $this->assertEmpty($builder->getParams());
     }
+
+    public function testSelectOne(): void {
+        // With limit 1 always returns single result
+        $result = $this->createBuilder()
+            ->limit(1)
+            ->select();
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
+    }
+
+    public function testSelectAll(): void {
+        // Without limit always returns Collection
+        $result = $this->createBuilder()->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
+    public function testSelectWithPagination(): void {
+        // withPagination true (Default behavior)
+        $result = $this->createBuilder()
+            ->limit(2)
+            ->select();
+        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
+    public function testSelectWithPaginationFalse(): void {
+        $database = $this->createMock(Database::class);
+
+        // Should call selectAll but not selectFirst (which count() uses internally)
+        $database->expects($this->once())->method("selectAll");
+        $database->expects($this->never())->method("selectFirst");
+
+        // When withPagination is false, should return Collection instead of PaginatedCollection
+        $result = $this->createBuilder($database)
+            ->limit(2)
+            ->select(false);
+        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
+        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+    }
+
 }

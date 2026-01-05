@@ -8,6 +8,8 @@ use JPI\Database;
 use JPI\Database\Query\Clause\Join as JoinClause;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
 use JPI\Database\Query\Clause\Where as WhereClause;
+use JPI\Database\Query\Clause\Where\AndCondition;
+use JPI\Database\Query\Clause\Where\OrCondition;
 use JPI\Database\Query\Result\Collection;
 use JPI\Database\Query\Result\CollectionInterface;
 use JPI\Database\Query\Result\PaginatedCollection;
@@ -91,11 +93,11 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function where(
-        Stringable|string $whereOrColumn,
-        ?string $expression = null,
-        Stringable|string|int|float|array|null $valueOrPlaceholder = null
+        Stringable|string $columnOrExpression,
+        ?string $operator = null,
+        Builder|Stringable|string|int|float|array|null $valueOrPlaceholder = null
     ): static {
-        $this->where->where($whereOrColumn, $expression, $valueOrPlaceholder);
+        $this->where->where($columnOrExpression, $operator, $valueOrPlaceholder);
         return $this;
     }
 
@@ -110,7 +112,7 @@ class Builder implements WhereableInterface, ParamableInterface {
     }
 
     public function limit(int $limit, ?int $page = null): static {
-        if (!is_null($page)) {
+        if ($page !== null) {
             $this->page($page);
         }
 
@@ -118,12 +120,20 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $this;
     }
 
+    public function newAndCondition(): AndCondition {
+        return new AndCondition($this);
+    }
+
+    public function newOrCondition(): OrCondition {
+        return new OrCondition($this);
+    }
+
     /**
      * Convenient function to pluck/get out the single value from an array if it's the only value.
      * Then build a string value if an array.
      */
     public static function arrayToString(Traversable|array $value, string $separator = ","): string {
-        $value = iterator_to_array($value);
+        $value = $value instanceof Traversable ? iterator_to_array($value) : $value;
         if (count($value) === 1) {
             return (string)array_shift($value);
         }
@@ -189,7 +199,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         return $results;
     }
 
-    public function select(): CollectionInterface|PaginatedCollectionInterface|ResultInterface|null {
+    public function select(bool $withPagination = true): CollectionInterface|PaginatedCollectionInterface|ResultInterface|null {
         $limit = $this->limit;
 
         $query = $this->getSelectQuery();
@@ -206,7 +216,7 @@ class Builder implements WhereableInterface, ParamableInterface {
 
         $rows = $this->database->selectAll($query, $this->params);
 
-        if (!$limit) {
+        if (!$limit || ($limit && !$withPagination)) {
             return new static::$collectionClass($this->createResults($rows));
         }
 
@@ -231,12 +241,12 @@ class Builder implements WhereableInterface, ParamableInterface {
         return new static::$paginatedCollectionClass($this->createResults($rows), $totalCount, $limit, $page);
     }
 
-    public function count(): int {
+    public function count(string $column = "*"): int {
         // Clear/reset
         $this->columns = [];
         $this->orderBy->clear();
 
-        $this->column("COUNT(*)", "count");
+        $this->column("COUNT($column)", "count");
         $this->limit(1, 1);
 
         $row = $this->database->selectFirst($this->getSelectQuery(), $this->params);
