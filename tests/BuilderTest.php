@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
-use JPI\Database\Query\Builder;
 use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
 
-final class BuilderTest extends TestCase {
+final class BuilderTest extends BaseTestCase {
 
-    private function createDatabase(): Database&Stub {
+    protected function createDatabase(): Database&Stub {
         $database = $this->createStub(Database::class);
         $database->method("selectAll")
             ->willReturn([
@@ -32,19 +30,13 @@ final class BuilderTest extends TestCase {
         return $database;
     }
 
-    private function createBuilder(?Database $database = null): Builder {
-        return new Builder($database ?: $this->createDatabase(), "table_one");
-    }
-
     public function testSelectBuilding(): void {
-        $database = $this->createDatabase();
-
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
 
         // Just select all
         $this->assertSame(
             "SELECT *
-FROM table_one;",
+FROM users;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
@@ -125,11 +117,11 @@ WHERE column_one = :column_one AND column_two = :column_two AND (column_three = 
         );
 
         // Order by
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->orderBy("column_one");
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 ORDER BY column_one ASC;",
             $builder->getSelectQuery()
         );
@@ -139,18 +131,18 @@ ORDER BY column_one ASC;",
         $builder->orderBy("column_two", false);
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 ORDER BY column_one ASC, column_two DESC;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // Limit
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->limit(5);
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 LIMIT 5;",
             $builder->getSelectQuery()
         );
@@ -160,25 +152,25 @@ LIMIT 5;",
         $builder->limit(5, 2);
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 LIMIT 5 OFFSET 5;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // With an inner join
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->join("table_two", "column_one = column_two");
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 INNER JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // With 2 ON conditions on an inner join
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->join(
             $builder->newJoinClause("table_two")
                 ->on("column_one = column_two")
@@ -186,41 +178,41 @@ INNER JOIN table_two ON column_one = column_two;",
         );
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // With a right join - using helper/alias method
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->rightJoin("table_two", "column_one = column_two");
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 RIGHT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // With a left join - using helper/alias method
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->leftJoin("table_two", "column_one = column_two");
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 LEFT JOIN table_two ON column_one = column_two;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // 2 joins
-        $builder = new Builder($database, "table_one");
+        $builder = $this->createBuilder();
         $builder->join("table_two", "column_one = column_two");
         $builder->leftJoin("table_three", "column_one = column_two");
         $this->assertSame(
             "SELECT *
-FROM table_one
+FROM users
 INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_one = column_two;",
             $builder->getSelectQuery()
         );

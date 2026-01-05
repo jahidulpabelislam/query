@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Tests;
 
-use JPI\Database;
-
 final class CountTest extends BaseTestCase {
 
     public function testBasicCount(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -27,7 +25,7 @@ final class CountTest extends BaseTestCase {
     }
 
     public function testCountWithColumn(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -45,7 +43,7 @@ final class CountTest extends BaseTestCase {
     }
 
     public function testCountWithWhere(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())

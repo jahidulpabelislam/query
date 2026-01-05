@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Tests;
 
-use JPI\Database;
-
 final class DeleteTest extends BaseTestCase {
 
     public function testBasicDelete(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -25,7 +23,7 @@ final class DeleteTest extends BaseTestCase {
     }
 
     public function testDeleteWithWhere(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -45,7 +43,7 @@ final class DeleteTest extends BaseTestCase {
     }
 
     public function testDeleteWithOrderBy(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -63,7 +61,7 @@ final class DeleteTest extends BaseTestCase {
     }
 
     public function testDeleteWithLimit(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -81,7 +79,7 @@ final class DeleteTest extends BaseTestCase {
     }
 
     public function testDeleteWithWhereOrderByAndLimit(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())

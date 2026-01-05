@@ -10,7 +10,7 @@ use JPI\Database;
 final class InsertTest extends BaseTestCase {
 
     public function testLegacySingleRow(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -38,7 +38,7 @@ final class InsertTest extends BaseTestCase {
     }
 
     public function testSingleRow(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -66,7 +66,7 @@ final class InsertTest extends BaseTestCase {
     }
 
     public function testMultiRow(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -97,7 +97,7 @@ final class InsertTest extends BaseTestCase {
     }
 
     public function testMultiRowDifferentOrder(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -128,7 +128,7 @@ final class InsertTest extends BaseTestCase {
     }
 
     public function testFailure(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Simulate failed insert
         $database->method("exec")->willReturn(0);
@@ -144,7 +144,7 @@ final class InsertTest extends BaseTestCase {
     }
 
     public function testMultiRowFailure(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Simulate failed multi-row insert
         $database->method("exec")->willReturn(0);

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Tests;
 
-use JPI\Database;
-
 final class UpdateTest extends BaseTestCase {
 
     public function testBasicUpdate(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -34,7 +32,7 @@ final class UpdateTest extends BaseTestCase {
     }
 
     public function testUpdateWithWhere(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -59,7 +57,7 @@ final class UpdateTest extends BaseTestCase {
     }
 
     public function testUpdateWithOrderBy(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -83,7 +81,7 @@ final class UpdateTest extends BaseTestCase {
     }
 
     public function testUpdateWithLimit(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -107,7 +105,7 @@ final class UpdateTest extends BaseTestCase {
     }
 
     public function testUpdateWithWhereOrderByAndLimit(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
@@ -134,7 +132,7 @@ final class UpdateTest extends BaseTestCase {
     }
 
     public function testUpdateMultipleColumns(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
