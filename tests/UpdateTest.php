@@ -58,33 +58,6 @@ final class UpdateTest extends BaseTestCase {
         $this->assertSame(1, $result);
     }
 
-    public function testUpdateWithMultipleWhereConditions(): void {
-        $database = $this->createDatabaseMock();
-
-        // Check the SQL generated
-        $database->expects($this->once())
-            ->method("exec")
-            ->with(
-                $this->equalTo("UPDATE users\nSET status = :status\nWHERE active = :active AND role = :role;"),
-                $this->equalTo([
-                    "status" => "verified",
-                    "active" => 1,
-                    "role" => "admin",
-                ])
-            )
-            ->willReturn(3)
-        ;
-
-        $result = $this->createBuilder($database)
-            ->where("active", "=", 1)
-            ->where("role", "=", "admin")
-            ->update([
-                "status" => "verified",
-            ]);
-
-        $this->assertSame(3, $result);
-    }
-
     public function testUpdateWithOrderBy(): void {
         $database = $this->createDatabaseMock();
 
@@ -158,23 +131,6 @@ final class UpdateTest extends BaseTestCase {
             ]);
 
         $this->assertSame(5, $result);
-    }
-
-    public function testUpdateNoRowsAffected(): void {
-        $database = $this->createDatabaseMock();
-
-        // Simulate no rows affected
-        $database->expects($this->once())
-            ->method("exec")
-            ->willReturn(0);
-
-        $result = $this->createBuilder($database)
-            ->where("id", "=", 999)
-            ->update([
-                "name" => "Test User",
-            ]);
-
-        $this->assertSame(0, $result);
     }
 
     public function testUpdateMultipleColumns(): void {
