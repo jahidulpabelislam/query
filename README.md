@@ -305,7 +305,7 @@ $count = $queryBuilder->count("DISTINCT status");
 This method supports inserting one or more rows into the table.
 
 **Single Row Insert:**
-When inserting a single row successfully, the method returns the last inserted ID. If the insert fails, it returns `null`.
+When inserting a single row successfully, the method returns the last inserted ID, `null` if it fails.
 
 **Multi-Row Insert:**
 When inserting multiple rows, the method returns the number of rows affected.
