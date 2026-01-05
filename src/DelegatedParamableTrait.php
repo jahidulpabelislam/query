@@ -11,7 +11,7 @@ use Stringable;
  */
 trait DelegatedParamableTrait {
 
-    public function param(string $key, Stringable|string|int|float $value): static {
+    public function param(string $key, Stringable|string|int|float|null $value): static {
         $this->query->param($key, $value);
         return $this;
     }

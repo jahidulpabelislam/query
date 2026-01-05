@@ -8,7 +8,7 @@ use Stringable;
 
 interface ParamableInterface {
 
-    public function param(string $key, Stringable|string|int|float $value): static;
+    public function param(string $key, Stringable|string|int|float|null $value): static;
 
     public function params(array $params): static;
 }
