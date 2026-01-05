@@ -109,6 +109,10 @@ $queryBuilder->where("created_at > NOW()");
 $queryBuilder->where("status", "=", "active");
 $queryBuilder->where("age", ">", 18);
 $queryBuilder->where("name", "LIKE", "%john%");
+
+// If you want to manually set the param (use `:`)
+$queryBuilder->where("status", "=", ":status_value");
+$queryBuilder->param("status_value", "active");
 ```
 
 **IN/NOT IN**:
