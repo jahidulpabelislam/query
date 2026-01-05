@@ -10,13 +10,17 @@ trait ParamableTrait {
 
     protected array $params = [];
 
-    public function param(string $key, Stringable|string|int|float $value): static {
+    public function param(string $key, Stringable|string|int|float|null $value): static {
         $this->params[$key] = $value;
         return $this;
     }
 
     public function params(array $params): static {
-        $this->params = array_merge($this->params, $params);
+        // Run through each param and set it - to allow for any processing in param()
+        foreach ($params as $key => $value) {
+            $this->param($key, $value);
+        }
+
         return $this;
     }
 
