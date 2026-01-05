@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query;
 
+use InvalidArgumentException;
 use JPI\Database;
 use JPI\Database\Query\Clause\Join as JoinClause;
 use JPI\Database\Query\Clause\OrderBy as OrderByClause;
@@ -254,22 +255,61 @@ class Builder implements WhereableInterface, ParamableInterface {
         return (int)$row["count"];
     }
 
-    public function insert(array $values): ?int {
-        $this->params($values);
+    /**
+     * @throws InvalidArgumentException If records are invalid
+     */
+    public function insert(array $records): ?int {
+        if (!is_array(reset($records))) {
+            $records = [$records];
+        }
 
-        $sets = [];
-        foreach (array_keys($values) as $column) {
-            $sets[] = "$column = :$column";
+        $records = array_values($records); // Reindex to ensure numeric keys
+
+        if (empty($records[0])) {
+            throw new InvalidArgumentException("Record(s) passed to insert() cannot be empty.");
+        }
+
+        $values = [];
+        $columns = array_keys($records[0]);
+        $expectedColumns = $columns;
+        sort($expectedColumns);
+
+        foreach ($records as $i => $record) {
+            // Validate that each record has the same set of columns
+            $recordColumns = array_keys($record);
+            sort($recordColumns);
+            if ($recordColumns !== $expectedColumns) {
+                throw new InvalidArgumentException("All records passed to insert() must have the same set of columns.");
+            }
+
+            $recordPlaceholders = [];
+            // Generate placeholders in the canonical column order
+            foreach ($columns as $column) {
+                // Use a delimiter pattern unlikely to collide with column names.
+                // This avoids cases like "column_1" (column name) colliding with "column_1_1" (generated placeholder).
+                $key = "{$column}__row" . ($i + 1);
+                $this->param($key, $record[$column]);
+                $recordPlaceholders[] = ":$key";
+            }
+
+            $values[] = "(" . static::arrayToString($recordPlaceholders) . ")";
         }
 
         $rowsAffected = $this->database->exec(
             static::buildQuery(array_filter([
                 "INSERT INTO $this->table",
-                "SET " . static::arrayToString($sets),
+                "(" . static::arrayToString($columns) . ")",
+                "VALUES " . static::arrayToString($values),
             ])),
             $this->params
         );
 
+        // For multi-row inserts, return the number of rows affected
+        if (count($records) > 1) {
+            return $rowsAffected;
+        }
+
+        // For single-row inserts, return null on failure or the last inserted ID on success
         if ($rowsAffected === 0) {
             return null;
         }
