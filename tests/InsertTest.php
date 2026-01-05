@@ -107,6 +107,37 @@ final class InsertTest extends TestCase {
         $this->assertSame(2, $result);
     }
 
+    public function testMultiRowDifferentOrder(): void {
+        $database = $this->createDatabaseMock();
+
+        // Check the SQL generated
+        $database->expects($this->once())
+            ->method("exec")
+            ->with(
+                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
+                $this->equalTo([
+                    "name__row1" => "John Doe",
+                    "email__row1" => "john@example.com",
+                    "name__row2" => "Jane Doe",
+                    "email__row2" => "jane@example.com",
+                ])
+            )
+            ->willReturn(2)
+        ;
+
+        // Confirm getLastInsertedId isn't called
+        $database->expects($this->never())->method("getLastInsertedId");
+
+        $builder = $this->createBuilder($database);
+        $result = $builder->insert([
+            ["name" => "John Doe", "email" => "john@example.com"],
+            ["email" => "jane@example.com", "name" => "Jane Doe"],
+        ]);
+
+        // Confirm row count is returned for multi-row insert
+        $this->assertSame(2, $result);
+    }
+
     public function testFailure(): void {
         $database = $this->createDatabaseMock();
 
