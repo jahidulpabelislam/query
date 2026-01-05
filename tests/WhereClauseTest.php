@@ -213,11 +213,22 @@ final class WhereClauseTest extends TestCase {
 
     #[AllowMockObjectsWithoutExpectations]
     public function testValues(): void {
+        // Test empty string value
         $builder = $this->createPartialMock(Builder::class, []);
         $where = new Where($builder);
         $where->where("column", "=", "");
         $this->assertSame("WHERE column = :column", (string)$where);
         $this->assertSame(["column" => ""], $builder->getParams());
+
+        // Test using parameter placeholder
+        $builder = $this->createPartialMock(Builder::class, []);
+        $where = new Where($builder);
+        $where->where("column", "=", ":value");
+        $this->assertSame("WHERE column = :value", (string)$where);
+        $this->assertEmpty($builder->getParams()); // Should be empty at this point
+
+        $where->param("value", "test_value");
+        $this->assertSame(["value" => "test_value"], $builder->getParams());
     }
 
     #[AllowMockObjectsWithoutExpectations]
