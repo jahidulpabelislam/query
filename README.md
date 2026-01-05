@@ -130,11 +130,8 @@ $queryBuilder->where("age", "BETWEEN", [18, 65]);
 **IS NULL / IS NOT NULL**: For checking NULL values, use raw expressions
 
 ```php
-// deleted_at IS NULL
-$queryBuilder->where("deleted_at IS NULL");
-
-// email IS NOT NULL
-$queryBuilder->where("email IS NOT NULL");
+$queryBuilder->where("deleted_at", "IS NULL");
+$queryBuilder->where("email, "IS NOT NULL");
 ```
 
 **Subqueries**: Pass a Builder instance as the value to use a subquery
