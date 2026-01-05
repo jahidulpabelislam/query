@@ -259,9 +259,11 @@ class Builder implements WhereableInterface, ParamableInterface {
      * @throws InvalidArgumentException If records are invalid
      */
     public function insert(array $records): ?int {
-        if (!is_numeric(array_key_first($records))) {
+        if (!is_array(reset($records))) {
             $records = [$records];
         }
+
+        $records = array_values($records); // Reindex to ensure numeric keys
 
         if (empty($records[0])) {
             throw new InvalidArgumentException("Record(s) passed to insert() cannot be empty.");
