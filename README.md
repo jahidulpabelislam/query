@@ -75,15 +75,23 @@ join(): static
 By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods if you want those.
 
 ```php
-// Join with a single expression, but can add more to the 2nd parameter
-$queryBuilder->join("another_table", "column_one = another_table_column_one");
+// Simple join: Join users table with orders table
+$queryBuilder->join("orders", "users.id = orders.user_id");
 
-// Nicer syntax adding multiple expressions
+// Join with multiple conditions
 $queryBuilder->join(
-    $queryBuilder->newJoinClause("another_table")
-        ->on("column_one = another_table_column_one")
-        ->on("another_table_column_two > 'active'")
+    $queryBuilder->newJoinClause("orders")
+        ->on("users.id = orders.user_id")
+        ->on("orders.status = 'completed'")
 );
+
+// Left join: Get all users and their orders (if any)
+$queryBuilder->leftJoin("orders", "users.id = orders.user_id");
+
+// Join multiple tables: users -> orders -> order_items
+$queryBuilder
+    ->join("orders", "users.id = orders.user_id")
+    ->join("order_items", "orders.id = order_items.order_id");
 ```
 
 #### `where`
