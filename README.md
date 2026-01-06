@@ -72,26 +72,18 @@ column(string $column, string|null $alias): static
 join(): static
 ```
 
-By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods if you want those.
+By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods instead if you want those.
 
 ```php
-// Simple join: Join users table with orders table
+// Join with a single expression, but can add more to the 2nd parameter
 $queryBuilder->join("orders", "users.id = orders.user_id");
 
-// Join with multiple conditions
+// Nicer syntax adding multiple expressions
 $queryBuilder->join(
     $queryBuilder->newJoinClause("orders")
         ->on("users.id = orders.user_id")
         ->on("orders.status = 'completed'")
 );
-
-// Left join: Get all users and their orders (if any)
-$queryBuilder->leftJoin("orders", "users.id = orders.user_id");
-
-// Join multiple tables: users -> orders -> order_items
-$queryBuilder
-    ->join("orders", "users.id = orders.user_id")
-    ->join("order_items", "orders.id = order_items.order_id");
 ```
 
 #### `where`
