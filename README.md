@@ -439,7 +439,7 @@ $collection = [
 
 As the name implies this method will just return the count as an integer. By default it will do `COUNT(*)`, but you can pass a column name or expression as the first parameter to count non-NULL values in a specific column or use expressions like `DISTINCT`.
 
-For obvious reasons only the `table` & `where` builder methods are supported for this action.
+For obvious reasons only the `table`, `join` &  `where` builder methods are supported for this action.
 
 ```php
 // SELECT COUNT(*) as count FROM users;
@@ -509,7 +509,7 @@ $rowCount = $queryBuilder->insert([
 
 This method will return the count of how many rows have been updated by the query.
 
-`column` & `page` builder methods aren't supported for this action.
+`column`, `join` & `page` builder methods aren't supported for this action.
 
 ```php
 // UPDATE users SET status = "inactive";
@@ -531,7 +531,7 @@ $numberOrRowsUpdated = $queryBuilder
 
 This method will return the count of how many rows have been deleted by the query.
 
-`column` & `page` builder methods aren't supported for this action.
+`column`, `join` & `page` builder methods aren't supported for this action.
 
 ```php
 // DELETE FROM users;
