@@ -99,11 +99,11 @@ $queryBuilder->where("status = 'active'");
 $queryBuilder->where("created_at > NOW()");
 ```
 
-**Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterized queries)
+**Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterised queries)
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
 
-**Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection.
+**Note**: All values (except raw SQL expressions) are automatically parameterised to prevent SQL injection.
 
 ```php
 $queryBuilder->where("status", "=", "active");
