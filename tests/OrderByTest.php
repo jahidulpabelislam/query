@@ -24,23 +24,23 @@ final class OrderByTest extends TestCase {
 
         // Basic single clause
         $orderBy = new OrderBy($builder);
-        $orderBy[] = "column_one";
-        $this->assertSame("ORDER BY column_one", (string)$orderBy);
+        $orderBy[] = "created_at";
+        $this->assertSame("ORDER BY created_at", (string)$orderBy);
 
         // Multiple
         $orderBy = new OrderBy($builder);
-        $orderBy[] = "column_one";
-        $orderBy[] = "column_two";
-        $this->assertSame("ORDER BY column_one, column_two", (string)$orderBy);
+        $orderBy[] = "last_name";
+        $orderBy[] = "first_name";
+        $this->assertSame("ORDER BY last_name, first_name", (string)$orderBy);
 
         // Cloning
         $orderBy1 = new OrderBy($builder);
-        $orderBy1[] = "column_one";
+        $orderBy1[] = "email";
 
         $orderBy2 = clone $orderBy1;
-        $orderBy2[] = "column_two";
+        $orderBy2[] = "created_at";
 
-        $this->assertSame("ORDER BY column_one", (string)$orderBy1); // Shouldn't have changed
-        $this->assertSame("ORDER BY column_one, column_two", (string)$orderBy2); // Should get the new one
+        $this->assertSame("ORDER BY email", (string)$orderBy1); // Shouldn't have changed
+        $this->assertSame("ORDER BY email, created_at", (string)$orderBy2); // Should get the new one
     }
 }
