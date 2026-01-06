@@ -8,9 +8,10 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use JPI\Database\Query\ResultInterface;
+use JsonSerializable;
 use OutOfBoundsException;
 
-class Row implements ArrayAccess, Countable, ResultInterface {
+class Row implements ArrayAccess, Countable, JsonSerializable, ResultInterface {
 
     public function __construct(
         protected array $data
@@ -62,5 +63,9 @@ class Row implements ArrayAccess, Countable, ResultInterface {
 
     public function getIterator(): ArrayIterator {
         return new ArrayIterator($this->toArray());
+    }
+
+    public function jsonSerialize(): array {
+        return $this->data;
     }
 }
