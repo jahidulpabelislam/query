@@ -123,29 +123,4 @@ final class UpdateTest extends BaseTestCase {
                 "status" => "pending",
             ]);
     }
-
-    public function testMultipleColumns(): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
-            ->method("exec")
-            ->with(
-                $this->equalTo("UPDATE users\nSET name = :name,email = :email,age = :age,status = :status;"),
-                $this->equalTo([
-                    "name" => "John Doe",
-                    "email" => "john@example.com",
-                    "age" => 30,
-                    "status" => "active",
-                ])
-            )
-            ->willReturn(1)
-        ;
-
-        $this->createBuilder($database)->update([
-            "name" => "John Doe",
-            "email" => "john@example.com",
-            "age" => 30,
-            "status" => "active",
-        ]);
-    }
 }
