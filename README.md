@@ -122,7 +122,7 @@ $queryBuilder->where("status", "IN", ["active", "pending"]);
 $queryBuilder->where("id", "NOT IN", [1, 2, 3]);
 ```
 
-**Note**: If there is just one value, it will auto optimise and switch to `=` or `<>` operator.
+**Note**: If there is just one value, it will automatically optimise and switch to `=` or `<>` operator.
 
 **BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
 
