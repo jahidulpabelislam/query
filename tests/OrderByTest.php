@@ -9,6 +9,9 @@ use JPI\Database\Query\Clause\OrderBy;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \JPI\Database\Query\Clause\OrderBy
+ */
 final class OrderByTest extends TestCase {
 
     #[AllowMockObjectsWithoutExpectations]
