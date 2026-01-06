@@ -228,7 +228,8 @@ LEFT JOIN orders ON users.id = orders.user_id;",
         $this->assertSame(
             "SELECT *
 FROM users
-INNER JOIN orders ON users.id = orders.user_id LEFT JOIN profiles ON users.id = profiles.user_id;",
+INNER JOIN orders ON users.id = orders.user_id
+LEFT JOIN profiles ON users.id = profiles.user_id;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());

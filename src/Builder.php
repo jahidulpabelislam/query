@@ -172,7 +172,7 @@ class Builder implements WhereableInterface, ParamableInterface {
         $joins = $this->joins;
 
         $columns = !empty($columns) ? static::arrayToString($columns) : "*";
-        $joins = !empty($joins) ? static::arrayToString($joins, " ") : null;
+        $joins = !empty($joins) ? static::arrayToString($joins, "\n") : null;
 
         return static::buildQuery(array_filter([
             "SELECT $columns",
