@@ -22,10 +22,11 @@ final class UpdateTest extends BaseTestCase {
             ->method("exec")
             ->with(
                 $this->equalTo("UPDATE users
-SET name = :name,email = :email;"),
+SET name = :name,email = :email,age = :age;"),
                 $this->equalTo([
                     "name" => "John Doe",
                     "email" => "john@example.com",
+                    "age" => null,
                 ])
             )
             ->willReturn(1)
@@ -34,6 +35,7 @@ SET name = :name,email = :email;"),
         $this->createBuilder($database)->update([
             "name" => "John Doe",
             "email" => "john@example.com",
+            "age" => null,
         ]);
     }
 
