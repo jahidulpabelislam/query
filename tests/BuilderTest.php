@@ -27,8 +27,8 @@ final class BuilderTest extends BaseTestCase {
         $database = $this->createStub(Database::class);
         $database->method("selectAll")
             ->willReturn([
-                ["column_one" => "Value 11", "column_two" => "Value 12"],
-                ["column_one" => "Value 21", "column_two" => "Value 22"],
+                ["first_name" => "John", "last_name" => "Doe"],
+                ["first_name" => "Jane", "last_name" => "Smith"],
             ])
         ;
 
@@ -37,7 +37,7 @@ final class BuilderTest extends BaseTestCase {
                 if (str_contains($query, "as count")) {
                     return ["count" => 2];
                 }
-                return ["column_one" => "Value 11", "column_two" => "Value 12"];
+                return ["first_name" => "John", "last_name" => "Doe"];
             })
         ;
 
@@ -65,45 +65,45 @@ FROM table;",
         $this->assertEmpty($builder->getParams());
 
         // Single column
-        $builder->column("column");
+        $builder->column("email");
         $this->assertSame(
-            "SELECT column
+            "SELECT email
 FROM table;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // + another column with an alias
-        $builder->column("column_two", "column_two_alias");
+        $builder->column("first_name", "name");
         $this->assertSame(
-            "SELECT column,column_two as column_two_alias
+            "SELECT email,first_name as name
 FROM table;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // + single where clause
-        $builder->where("column_one", "=", 1);
+        $builder->where("status", "=", "active");
         $this->assertSame(
-            "SELECT column,column_two as column_two_alias
+            "SELECT email,first_name as name
 FROM table
-WHERE column_one = :column_one;",
+WHERE status = :status;",
             $builder->getSelectQuery()
         );
-        $this->assertSame(["column_one" => 1], $builder->getParams());
+        $this->assertSame(["status" => "active"], $builder->getParams());
 
         // + another where clause
-        $builder->where("column_two", "=", 2);
+        $builder->where("age", ">", 18);
         $this->assertSame(
-            "SELECT column,column_two as column_two_alias
+            "SELECT email,first_name as name
 FROM table
-WHERE column_one = :column_one AND column_two = :column_two;",
+WHERE status = :status AND age > :age;",
             $builder->getSelectQuery()
         );
         $this->assertSame(
             [
-                "column_one" => 1,
-                "column_two" => 2,
+                "status" => "active",
+                "age" => 18,
             ],
             $builder->getParams()
         );
@@ -111,42 +111,42 @@ WHERE column_one = :column_one AND column_two = :column_two;",
         // + inner OR where
         $builder->where(
             $builder->newOrCondition()
-                ->where("column_three", "=", 3)
-                ->where("column_four", "=", 4)
+                ->where("role", "=", "admin")
+                ->where("type", "=", "premium")
         );
         $this->assertSame(
-            "SELECT column,column_two as column_two_alias
+            "SELECT email,first_name as name
 FROM table
-WHERE column_one = :column_one AND column_two = :column_two AND (column_three = :column_three OR column_four = :column_four);",
+WHERE status = :status AND age > :age AND (role = :role OR type = :type);",
             $builder->getSelectQuery()
         );
         $this->assertSame(
             [
-                "column_one" => 1,
-                "column_two" => 2,
-                "column_three" => 3,
-                "column_four" => 4,
+                "status" => "active",
+                "age" => 18,
+                "role" => "admin",
+                "type" => "premium",
             ],
             $builder->getParams()
         );
 
         // Order by
         $builder = $this->createBuilder();
-        $builder->orderBy("column_one");
+        $builder->orderBy("created_at");
         $this->assertSame(
             "SELECT *
 FROM users
-ORDER BY column_one ASC;",
+ORDER BY created_at ASC;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // + another order by
-        $builder->orderBy("column_two", false);
+        $builder->orderBy("last_name", false);
         $this->assertSame(
             "SELECT *
 FROM users
-ORDER BY column_one ASC, column_two DESC;",
+ORDER BY created_at ASC, last_name DESC;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
@@ -174,11 +174,11 @@ LIMIT 5 OFFSET 5;",
 
         // With an inner join
         $builder = $this->createBuilder();
-        $builder->join("table_two", "column_one = column_two");
+        $builder->join("orders", "users.id = orders.user_id");
         $this->assertSame(
             "SELECT *
 FROM users
-INNER JOIN table_two ON column_one = column_two;",
+INNER JOIN orders ON users.id = orders.user_id;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
@@ -186,48 +186,48 @@ INNER JOIN table_two ON column_one = column_two;",
         // With 2 ON conditions on an inner join
         $builder = $this->createBuilder();
         $builder->join(
-            $builder->newJoinClause("table_two")
-                ->on("column_one = column_two")
-                ->on("column_three = column_four")
+            $builder->newJoinClause("orders")
+                ->on("users.id = orders.user_id")
+                ->on("orders.status = 'completed'")
         );
         $this->assertSame(
             "SELECT *
 FROM users
-INNER JOIN table_two ON column_one = column_two AND column_three = column_four;",
+INNER JOIN orders ON users.id = orders.user_id AND orders.status = 'completed';",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // With a right join - using helper/alias method
         $builder = $this->createBuilder();
-        $builder->rightJoin("table_two", "column_one = column_two");
+        $builder->rightJoin("orders", "users.id = orders.user_id");
         $this->assertSame(
             "SELECT *
 FROM users
-RIGHT JOIN table_two ON column_one = column_two;",
+RIGHT JOIN orders ON users.id = orders.user_id;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // With a left join - using helper/alias method
         $builder = $this->createBuilder();
-        $builder->leftJoin("table_two", "column_one = column_two");
+        $builder->leftJoin("orders", "users.id = orders.user_id");
         $this->assertSame(
             "SELECT *
 FROM users
-LEFT JOIN table_two ON column_one = column_two;",
+LEFT JOIN orders ON users.id = orders.user_id;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // 2 joins
         $builder = $this->createBuilder();
-        $builder->join("table_two", "column_one = column_two");
-        $builder->leftJoin("table_three", "column_one = column_two");
+        $builder->join("orders", "users.id = orders.user_id");
+        $builder->leftJoin("profiles", "users.id = profiles.user_id");
         $this->assertSame(
             "SELECT *
 FROM users
-INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_one = column_two;",
+INNER JOIN orders ON users.id = orders.user_id LEFT JOIN profiles ON users.id = profiles.user_id;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
