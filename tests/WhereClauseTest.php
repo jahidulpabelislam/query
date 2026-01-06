@@ -7,7 +7,6 @@ namespace JPI\Database\Query\Tests;
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\Clause\Where;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \JPI\Database\Query\Clause\Where
@@ -17,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  * @covers \JPI\Database\Query\ParamableTrait
  * @covers \JPI\Database\Query\WhereableTrait
  */
-final class WhereClauseTest extends TestCase {
+final class WhereClauseTest extends BaseTestCase {
 
     #[AllowMockObjectsWithoutExpectations]
     public function testAnd(): void {
@@ -241,7 +240,7 @@ final class WhereClauseTest extends TestCase {
 
     #[AllowMockObjectsWithoutExpectations]
     public function testSubquery(): void {
-        $database = $this->createMock(\JPI\Database::class);
+        $database = $this->createDatabase();
 
         $subQuery = new Builder($database, "orders");
         $subQuery->column("customer_id");
@@ -264,7 +263,7 @@ final class WhereClauseTest extends TestCase {
     #[AllowMockObjectsWithoutExpectations]
     public function testMultipleSubqueries(): void {
         // Multiple subqueries in same WHERE clause
-        $database = $this->createMock(\JPI\Database::class);
+        $database = $this->createDatabase();
 
         $subQuery1 = new Builder($database, "premium_users");
         $subQuery1->column("user_id");

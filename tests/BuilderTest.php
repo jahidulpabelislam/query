@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
+use JPI\Database\Query\Result\Collection;
+use JPI\Database\Query\Result\PaginatedCollection;
+use JPI\Database\Query\Result\Row;
 use PHPUnit\Framework\MockObject\Stub;
 
 /**
@@ -235,14 +238,14 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $result = $this->createBuilder()
             ->limit(1)
             ->select();
-        $this->assertInstanceOf(\JPI\Database\Query\Result\Row::class, $result);
+        $this->assertInstanceOf(Row::class, $result);
     }
 
     public function testSelectAll(): void {
         // Without limit always returns Collection
         $result = $this->createBuilder()->select(false);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertNotInstanceOf(PaginatedCollection::class, $result);
     }
 
     public function testSelectWithPagination(): void {
@@ -250,11 +253,11 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $result = $this->createBuilder()
             ->limit(2)
             ->select();
-        $this->assertInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+        $this->assertInstanceOf(PaginatedCollection::class, $result);
     }
 
     public function testSelectWithPaginationFalse(): void {
-        $database = $this->createMock(Database::class);
+        $database = parent::createDatabase();
 
         // Should call selectAll but not selectFirst (which count() uses internally)
         $database->expects($this->once())->method("selectAll");
@@ -264,7 +267,7 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $result = $this->createBuilder($database)
             ->limit(2)
             ->select(false);
-        $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
-        $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertNotInstanceOf(PaginatedCollection::class, $result);
     }
 }
