@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JPI\Database\Query\Tests;
 
 use JPI\Database;
+use JPI\Database\Query\Builder;
 use JPI\Database\Query\Result\Collection;
 use JPI\Database\Query\Result\PaginatedCollection;
 use JPI\Database\Query\Result\Row;
@@ -45,21 +46,21 @@ final class BuilderTest extends BaseTestCase {
     }
 
     public function testSelectBuilding(): void {
-        $builder = $this->createBuilder();
+        $builder = new Builder($this->createDatabase(), "table_one");
 
         // Just select all
         $this->assertSame(
             "SELECT *
-FROM users;",
+FROM table_one;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
 
         // Changing table
-        $builder->table("table");
+        $builder->table("users");
         $this->assertSame(
             "SELECT *
-FROM table;",
+FROM users;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
@@ -68,7 +69,7 @@ FROM table;",
         $builder->column("email");
         $this->assertSame(
             "SELECT email
-FROM table;",
+FROM users;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
@@ -77,7 +78,7 @@ FROM table;",
         $builder->column("first_name", "name");
         $this->assertSame(
             "SELECT email,first_name as name
-FROM table;",
+FROM users;",
             $builder->getSelectQuery()
         );
         $this->assertEmpty($builder->getParams());
@@ -86,7 +87,7 @@ FROM table;",
         $builder->where("status", "=", "active");
         $this->assertSame(
             "SELECT email,first_name as name
-FROM table
+FROM users
 WHERE status = :status;",
             $builder->getSelectQuery()
         );
@@ -96,7 +97,7 @@ WHERE status = :status;",
         $builder->where("age", ">", 18);
         $this->assertSame(
             "SELECT email,first_name as name
-FROM table
+FROM users
 WHERE status = :status AND age > :age;",
             $builder->getSelectQuery()
         );
@@ -116,7 +117,7 @@ WHERE status = :status AND age > :age;",
         );
         $this->assertSame(
             "SELECT email,first_name as name
-FROM table
+FROM users
 WHERE status = :status AND age > :age AND (role = :role OR type = :type);",
             $builder->getSelectQuery()
         );
