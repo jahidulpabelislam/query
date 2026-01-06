@@ -7,9 +7,16 @@ namespace JPI\Database\Query\Tests;
 use JPI\Database\Query\Builder;
 use JPI\Database\Query\Clause\Where;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\TestCase;
 
-final class WhereClauseTest extends TestCase {
+/**
+ * @covers \JPI\Database\Query\Clause\Where
+ * @covers \JPI\Database\Query\Clause\Where\AndCondition
+ * @covers \JPI\Database\Query\Clause\Where\OrCondition
+ * @covers \JPI\Database\Query\DelegatedParamableTrait
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
+final class WhereClauseTest extends BaseTestCase {
 
     #[AllowMockObjectsWithoutExpectations]
     public function testAnd(): void {
@@ -233,7 +240,7 @@ final class WhereClauseTest extends TestCase {
 
     #[AllowMockObjectsWithoutExpectations]
     public function testSubquery(): void {
-        $database = $this->createMock(\JPI\Database::class);
+        $database = $this->createDatabase();
 
         $subQuery = new Builder($database, "orders");
         $subQuery->column("customer_id");
@@ -243,7 +250,9 @@ final class WhereClauseTest extends TestCase {
         $where = new Where($builder);
         $where->where("id", "IN", $subQuery);
 
-        $expected = "WHERE id IN (SELECT customer_id\nFROM orders\nWHERE status = :status)";
+        $expected = "WHERE id IN (SELECT customer_id
+FROM orders
+WHERE status = :status)";
         $this->assertSame($expected, (string)$where);
         $this->assertSame(
             [
@@ -256,7 +265,7 @@ final class WhereClauseTest extends TestCase {
     #[AllowMockObjectsWithoutExpectations]
     public function testMultipleSubqueries(): void {
         // Multiple subqueries in same WHERE clause
-        $database = $this->createMock(\JPI\Database::class);
+        $database = $this->createDatabase();
 
         $subQuery1 = new Builder($database, "premium_users");
         $subQuery1->column("user_id");
@@ -269,7 +278,9 @@ final class WhereClauseTest extends TestCase {
         $where->where("id", "IN", $subQuery1);
         $where->where("id", "NOT IN", $subQuery2);
 
-        $expected = "WHERE id IN (SELECT user_id\nFROM premium_users) AND id NOT IN (SELECT user_id\nFROM banned_users)";
+        $expected = "WHERE id IN (SELECT user_id
+FROM premium_users) AND id NOT IN (SELECT user_id
+FROM banned_users)";
         $this->assertSame($expected, (string)$where);
         $this->assertEmpty($builder->getParams());
     }

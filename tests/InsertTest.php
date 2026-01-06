@@ -6,28 +6,24 @@ namespace JPI\Database\Query\Tests;
 
 use InvalidArgumentException;
 use JPI\Database;
-use JPI\Database\Query\Builder;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-final class InsertTest extends TestCase {
-
-    private function createDatabaseMock(): Database&MockObject {
-        return $this->createMock(Database::class);
-    }
-
-    private function createBuilder(?Database $database = null): Builder {
-        return new Builder($database ?: $this->createDatabaseMock(), "users");
-    }
+/**
+ * @covers \JPI\Database\Query\Builder::insert
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
+final class InsertTest extends BaseTestCase {
 
     public function testLegacySingleRow(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -49,13 +45,15 @@ final class InsertTest extends TestCase {
     }
 
     public function testSingleRow(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -77,13 +75,15 @@ final class InsertTest extends TestCase {
     }
 
     public function testMultiRow(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -108,13 +108,15 @@ final class InsertTest extends TestCase {
     }
 
     public function testMultiRowDifferentOrder(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -139,7 +141,7 @@ final class InsertTest extends TestCase {
     }
 
     public function testFailure(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Simulate failed insert
         $database->method("exec")->willReturn(0);
@@ -155,7 +157,7 @@ final class InsertTest extends TestCase {
     }
 
     public function testMultiRowFailure(): void {
-        $database = $this->createDatabaseMock();
+        $database = $this->createDatabase();
 
         // Simulate failed multi-row insert
         $database->method("exec")->willReturn(0);
