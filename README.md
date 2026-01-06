@@ -103,6 +103,8 @@ $queryBuilder->where("created_at > NOW()");
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
 
+**Note**: `<>` is the SQL standard "not equal" operator and is equivalent to `!=`.
+
 **Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection.
 
 ```php
@@ -131,7 +133,7 @@ $queryBuilder->where("id", "NOT IN", [1, 2, 3]);
 $queryBuilder->where("age", "BETWEEN", [18, 65]);
 ```
 
-**IS NULL / IS NOT NULL**: For checking NULL values, use raw expressions
+**IS NULL / IS NOT NULL**: For checking NULL values, use special two-parameter syntax
 
 ```php
 $queryBuilder->where("deleted_at", "IS NULL");
