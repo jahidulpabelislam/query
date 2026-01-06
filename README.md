@@ -103,8 +103,6 @@ $queryBuilder->where("created_at > NOW()");
 
 **Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
 
-**Note**: `<>` is the SQL standard "not equal" operator and is equivalent to `!=`.
-
 **Note**: All values (except raw SQL expressions) are automatically parameterized to prevent SQL injection.
 
 ```php
