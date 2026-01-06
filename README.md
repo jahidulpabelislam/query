@@ -72,7 +72,7 @@ column(string $column, string|null $alias): static
 join(): static
 ```
 
-By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods  if you want those.
+By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods if you want those.
 
 ```php
 // Join with a single expression, but can add more to the 2nd parameter
