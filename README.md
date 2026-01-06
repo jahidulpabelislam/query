@@ -135,7 +135,7 @@ $queryBuilder->where("age", "BETWEEN", [18, 65]);
 
 ```php
 $queryBuilder->where("deleted_at", "IS NULL");
-$queryBuilder->where("email, "IS NOT NULL");
+$queryBuilder->where("email", "IS NOT NULL");
 ```
 
 **Subqueries**: Pass a Builder instance as the value to use a subquery
