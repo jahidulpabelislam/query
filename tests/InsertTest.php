@@ -52,11 +52,12 @@ VALUES (:name__row1,:email__row1);"),
             ->method("exec")
             ->with(
                 $this->equalTo("INSERT INTO users
-(name,email)
-VALUES (:name__row1,:email__row1);"),
+(name,email,age)
+VALUES (:name__row1,:email__row1,:age__row1);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
+                    "age__row1" => null,
                 ])
             )
             ->willReturn(1)
@@ -68,6 +69,7 @@ VALUES (:name__row1,:email__row1);"),
         $result = $this->createBuilder($database)->insert([[
             "name" => "John Doe",
             "email" => "john@example.com",
+            "age" => null,
         ]]);
 
         // Confirm the last inserted ID is returned
