@@ -110,7 +110,8 @@ $queryBuilder->where("status", "=", "active");
 $queryBuilder->where("age", ">", 18);
 $queryBuilder->where("name", "LIKE", "%john%");
 
-// If you want to manually set the param (use `:`)
+// If you need to control the parameter name yourself (for example, to reuse it across multiple
+// conditions), prefix the placeholder with `:` and then bind it explicitly using `param()`:
 $queryBuilder->where("status", "=", ":status_value");
 $queryBuilder->param("status_value", "active");
 ```
