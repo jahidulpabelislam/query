@@ -141,7 +141,7 @@ $queryBuilder->where("email", "IS NOT NULL");
 **Subqueries**: Pass a Builder instance as the value to use a subquery
 
 ```php
-// id IN (SELECT customer_id FROM orders WHERE status = "completed")
+// id IN (SELECT customer_id FROM orders WHERE status = 'completed')
 $subQuery = new \JPI\Database\Query\Builder($database, "orders");
 $subQuery
     ->column("customer_id")
