@@ -50,17 +50,180 @@ These are the methods to call to end with `select`, `count`, `insert`, `update` 
 
 These are all fluent methods, so you can chain them together.
 
-- `table(string $table, string|null $alias)`: if you want to change to another table or didn't set when creating the instance
-- `column(string $column, string|null $alias)`:  will select all columns if not set
-- `join($joinOrTable, string|null $on, string $type)`:
-    - `$joinOrTable`: instance of `\JPI\Database\Query\Clause\Join` or the table name as string, use the class if you want multiple expressions in the `ON` clause
-    - `type`: `INNER` (default), `LEFT` or `RIGHT`, usually you can leave blank, and use `rightJoin` or `leftJoin` methods
-- `where`:
-    - you can pass in the whole clause using the first parameter
-    - or you can pass column, expression and value separately
-- `orderBy(string $column, bool $ascDirection = true)`
-- `limit(int $limit, int|null $page)`
-- `page(int)`: used to change the offset, only used if `limit` set
+#### `table`
+
+If you want to change to another table or didn't set when creating the instance.
+
+```php
+table(string $table, string|null $alias): static
+```
+
+#### `column`
+
+To select a particular column. Call this method multiple times to select multiple columns. This method is also used to add aggregate functions. If not called, all columns will be selected.
+
+```php
+column(string $column, string|null $alias): static
+```
+
+#### `join`
+
+```php
+join(): static
+```
+
+By default will be a `INNER` join, use `rightJoin` or `leftJoin` methods instead if you want those.
+
+```php
+// Join with a single expression, but can add more to the 2nd parameter
+$queryBuilder->join("orders", "users.id = orders.user_id");
+
+// Nicer syntax adding multiple expressions
+$queryBuilder->join(
+    $queryBuilder->newJoinClause("orders")
+        ->on("users.id = orders.user_id")
+        ->on("orders.status = 'completed'")
+);
+```
+
+#### `where`
+
+Adds an expression to the WHERE clause. This method is very flexible and supports multiple calling patterns:
+
+**Note**: By default, multiple `where()` calls on the builder are combined with AND logic. Also note parameters will be keyed by the column, so if you use the same column for 2 different values, it will use the last value added.
+
+**Raw expression**: Pass a complete expression as the first parameter only
+
+```php
+$queryBuilder->where("status = 'active'");
+$queryBuilder->where("created_at > NOW()");
+```
+
+**Column, operator, value**: Pass column name, operator, and value separately (recommended for security as it uses parameterised queries)
+
+**Supported operators**: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `LIKE`, `IN`, `NOT IN`, `BETWEEN`
+
+**Note**: All values (except raw SQL expressions) are automatically parameterised to prevent SQL injection.
+
+```php
+$queryBuilder->where("status", "=", "active");
+$queryBuilder->where("age", ">", 18);
+$queryBuilder->where("name", "LIKE", "%john%");
+
+// If you need to control the parameter name yourself (for example, to reuse it across multiple
+// conditions), prefix the placeholder with `:` and then bind it explicitly using `param()`:
+$queryBuilder->where("status", "=", ":status_value");
+$queryBuilder->param("status_value", "active");
+```
+
+**IN/NOT IN**:
+
+```php
+$queryBuilder->where("status", "IN", ["active", "pending"]);
+$queryBuilder->where("id", "NOT IN", [1, 2, 3]);
+```
+
+**Note**: If there is just one value, it will automatically optimise and switch to `=` or `<>` operator.
+
+**BETWEEN operator**: Pass an array with exactly 2 values for the BETWEEN operator
+
+```php
+// age BETWEEN 18 AND 65
+$queryBuilder->where("age", "BETWEEN", [18, 65]);
+```
+
+**IS NULL / IS NOT NULL**: For checking NULL values, use special two-parameter syntax
+
+```php
+$queryBuilder->where("deleted_at", "IS NULL");
+$queryBuilder->where("email", "IS NOT NULL");
+```
+
+**Subqueries**: Pass a Builder instance as the value to use a subquery
+
+```php
+// id IN (SELECT customer_id FROM orders WHERE status = 'completed')
+$subQuery = new \JPI\Database\Query\Builder($database, "orders");
+$subQuery
+    ->column("customer_id")
+    ->where("status", "=", "completed");
+$queryBuilder->where("id", "IN", $subQuery);
+```
+
+#### `orderBy`
+
+```php
+orderBy(string $column, bool $ascDirection = true): static
+```
+
+#### `limit`
+
+Add a limit to the query, and optionally set the page at the same time - this sets the `OFFSET`.
+
+```php
+limit(int $limit, int|null $page): static
+```
+
+#### `page`
+
+Used to change the offset, only used if `limit` set.
+
+```php
+page(int $page): static
+```
+
+#### Complex WHERE Conditions
+
+For more complex WHERE clauses that require OR logic or nested conditions, you can use `AndCondition` and `OrCondition` classes.
+
+##### AndCondition
+
+`AndCondition` groups multiple conditions together with AND logic. Create one using `$queryBuilder->newAndCondition()`.
+
+```php
+// (status = "active" AND age > 18)
+$andCondition = $queryBuilder->newAndCondition()
+    ->where("status", "=", "active")
+    ->where("age", ">", 18);
+```
+
+##### OrCondition
+
+`OrCondition` groups multiple conditions together with OR logic. Create one using `$queryBuilder->newOrCondition()`.
+
+```php
+// (status = "active" OR role = "admin")
+$orCondition = $queryBuilder->newOrCondition()
+    ->where("status", "=", "active")
+    ->where("role", "=", "admin");
+```
+
+##### Combining AND and OR Conditions
+
+You can nest `AndCondition` and `OrCondition` to create complex logic:
+
+```php
+// status = 'active' AND (role = 'admin' OR type = 'premium')
+$queryBuilder
+    ->where("status", "=", "active")
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where("role", "=", "admin")
+            ->where("type", "=", "premium")
+    );
+
+// ((status = 'active' AND age > 18) OR type = 'premium')
+$queryBuilder
+    ->where(
+        $queryBuilder->newOrCondition()
+            ->where(
+                $queryBuilder->newAndCondition()
+                    ->where("status", "=", "active")
+                    ->where("age", ">", 18)
+            )
+            ->where("type", "=", "premium")
+    );
+```
 
 ### Examples
 
