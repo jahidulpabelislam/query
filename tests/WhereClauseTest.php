@@ -9,6 +9,14 @@ use JPI\Database\Query\Clause\Where;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \JPI\Database\Query\Clause\Where
+ * @covers \JPI\Database\Query\Clause\Where\AndCondition
+ * @covers \JPI\Database\Query\Clause\Where\OrCondition
+ * @covers \JPI\Database\Query\DelegatedParamableTrait
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
 final class WhereClauseTest extends TestCase {
 
     #[AllowMockObjectsWithoutExpectations]

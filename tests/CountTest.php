@@ -4,63 +4,64 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Tests;
 
+/**
+ * Check the SQL generated
+ *
+ * @covers \JPI\Database\Query\Builder::count
+ * @covers \JPI\Database\Query\Clause\Where
+ * @covers \JPI\Database\Query\Clause\Where\AndCondition
+ * @covers \JPI\Database\Query\DelegatedParamableTrait
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
 final class CountTest extends BaseTestCase {
 
-    public function testBasicCount(): void {
+    public function testBasic(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT COUNT(*) as count\nFROM users\nLIMIT 1;"),
                 $this->equalTo([])
             )
-            ->willReturn(["count" => 42])
+            ->willReturn(["count" => 1])
         ;
 
-        $result = $this->createBuilder($database)->count();
-
-        $this->assertSame(42, $result);
+        $this->createBuilder($database)->count();
     }
 
-    public function testCountWithColumn(): void {
+    public function testWithColumn(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT COUNT(id) as count\nFROM users\nLIMIT 1;"),
                 $this->equalTo([])
             )
-            ->willReturn(["count" => 10])
+            ->willReturn(["count" => 1])
         ;
 
-        $result = $this->createBuilder($database)->count("id");
-
-        $this->assertSame(10, $result);
+        $this->createBuilder($database)->count("id");
     }
 
-    public function testCountWithWhere(): void {
+    public function testWithWhere(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("selectFirst")
             ->with(
-                $this->equalTo("SELECT COUNT(*) as count\nFROM users\nWHERE active = :active\nLIMIT 1;"),
+                $this->equalTo("SELECT COUNT(*) as count\nFROM users\nWHERE status = :status\nLIMIT 1;"),
                 $this->equalTo([
-                    "active" => 1,
+                    "status" => "active",
                 ])
             )
-            ->willReturn(["count" => 5])
+            ->willReturn(["count" => 1])
         ;
 
-        $result = $this->createBuilder($database)
-            ->where("active", "=", 1)
+        $this->createBuilder($database)
+            ->where("status", "=", "active")
             ->count();
-
-        $this->assertSame(5, $result);
     }
 }

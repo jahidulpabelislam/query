@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Tests;
 
+/**
+ * Check the SQL generated.
+ *
+ * @covers \JPI\Database\Query\Builder::delete
+ * @covers \JPI\Database\Query\Clause\Where
+ * @covers \JPI\Database\Query\Clause\Where\AndCondition
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
 final class DeleteTest extends BaseTestCase {
 
-    public function testBasicDelete(): void {
+    public function testBasic(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -22,10 +30,9 @@ final class DeleteTest extends BaseTestCase {
         $this->createBuilder($database)->delete();
     }
 
-    public function testDeleteWithWhere(): void {
+    public function testWithWhere(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -42,28 +49,9 @@ final class DeleteTest extends BaseTestCase {
             ->delete();
     }
 
-    public function testDeleteWithOrderBy(): void {
+    public function testWithLimit(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
-        $database->expects($this->once())
-            ->method("exec")
-            ->with(
-                $this->equalTo("DELETE FROM users\nORDER BY created_at ASC;"),
-                $this->equalTo([])
-            )
-            ->willReturn(3)
-        ;
-
-        $this->createBuilder($database)
-            ->orderBy("created_at", true)
-            ->delete();
-    }
-
-    public function testDeleteWithLimit(): void {
-        $database = $this->createDatabase();
-
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -78,23 +66,39 @@ final class DeleteTest extends BaseTestCase {
             ->delete();
     }
 
-    public function testDeleteWithWhereOrderByAndLimit(): void {
+    public function testWithOrderBy(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("DELETE FROM users\nWHERE active = :active\nORDER BY created_at DESC\nLIMIT 5;"),
+                $this->equalTo("DELETE FROM users\nORDER BY created_at ASC;"),
+                $this->equalTo([])
+            )
+            ->willReturn(3)
+        ;
+
+        $this->createBuilder($database)
+            ->orderBy("created_at", true)
+            ->delete();
+    }
+
+    public function testWithWhereOrderByAndLimit(): void {
+        $database = $this->createDatabase();
+
+        $database->expects($this->once())
+            ->method("exec")
+            ->with(
+                $this->equalTo("DELETE FROM users\nWHERE status = :status\nORDER BY created_at DESC\nLIMIT 5;"),
                 $this->equalTo([
-                    "active" => 0,
+                    "status" => "active",
                 ])
             )
             ->willReturn(5)
         ;
 
         $this->createBuilder($database)
-            ->where("active", "=", 0)
+            ->where("status", "=", "active")
             ->orderBy("created_at", false)
             ->limit(5)
             ->delete();

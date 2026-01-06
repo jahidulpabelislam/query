@@ -7,12 +7,18 @@ namespace JPI\Database\Query\Tests;
 use InvalidArgumentException;
 use JPI\Database;
 
+/**
+ * Check the SQL generated
+ *
+ * @covers \JPI\Database\Query\Builder::insert
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
 final class InsertTest extends BaseTestCase {
 
     public function testLegacySingleRow(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -40,7 +46,6 @@ final class InsertTest extends BaseTestCase {
     public function testSingleRow(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -68,7 +73,6 @@ final class InsertTest extends BaseTestCase {
     public function testMultiRow(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -99,7 +103,6 @@ final class InsertTest extends BaseTestCase {
     public function testMultiRowDifferentOrder(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(

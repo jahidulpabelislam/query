@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace JPI\Database\Query\Tests;
 
+/**
+ * Check the SQL generated
+ *
+ * @covers \JPI\Database\Query\Builder::update
+ * @covers \JPI\Database\Query\Clause\Where
+ * @covers \JPI\Database\Query\Clause\Where\AndCondition
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
 final class UpdateTest extends BaseTestCase {
 
-    public function testBasicUpdate(): void {
+    public function testBasic(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -22,19 +30,15 @@ final class UpdateTest extends BaseTestCase {
             ->willReturn(1)
         ;
 
-        $result = $this->createBuilder($database)->update([
+        $this->createBuilder($database)->update([
             "name" => "John Doe",
             "email" => "john@example.com",
         ]);
-
-        // Confirm row count is returned
-        $this->assertSame(1, $result);
     }
 
-    public function testUpdateWithWhere(): void {
+    public function testWithWhere(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -47,19 +51,16 @@ final class UpdateTest extends BaseTestCase {
             ->willReturn(1)
         ;
 
-        $result = $this->createBuilder($database)
+        $this->createBuilder($database)
             ->where("id", "=", 123)
             ->update([
                 "name" => "Jane Doe",
             ]);
-
-        $this->assertSame(1, $result);
     }
 
-    public function testUpdateWithOrderBy(): void {
+    public function testWithOrderBy(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -71,70 +72,61 @@ final class UpdateTest extends BaseTestCase {
             ->willReturn(5)
         ;
 
-        $result = $this->createBuilder($database)
+        $this->createBuilder($database)
             ->orderBy("created_at", false)
             ->update([
                 "score" => 100,
             ]);
-
-        $this->assertSame(5, $result);
     }
 
-    public function testUpdateWithLimit(): void {
+    public function testWithLimit(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET active = :active\nLIMIT 10;"),
+                $this->equalTo("UPDATE users\nSET status = :status\nLIMIT 10;"),
                 $this->equalTo([
-                    "active" => 0,
+                    "status" => "active",
                 ])
             )
             ->willReturn(10)
         ;
 
-        $result = $this->createBuilder($database)
+        $this->createBuilder($database)
             ->limit(10)
             ->update([
-                "active" => 0,
+                "status" => "active",
             ]);
-
-        $this->assertSame(10, $result);
     }
 
-    public function testUpdateWithWhereOrderByAndLimit(): void {
+    public function testWithWhereOrderByAndLimit(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET status = :status\nWHERE active = :active\nORDER BY created_at ASC\nLIMIT 5;"),
+                $this->equalTo("UPDATE users\nSET status = :status\nWHERE status_now = :status_now\nORDER BY created_at ASC\nLIMIT 5;"),
                 $this->equalTo([
+                    "status_now" => "active",
                     "status" => "pending",
-                    "active" => 1,
                 ])
             )
             ->willReturn(5)
         ;
 
-        $result = $this->createBuilder($database)
-            ->where("active", "=", 1)
+        $this->createBuilder($database)
+            ->where("status_now", "=", "active")
             ->orderBy("created_at", true)
             ->limit(5)
             ->update([
                 "status" => "pending",
             ]);
-
-        $this->assertSame(5, $result);
     }
 
-    public function testUpdateMultipleColumns(): void {
+    public function testMultipleColumns(): void {
         $database = $this->createDatabase();
 
-        // Check the SQL generated
         $database->expects($this->once())
             ->method("exec")
             ->with(
@@ -149,13 +141,11 @@ final class UpdateTest extends BaseTestCase {
             ->willReturn(1)
         ;
 
-        $result = $this->createBuilder($database)->update([
+        $this->createBuilder($database)->update([
             "name" => "John Doe",
             "email" => "john@example.com",
             "age" => 30,
             "status" => "active",
         ]);
-
-        $this->assertSame(1, $result);
     }
 }

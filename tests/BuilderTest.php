@@ -7,6 +7,17 @@ namespace JPI\Database\Query\Tests;
 use JPI\Database;
 use PHPUnit\Framework\MockObject\Stub;
 
+/**
+ * @covers \JPI\Database\Query\Builder
+ * @covers \JPI\Database\Query\Clause\Join
+ * @covers \JPI\Database\Query\Clause\OrderBy
+ * @covers \JPI\Database\Query\Clause\Where
+ * @covers \JPI\Database\Query\Clause\Where\AndCondition
+ * @covers \JPI\Database\Query\Clause\Where\OrCondition
+ * @covers \JPI\Database\Query\DelegatedParamableTrait
+ * @covers \JPI\Database\Query\ParamableTrait
+ * @covers \JPI\Database\Query\WhereableTrait
+ */
 final class BuilderTest extends BaseTestCase {
 
     protected function createDatabase(): Database&Stub {
@@ -256,5 +267,4 @@ INNER JOIN table_two ON column_one = column_two LEFT JOIN table_three ON column_
         $this->assertInstanceOf(\JPI\Database\Query\Result\Collection::class, $result);
         $this->assertNotInstanceOf(\JPI\Database\Query\Result\PaginatedCollection::class, $result);
     }
-
 }
