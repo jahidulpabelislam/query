@@ -60,7 +60,7 @@ table(string $table, string|null $alias): static
 
 #### `column`
 
-To only select a particular column, can be called to select multiple columns, also used to add aggregate functions. If not called will select all columns.
+To select a particular column. Call this method multiple times to select multiple columns. This method is also used to add aggregate functions. If not called, all columns will be selected.
 
 ```php
 column(string $column, string|null $alias): static
