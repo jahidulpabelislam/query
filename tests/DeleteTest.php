@@ -36,7 +36,8 @@ final class DeleteTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("DELETE FROM users\nWHERE id = :id;"),
+                $this->equalTo("DELETE FROM users
+WHERE id = :id;"),
                 $this->equalTo([
                     "id" => 123,
                 ])
@@ -55,7 +56,8 @@ final class DeleteTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("DELETE FROM users\nLIMIT 10;"),
+                $this->equalTo("DELETE FROM users
+LIMIT 10;"),
                 $this->equalTo([])
             )
             ->willReturn(10)
@@ -72,7 +74,8 @@ final class DeleteTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("DELETE FROM users\nORDER BY created_at ASC;"),
+                $this->equalTo("DELETE FROM users
+ORDER BY created_at ASC;"),
                 $this->equalTo([])
             )
             ->willReturn(3)
@@ -89,7 +92,10 @@ final class DeleteTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("DELETE FROM users\nWHERE status = :status\nORDER BY created_at DESC\nLIMIT 5;"),
+                $this->equalTo("DELETE FROM users
+WHERE status = :status
+ORDER BY created_at DESC
+LIMIT 5;"),
                 $this->equalTo([
                     "status" => "active",
                 ])

@@ -21,7 +21,8 @@ final class UpdateTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET name = :name,email = :email;"),
+                $this->equalTo("UPDATE users
+SET name = :name,email = :email;"),
                 $this->equalTo([
                     "name" => "John Doe",
                     "email" => "john@example.com",
@@ -42,7 +43,9 @@ final class UpdateTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET name = :name\nWHERE id = :id;"),
+                $this->equalTo("UPDATE users
+SET name = :name
+WHERE id = :id;"),
                 $this->equalTo([
                     "name" => "Jane Doe",
                     "id" => 123,
@@ -64,7 +67,9 @@ final class UpdateTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET score = :score\nORDER BY created_at DESC;"),
+                $this->equalTo("UPDATE users
+SET score = :score
+ORDER BY created_at DESC;"),
                 $this->equalTo([
                     "score" => 100,
                 ])
@@ -85,7 +90,9 @@ final class UpdateTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET status = :status\nLIMIT 10;"),
+                $this->equalTo("UPDATE users
+SET status = :status
+LIMIT 10;"),
                 $this->equalTo([
                     "status" => "active",
                 ])
@@ -106,7 +113,11 @@ final class UpdateTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("UPDATE users\nSET status = :status\nWHERE status_now = :status_now\nORDER BY created_at ASC\nLIMIT 5;"),
+                $this->equalTo("UPDATE users
+SET status = :status
+WHERE status_now = :status_now
+ORDER BY created_at ASC
+LIMIT 5;"),
                 $this->equalTo([
                     "status_now" => "active",
                     "status" => "pending",

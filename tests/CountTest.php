@@ -22,7 +22,9 @@ final class CountTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("selectFirst")
             ->with(
-                $this->equalTo("SELECT COUNT(*) as count\nFROM users\nLIMIT 1;"),
+                $this->equalTo("SELECT COUNT(*) as count
+FROM users
+LIMIT 1;"),
                 $this->equalTo([])
             )
             ->willReturn(["count" => 1])
@@ -37,7 +39,9 @@ final class CountTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("selectFirst")
             ->with(
-                $this->equalTo("SELECT COUNT(id) as count\nFROM users\nLIMIT 1;"),
+                $this->equalTo("SELECT COUNT(id) as count
+FROM users
+LIMIT 1;"),
                 $this->equalTo([])
             )
             ->willReturn(["count" => 1])
@@ -52,7 +56,10 @@ final class CountTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("selectFirst")
             ->with(
-                $this->equalTo("SELECT COUNT(*) as count\nFROM users\nWHERE status = :status\nLIMIT 1;"),
+                $this->equalTo("SELECT COUNT(*) as count
+FROM users
+WHERE status = :status
+LIMIT 1;"),
                 $this->equalTo([
                     "status" => "active",
                 ])

@@ -250,7 +250,9 @@ final class WhereClauseTest extends BaseTestCase {
         $where = new Where($builder);
         $where->where("id", "IN", $subQuery);
 
-        $expected = "WHERE id IN (SELECT customer_id\nFROM orders\nWHERE status = :status)";
+        $expected = "WHERE id IN (SELECT customer_id
+FROM orders
+WHERE status = :status)";
         $this->assertSame($expected, (string)$where);
         $this->assertSame(
             [
@@ -276,7 +278,9 @@ final class WhereClauseTest extends BaseTestCase {
         $where->where("id", "IN", $subQuery1);
         $where->where("id", "NOT IN", $subQuery2);
 
-        $expected = "WHERE id IN (SELECT user_id\nFROM premium_users) AND id NOT IN (SELECT user_id\nFROM banned_users)";
+        $expected = "WHERE id IN (SELECT user_id
+FROM premium_users) AND id NOT IN (SELECT user_id
+FROM banned_users)";
         $this->assertSame($expected, (string)$where);
         $this->assertEmpty($builder->getParams());
     }

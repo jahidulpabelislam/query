@@ -21,7 +21,9 @@ final class InsertTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -49,7 +51,9 @@ final class InsertTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -77,7 +81,9 @@ final class InsertTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
@@ -108,7 +114,9 @@ final class InsertTest extends BaseTestCase {
         $database->expects($this->once())
             ->method("exec")
             ->with(
-                $this->equalTo("INSERT INTO users\n(name,email)\nVALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
+                $this->equalTo("INSERT INTO users
+(name,email)
+VALUES (:name__row1,:email__row1),(:name__row2,:email__row2);"),
                 $this->equalTo([
                     "name__row1" => "John Doe",
                     "email__row1" => "john@example.com",
