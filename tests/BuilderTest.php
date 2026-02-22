@@ -240,14 +240,13 @@ LEFT JOIN profiles ON users.id = profiles.user_id;",
         $result = $this->createBuilder()
             ->limit(1)
             ->select();
-        $this->assertInstanceOf(Row::class, $result);
+        $this->assertSame(Row::class, $result::class);
     }
 
     public function testSelectAll(): void {
         // Without limit always returns Collection
         $result = $this->createBuilder()->select(false);
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertNotInstanceOf(PaginatedCollection::class, $result);
+        $this->assertSame(Collection::class, $result::class);
     }
 
     public function testSelectWithPagination(): void {
@@ -255,7 +254,7 @@ LEFT JOIN profiles ON users.id = profiles.user_id;",
         $result = $this->createBuilder()
             ->limit(2)
             ->select();
-        $this->assertInstanceOf(PaginatedCollection::class, $result);
+        $this->assertSame(PaginatedCollection::class, $result::class);
     }
 
     public function testSelectWithPaginationFalse(): void {
@@ -269,7 +268,6 @@ LEFT JOIN profiles ON users.id = profiles.user_id;",
         $result = $this->createBuilder($database)
             ->limit(2)
             ->select(false);
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertNotInstanceOf(PaginatedCollection::class, $result);
+        $this->assertSame(Collection::class, $result::class);
     }
 }
