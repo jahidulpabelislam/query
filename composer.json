@@ -31,7 +31,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "JPI\\Database\\Query\\Tests\\": "tests/"
+            "JPI\\Database\\Query\\Tests\\Unit\\": "tests/unit"
         }
     }
 }

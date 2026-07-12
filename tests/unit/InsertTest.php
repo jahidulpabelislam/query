@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\Database\Query\Tests;
+namespace JPI\Database\Query\Tests\Unit;
 
 use InvalidArgumentException;
 use JPI\Database;
